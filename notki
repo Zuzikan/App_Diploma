@@ -1,0 +1,22 @@
+do obliczania paraboli do simpsona: [
+    import numpy as np
+
+    # Define f(x)
+    def f(x):
+        return 0.8 * np.sin(x) + 0.5 * x
+
+    # Points through which P_2(x) must pass
+    x_points = np.array([1, 2.5, 4])
+    y_points = np.array([f(1), f(2.5), f(4)])
+
+    # Matrix for the system of equations
+    A = np.vstack([x_points**2, x_points, np.ones(len(x_points))]).T
+
+    # Solve for the coefficients
+    coefficients = np.linalg.solve(A, y_points)
+
+    # Coefficients of the polynomial
+    a, b, c = coefficients
+
+    print(f"The polynomial P_2(x) = {a}x^2 + {b}x + {c}")
+]

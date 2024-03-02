@@ -1,0 +1,6 @@
+Metoda prostokątów polega na przybliżeniu obszaru ograniczonego wykresem funkcji 
+poprzez wstawianie w ten obszar prostokątów o podstawie równej długości kroku całkowania 
+i wysokości równej wartości funkcji w przedziale określonym przez punkt całkowania.
+
+Jest to jedna z najprostszych metod całkowania numerycznego, która 
+zastępuje funkcję stałą wartością równą wartości funkcji w środku przedziału całkowania.
