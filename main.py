@@ -7,7 +7,7 @@ import metoda_tr
 import metoda_simp
 import regula_3_8
 
-
+#new shit
 class MainWindow(qtw.QDialog):
     def __init__(self):
         super().__init__()
