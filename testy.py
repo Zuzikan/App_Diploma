@@ -29,7 +29,7 @@ class Oblicz(QDialog):
         self.a = QLineEdit(self)
         self.b = QLineEdit(self)
         # l5 = QLabel("n: ", self)
-        l6 = QLabel("Wynik: ", self)
+        self.l6 = QLabel("Wynik: ", self)
         slider = QSlider(Qt.Horizontal, self)
         slider.setMinimum(2)
         slider.setMaximum(50)
@@ -80,8 +80,8 @@ class Oblicz(QDialog):
         layout.addLayout(abHorizontal, 4, 0, 1, 2)
 
         layout.addWidget(oblicz, 5, 0, 1, 2)
-        eq = self.parser()
-        oblicz.clicked.connect(self.metoda_prostokatow(2))
+
+        oblicz.clicked.connect(self.parser)
 
         layout.addWidget(self.wartosc, 6, 0, 1, 2)
 
@@ -95,7 +95,7 @@ class Oblicz(QDialog):
 
         layout.addLayout(sliderLayout, 7, 0, 1, 2)
 
-        layout.addWidget(l6, 7, 3, 1, 2)
+        layout.addWidget(self.l6, 7, 3, 1, 2)
 
         self.setLayout(layout)
         self.setWindowTitle('Oblicz')
@@ -107,17 +107,12 @@ class Oblicz(QDialog):
     def silder_wartosc(self, value):
         self.wartosc.setText(f"Liczba node'ów: {value}")
 
-    def parser(self):
+    def parser(self, value):
         rownanie_string = self.rownanie.text()
-        a = self.a.text()
-        b = self.b.text()
-        ap = simplify(a)
-        bp = simplify(b)
         rownanie_matematyczne = sympify(rownanie_string)
-        return rownanie_matematyczne, ap,bp
+        self.l6.setText(f"Wynik: {value}")
 
-    def metoda_prostokatow(self, n):
-        eq, a, b = self.parser()
+    def metoda_prostokatow(self, n, a, b, eq):
         h = (b - a) / n
         wynik = 0
         for i in range(n):
