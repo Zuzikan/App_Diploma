@@ -16,7 +16,7 @@ class Oblicz(QDialog):
     def initUI(self):
         self.layout = QGridLayout()
         self.sliderLayout = QHBoxLayout()
-        abHorizontal = QHBoxLayout()
+        self.abHorizontal = QHBoxLayout()
 
         l2 = QLabel("Wpisz równanie: ", self)
         self.rownanie = QLineEdit(self)
@@ -28,7 +28,7 @@ class Oblicz(QDialog):
         self.slider.setMinimum(2)
         self.slider.setMaximum(50)
         self.slider.setValue(2)
-        self.n = 2  # Initialize slider value
+        self.n = 2
         start = QLabel('2')
         end = QLabel('50')
         self.wartosc = QLabel("Liczba node'ów: 2", self)
@@ -49,13 +49,13 @@ class Oblicz(QDialog):
         self.layout.addWidget(self.l6, 2, 0)
         self.layout.addWidget(self.wartosc, 3, 0)
 
-        abHorizontal.addWidget(la)
-        abHorizontal.addWidget(self.a)
+        self.abHorizontal.addWidget(la)
+        self.abHorizontal.addWidget(self.a)
 
-        abHorizontal.addWidget(lb)
-        abHorizontal.addWidget(self.b)
+        self.abHorizontal.addWidget(lb)
+        self.abHorizontal.addWidget(self.b)
 
-        self.layout.addLayout(abHorizontal, 4, 0, 1, 2)
+        self.layout.addLayout(self.abHorizontal, 4, 0, 1, 2)
 
         self.sliderLayout.addWidget(start)
         self.sliderLayout.addWidget(self.slider)
@@ -64,8 +64,8 @@ class Oblicz(QDialog):
         self.layout.addLayout(self.sliderLayout, 5, 0, 1, 2)
 
         # Connection
-        self.slider.valueChanged.connect(self.slider_value_changed)
-        oblicz.clicked.connect(self.calculate_result)
+        self.slider.valueChanged.connect(self.slider_nodes)
+        oblicz.clicked.connect(self.get_a_b)
         self.layout.addWidget(self.canvas, 0, 2, 5, 2)
 
         self.setLayout(self.layout)
@@ -86,12 +86,12 @@ class Oblicz(QDialog):
             wynik += self.f(xi) * h
         self.l6.setText(f"Wynik: {wynik}")
 
-    def slider_value_changed(self, value):
+    def slider_nodes(self, value):
         self.n = value
         self.wartosc.setText(f"Liczba node'ów: {value}")
-        self.calculate_result()  # Perform calculation whenever the slider value changes
+        self.get_a_b()
 
-    def calculate_result(self):
+    def get_a_b(self):
         if self.rownanie.text().strip() == "":
             self.l6.setText("Error: Wpisz równanie")
             return
@@ -111,7 +111,7 @@ class Oblicz(QDialog):
             self.l6.setText("Error: a powinno być mniejsze niż b")
             return
         self.metoda_prostokatow(self.n, a, b)
-        self.update_plot(a, b)
+        self.update_wykres(a, b)
 
     def update_wykres(self, a, b):
         if a is None or b is None or a >= b:
@@ -121,19 +121,19 @@ class Oblicz(QDialog):
         ax = self.figure.add_subplot(111)
         ax.set_xlim(a, b)
         h = (b - a) / self.n
-        x_positions = [a + i * h for i in range(self.n)]
-        y_positions = [self.f(a + (i + 0.5) * h) for i in range(self.n)]
-        y_max = max(y_positions)
+        x = [a + i * h for i in range(self.n)]
+        y = [self.f(a + (i + 0.5) * h) for i in range(self.n)]
+        y_max = max(y)
         ax.set_ylim(0, y_max + y_max * 0.1)
 
         for i in range(self.n):
-            rect = Rectangle((x_positions[i], 0), h, y_positions[i], linewidth=1, edgecolor='r', facecolor='r',
+            rect = Rectangle((x[i], 0), h, y[i], linewidth=1, edgecolor='r', facecolor='r',
                              alpha=0.5)
             ax.add_patch(rect)
 
-        x_curve = np.linspace(a, b, 300)
-        y_curve = [self.f(x) for x in x_curve]
-        ax.plot(x_curve, y_curve, 'b-', linewidth=1)
+        x_f = np.linspace(a, b, 300)
+        y_f = [self.f(x) for x in x_f]
+        ax.plot(x_f, y_f, 'b-', linewidth=1)
         self.canvas.draw()
 
 
