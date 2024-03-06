@@ -15,7 +15,6 @@ class MetodaSimp(QDialog):
         self.setStyleSheet("background-color: white;")
         # layouty
         layout_for_buttons = QHBoxLayout()
-        layout_horizontal = QHBoxLayout()
         layout_horizontal_new = QHBoxLayout()
         layout = QVBoxLayout()
 
@@ -40,31 +39,31 @@ class MetodaSimp(QDialog):
 
         for text in labels_1:
             label = QLabel(text)
-            AddLabel(label, layout)
+            add_label(label, layout)
 
-        AddLabel(l5, layout)
+        add_label(l5, layout)
 
         wykres = QPushButton('Pokaż wykres')
         wykres.clicked.connect(self.open_przedzial_simpson)
         layout.addWidget(wykres)
         wykres.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
 
-        AddPic("zdjecia/podprzedzial_h_2.png", layout)
+        add_pic("zdjecia/podprzedzial_h_2.png", layout)
 
-        AddLabel(l1, layout)
+        add_label(l1, layout)
 
-        AddPic("zdjecia/Simpson/przedzial_h_2.png", layout)
+        add_pic("zdjecia/Simpson/przedzial_h_2.png", layout)
 
-        AddLabel(l2, layout)
+        add_label(l2, layout)
 
-        AddPic("zdjecia/Simpson/metoda_simp_wzor.png", layout)
+        add_pic("zdjecia/Simpson/metoda_simp_wzor.png", layout)
 
-        AddLabel(l3, layout)
+        add_label(l3, layout)
 
-        AddPic("zdjecia/Simpson/metoda_simp_blad.png", layout)
+        add_pic("zdjecia/Simpson/metoda_simp_blad.png", layout)
 
-        AddLabel(l4, layout_horizontal_new)
-        AddPic("zdjecia/ksi.png", layout_horizontal_new)
+        add_label(l4, layout_horizontal_new)
+        add_pic("zdjecia/ksi.png", layout_horizontal_new)
         layout.addLayout(layout_horizontal_new)
 
         zamknij = QPushButton('Zamknij program')
@@ -95,12 +94,12 @@ class MetodaSimp(QDialog):
         self.w.show()
 
 
-def AddLabel(name, layout):
+def add_label(name, layout):
     layout.addWidget(name)
     name.setAlignment(qtc.Qt.AlignCenter)
 
 
-def AddPic(path, layout_name):
+def add_pic(path, layout_name):
     label_pic = QLabel()
     label_pic.setPixmap(QPixmap(path))
     label_pic.setAlignment(qtc.Qt.AlignCenter)

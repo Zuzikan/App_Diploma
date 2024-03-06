@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QApplication, QWidget, QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
                              QPushButton, QDialog)
-from PyQt5.QtGui import QIntValidator
+from PyQt5.QtGui import QIntValidator, QFont
 from sympy import sympify, simplify
 
 
@@ -12,6 +12,9 @@ class Oblicz(QDialog):
         self.initUI()
 
     def initUI(self):
+        font = QFont()
+        font.setPointSize(10)
+
         layout = QGridLayout()
         sliderLayout = QHBoxLayout()
         abHorizontal = QHBoxLayout()

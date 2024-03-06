@@ -46,16 +46,16 @@ class MetodaTr(QDialog):
 
         for text in labels_1:
             label = QLabel(text)
-            AddLabel(label, layout)
+            add_label(label, layout)
 
-        AddPic("zdjecia/metoda_tr_jeden_trapez.png", layout)
+        add_pic("zdjecia/metoda_tr_jeden_trapez.png", layout)
 
-        AddLabel(l1, layout)
+        add_label(l1, layout)
 
-        AddPic("zdjecia/metoda_tr_jeden_blad.png", layout)
+        add_pic("zdjecia/metoda_tr_jeden_blad.png", layout)
 
-        AddLabel(l2, layout_horizontal)
-        AddPic("zdjecia/ksi.png", layout_horizontal)
+        add_label(l2, layout_horizontal)
+        add_pic("zdjecia/ksi.png", layout_horizontal)
         layout.addLayout(layout_horizontal)
 
         wykres_kwadrat = QPushButton('Pokaż wykres z jednym trapezem')
@@ -63,25 +63,25 @@ class MetodaTr(QDialog):
         layout.addWidget(wykres_kwadrat)
         wykres_kwadrat.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
 
-        AddLabel(l3, layout)
-        AddLabel(l4, layout)
+        add_label(l3, layout)
+        add_label(l4, layout)
 
-        AddPic("zdjecia/metoda_pr_przedzial.png", layout)
+        add_pic("zdjecia/metoda_pr_przedzial.png", layout)
 
-        AddLabel(l5, layout)
+        add_label(l5, layout)
 
-        AddPic("zdjecia/podprzedzial_h_2.png", layout)
+        add_pic("zdjecia/podprzedzial_h_2.png", layout)
 
-        AddLabel(l6, layout)
+        add_label(l6, layout)
 
-        AddPic("zdjecia/metoda_tr_wiele_trapezow.png", layout)
+        add_pic("zdjecia/metoda_tr_wiele_trapezow.png", layout)
 
-        AddLabel(l7, layout)
+        add_label(l7, layout)
 
-        AddPic("zdjecia/metoda_tr_wiele_blad.png", layout)
+        add_pic("zdjecia/metoda_tr_wiele_blad.png", layout)
 
-        AddLabel(l8, layout_horizontal_new)
-        AddPic("zdjecia/ksi.png", layout_horizontal_new)
+        add_label(l8, layout_horizontal_new)
+        add_pic("zdjecia/ksi.png", layout_horizontal_new)
         layout.addLayout(layout_horizontal_new)
 
         wykres_kwadraty = QPushButton('Pokaż wykres z wieloma trapezami')
@@ -121,12 +121,12 @@ class MetodaTr(QDialog):
         self.w1.show()
 
 
-def AddLabel(name, layout):
+def add_label(name, layout):
     layout.addWidget(name)
     name.setAlignment(qtc.Qt.AlignCenter)
 
 
-def AddPic(path, layout_name):
+def add_pic(path, layout_name):
     label_pic = QLabel()
     label_pic.setPixmap(QPixmap(path))
     label_pic.setAlignment(qtc.Qt.AlignCenter)

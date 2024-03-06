@@ -113,7 +113,7 @@ class Oblicz(QDialog):
         self.metoda_prostokatow(self.n, a, b)
         self.update_plot(a, b)
 
-    def update_plot(self, a, b):
+    def update_wykres(self, a, b):
         if a is None or b is None or a >= b:
             return
 
