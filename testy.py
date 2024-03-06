@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QApplication, QWidget, QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
                              QPushButton, QDialog)
 from PyQt5.QtGui import QIntValidator
+from sympy import sympify, simplify
 
 
 class Oblicz(QDialog):
@@ -21,23 +22,24 @@ class Oblicz(QDialog):
         l1 = QLabel("Porównaj z: ", self)
         l2 = QLabel("Wpisz równanie: ", self)
         l3 = QLabel("Podaj przedział [a,b]:", self)
-        rownanie = QLineEdit(self)
+        self.rownanie = QLineEdit(self)
         instrukcja = QPushButton('Instrukcja', self)
         la = QLabel("a: ", self)
         lb = QLabel("b:", self)
-        a = QLineEdit(self)
-        b = QLineEdit(self)
+        self.a = QLineEdit(self)
+        self.b = QLineEdit(self)
         # l5 = QLabel("n: ", self)
         l6 = QLabel("Wynik: ", self)
         slider = QSlider(Qt.Horizontal, self)
         slider.setMinimum(2)
         slider.setMaximum(50)
+        slider.setValue(2)
         start = QLabel('2')
         end = QLabel('50')
         oblicz = QPushButton('Oblicz', self)
         self.wartosc = QLabel("Liczba node'ów: 2", self)
 
-        slider.valueChanged.connect(self.sliderValueChanged)
+        slider.valueChanged.connect(self.silder_wartosc)
         instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         oblicz.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         slider.setStyleSheet("""
@@ -50,11 +52,11 @@ class Oblicz(QDialog):
                     border-radius:4px;  
                 }
                 """)
-        a.setPlaceholderText("Wpisz wartość a")
-        b.setPlaceholderText("Wpisz wartość b")
-        a.setValidator(QIntValidator())
-        b.setValidator(QIntValidator())
-        rownanie.setPlaceholderText("Wpisz wartość całki")
+        self.a.setPlaceholderText("Wpisz wartość a")
+        self.b.setPlaceholderText("Wpisz wartość b")
+        self.a.setValidator(QIntValidator())
+        self.b.setValidator(QIntValidator())
+        self.rownanie.setPlaceholderText("Wpisz wartość całki")
         l3.setAlignment(Qt.AlignCenter)
         self.wartosc.setAlignment(Qt.AlignCenter)
 
@@ -64,20 +66,22 @@ class Oblicz(QDialog):
         layout.addWidget(combo, 0, 1)
 
         layout.addWidget(l2, 1, 0)
-        layout.addWidget(rownanie, 1, 1)
+        layout.addWidget(self.rownanie, 1, 1)
         layout.addWidget(instrukcja, 2, 0, 1, 2)
 
         layout.addWidget(l3, 3, 0, 1, 2)
 
         abHorizontal.addWidget(la)
-        abHorizontal.addWidget(a)
+        abHorizontal.addWidget(self.a)
 
         abHorizontal.addWidget(lb)
-        abHorizontal.addWidget(b)
+        abHorizontal.addWidget(self.b)
 
         layout.addLayout(abHorizontal, 4, 0, 1, 2)
 
         layout.addWidget(oblicz, 5, 0, 1, 2)
+        eq = self.parser()
+        oblicz.clicked.connect(self.metoda_prostokatow(2))
 
         layout.addWidget(self.wartosc, 6, 0, 1, 2)
 
@@ -100,8 +104,27 @@ class Oblicz(QDialog):
         self.label.setText(f"You selected: {text}")
         self.label.adjustSize()
 
-    def sliderValueChanged(self, value):
+    def silder_wartosc(self, value):
         self.wartosc.setText(f"Liczba node'ów: {value}")
+
+    def parser(self):
+        rownanie_string = self.rownanie.text()
+        a = self.a.text()
+        b = self.b.text()
+        ap = simplify(a)
+        bp = simplify(b)
+        rownanie_matematyczne = sympify(rownanie_string)
+        return rownanie_matematyczne, ap,bp
+
+    def metoda_prostokatow(self, n):
+        eq, a, b = self.parser()
+        h = (b - a) / n
+        wynik = 0
+        for i in range(n):
+            wysokosc = eq(a + i * h)
+            wynik += wysokosc * h
+
+        self.l6.setText(f"Wynik: {wynik}")
 
 
 def main():
