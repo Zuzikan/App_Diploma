@@ -1,4 +1,5 @@
 import sys
+import math
 from PyQt5.QtWidgets import QApplication, QDialog, QGridLayout, QLabel, QLineEdit, QPushButton, QSlider, QHBoxLayout
 from PyQt5.QtCore import Qt
 from sympy import symbols, sympify, lambdify
@@ -21,9 +22,12 @@ class Oblicz(QDialog):
 
         l2 = QLabel("Wpisz równanie: ", self)
         self.rownanie = QLineEdit(self)
-
+        self.error_occured = False
         self.l6 = QLabel("Wynik: ", self)
-        oblicz = QPushButton('Oblicz', self)
+        self.l7 = QLabel("Wynik: ", self)
+        self.oblicz = QPushButton('Oblicz', self)
+
+        #self.check = QPushButton("Check", self)
 
         self.slider = QSlider(Qt.Horizontal, self)
         self.slider.setMinimum(2)
@@ -42,11 +46,12 @@ class Oblicz(QDialog):
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
 
-        oblicz.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+        self.oblicz.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
 
         self.layout.addWidget(l2, 0, 0)
         self.layout.addWidget(self.rownanie, 1, 0)
-        self.layout.addWidget(oblicz, 6, 0)
+        #self.layout.addWidget(self.oblicz, 6, 0)
+        self.layout.addWidget(self.oblicz, 6, 0)
         self.layout.addWidget(self.l6, 2, 0)
         self.layout.addWidget(self.wartosc, 3, 0)
 
@@ -63,34 +68,72 @@ class Oblicz(QDialog):
         self.sliderLayout.addWidget(end)
 
         self.layout.addLayout(self.sliderLayout, 5, 0, 1, 2)
+        self.layout.addWidget(self.l7, 8, 0)
 
         # Connection
         self.slider.valueChanged.connect(self.slider_nodes)
-        oblicz.clicked.connect(self.get_a_b)
+        self.oblicz.clicked.connect(self.check_errors)
+        #self.check.clicked.connect(self.check_errors)
         self.layout.addWidget(self.canvas, 0, 2, 5, 2)
+
+
+
+
 
         self.setLayout(self.layout)
         self.setWindowTitle('Oblicz')
 
-    def f(self, x):
+    def check_errors(self):
         try:
-            rownanie_string = self.rownanie.text()
-            x_sym = symbols('x')
-            rownanie_matematyczne = sympify(rownanie_string)
-            funkcja = lambdify(x_sym, rownanie_matematyczne, 'numpy')
-            return funkcja(x)
-        except SympifyError:
-            self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b")
-            return
+            self.f(1)
+        except Exception as e:
+            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.")
+            self.error_occured = True
+        try:
+            self.get_a_b()
+        except Exception as e:
+            self.error_occured = True
+            return e
 
+
+    def f(self, x):
+        rownanie_string = self.rownanie.text()
+        try:
+            rownanie_matematyczne = sympify(rownanie_string)
+            x_sym = rownanie_matematyczne.free_symbols
+            x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+            if len(x_sym_sorted) != 1:
+                self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
+                return None
+        except Exception as e:
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
+            return None
+        try:
+            funkcja = lambdify(x_sym_sorted, rownanie_matematyczne, 'numpy')
+            return funkcja(x)
+        except Exception as e:
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
+            return None
 
     def metoda_prostokatow(self, n, a, b):
-        h = (b - a) / n
-        wynik = 0
-        for i in range(n):
-            xi = a + (i + 0.5) * h
-            wynik += self.f(xi) * h
-        self.l6.setText(f"Wynik: {wynik}")
+        try:
+            h = (b - a) / n
+            wynik = 0
+            for i in range(n):
+                xi = a + (i + 0.5) * h
+                wynik += self.f(xi) * h
+
+            if math.isnan(wynik):
+                self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
+                self.error_occured = True
+                return None
+            else:
+                self.l6.setText(f"Wynik: {wynik}")
+
+        except Exception as e:
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
+            self.error_occured = True
+            return e
 
     def slider_nodes(self, value):
         self.n = value
@@ -99,22 +142,27 @@ class Oblicz(QDialog):
 
     def get_a_b(self):
         if self.rownanie.text().strip() == "":
-            self.l6.setText("Error: Wpisz równanie")
+            self.l6.setText("Error: Wpisz równanie.")
+            self.error_occured = True
             return
         if self.a.text().strip() == "":
-            self.l6.setText("Error: a nie może być puste")
+            self.l6.setText("Error: a nie może być puste.")
+            self.error_occured = True
             return
         if self.b.text().strip() == "":
-            self.l6.setText("Error: b nie może być puste")
+            self.l6.setText("Error: b nie może być puste.")
+            self.error_occured = True
             return
         try:
             a = int(self.a.text())
             b = int(self.b.text())
         except ValueError:
-            self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b")
+            self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
+            self.error_occured = True
             return
         if a >= b:
-            self.l6.setText("Error: a powinno być mniejsze niż b")
+            self.l6.setText("Error: a powinno być mniejsze niż b.")
+            self.error_occured = True
             return
         self.metoda_prostokatow(self.n, a, b)
         self.update_wykres(a, b)

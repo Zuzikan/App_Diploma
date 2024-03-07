@@ -1,10 +1,11 @@
 import sys
 import numpy as np
 import timeit
+import math
 from sympy import symbols, sympify, lambdify
 from PyQt5.QtCore import Qt, QCoreApplication
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
-                             QPushButton, QDialog)
+                             QPushButton, QDialog, QTabWidget)
 from PyQt5.QtGui import QDoubleValidator, QFont
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -16,6 +17,7 @@ class Oblicz(QDialog):
     def __init__(self):
         super().__init__()
         self.initUI()
+
 
     def initUI(self):
 
@@ -94,7 +96,7 @@ class Oblicz(QDialog):
         layout.addLayout(abHorizontal, 7, 0, 1, 2)
 
         layout.addWidget(oblicz, 8, 0, 1, 2)
-        oblicz.clicked.connect(self.get_a_b)
+        oblicz.clicked.connect(self.check_errors)
 
         layout.addWidget(self.wartosc, 9, 0, 1, 2)
 
@@ -134,25 +136,35 @@ class Oblicz(QDialog):
         self.label.setText(f"You selected: {text}")
         self.label.adjustSize()
 
+    def check_errors(self):
+        try:
+            self.f(1)
+        except Exception as e:
+            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.")
+            self.error_occured = True
+        try:
+            self.get_a_b()
+        except Exception as e:
+            self.error_occured = True
+            return e
+
     def f(self, x):
         rownanie_string = self.rownanie.text()
         try:
-            x_sym = symbols('x')
             rownanie_matematyczne = sympify(rownanie_string)
-        except SympifyError:
-            self.l6.setText("Error: Nieprawidłowe równanie. Sprawdź wpisane dane.")
-            return None
-
-        try:
-            funkcja = lambdify(x_sym, rownanie_matematyczne, 'numpy')
+            x_sym = rownanie_matematyczne.free_symbols
+            x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+            if len(x_sym_sorted) != 1:
+                self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
+                return None
         except Exception as e:
-            self.l6.setText(f"Error: Nie można przetworzyć równania: {e}")
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
             return None
-
         try:
+            funkcja = lambdify(x_sym_sorted, rownanie_matematyczne, 'numpy')
             return funkcja(x)
         except Exception as e:
-            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji: {e}")
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
             return None
 
     def metoda_prostokatow(self, n, a, b):
@@ -162,9 +174,19 @@ class Oblicz(QDialog):
             for i in range(n):
                 xi = a + (i + 0.5) * h
                 wynik += self.f(xi) * h
-            self.l6.setText(f"Wynik: {wynik}")
+
+            if math.isnan(wynik):
+                self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
+                self.error_occured = True
+                return None
+            else:
+                self.l6.setText(f"Wynik: {wynik}")
+
         except Exception as e:
-            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji: {e}")
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
+            self.error_occured = True
+            return e
+
 
     def slider_nodes(self, value):
         self.n = value
@@ -185,20 +207,17 @@ class Oblicz(QDialog):
             a = int(self.a.text())
             b = int(self.b.text())
         except ValueError:
-            self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b")
+            self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
             return
         if a >= b:
-            self.l6.setText("Error: a powinno być mniejsze niż b")
+            self.l6.setText("Error: a powinno być mniejsze niż b.")
             return
-        try:
-            start_time = timeit.default_timer()
-            self.metoda_prostokatow(self.n, a, b)
-            end_time = timeit.default_timer()
-            time = end_time - start_time
-            self.l7.setText(f"Czas potrzebny do obliczenia: {time}")
-        except ValueError as e:
-            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji: {e}")
 
+        start_time = timeit.default_timer()
+        self.metoda_prostokatow(self.n, a, b)
+        end_time = timeit.default_timer()
+        time = end_time - start_time
+        self.l7.setText(f"Czas potrzebny do obliczenia: {time}")
         self.update_wykres(a, b)
 
     def update_wykres(self, a, b):
@@ -220,8 +239,8 @@ class Oblicz(QDialog):
                              alpha=0.5)
             ax.add_patch(rect)
 
-        start = a - 4
-        stop = b + 4
+        start = a - 2
+        stop = b + 2
 
         x_f = np.linspace(start, stop, 300)
         y_f = self.f(x_f)
