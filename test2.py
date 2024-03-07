@@ -6,6 +6,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
 import numpy as np
+from sympy.core.sympify import SympifyError
 
 
 class Oblicz(QDialog):
@@ -72,11 +73,16 @@ class Oblicz(QDialog):
         self.setWindowTitle('Oblicz')
 
     def f(self, x):
-        rownanie_string = self.rownanie.text()
-        x_sym = symbols('x')
-        rownanie_matematyczne = sympify(rownanie_string)
-        funkcja = lambdify(x_sym, rownanie_matematyczne, 'numpy')
-        return funkcja(x)
+        try:
+            rownanie_string = self.rownanie.text()
+            x_sym = symbols('x')
+            rownanie_matematyczne = sympify(rownanie_string)
+            funkcja = lambdify(x_sym, rownanie_matematyczne, 'numpy')
+            return funkcja(x)
+        except SympifyError:
+            self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b")
+            return
+
 
     def metoda_prostokatow(self, n, a, b):
         h = (b - a) / n
