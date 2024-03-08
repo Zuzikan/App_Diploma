@@ -21,8 +21,8 @@ class Oblicz(QDialog):
     def initUI(self):
 
         # self.setStyleSheet("background-color: white;")
-        font = QFont()
-        font.setPointSize(12)
+        self.font = QFont()
+        self.font.setPointSize(9)
 
         layout = QGridLayout()
         sliderLayout = QHBoxLayout()
@@ -30,9 +30,11 @@ class Oblicz(QDialog):
         layout_for_buttons = QHBoxLayout()
 
 
+
         combo = QComboBox(self)
         combo.addItems(["Page 1", "Page 2"])
         l1 = QLabel("Porównaj z: ", self)
+        self.error_ocurred = False
         l2 = QLabel("Wpisz równanie: ", self)
         l3 = QLabel("Podaj przedział [a,b]:", self)
         self.rownanie = QLineEdit(self)
@@ -41,7 +43,7 @@ class Oblicz(QDialog):
         lb = QLabel("b:", self)
         self.a = QLineEdit(self)
         self.b = QLineEdit(self)
-        self.n = 2
+        self.n = 1
         self.l6 = QLabel(self)
         self.l6l = QLabel(self)
         self.l6r = QLabel(self)
@@ -49,13 +51,13 @@ class Oblicz(QDialog):
         self.l7l = QLabel(self)
         self.l7r = QLabel(self)
         self.slider = QSlider(Qt.Horizontal, self)
-        self.slider.setMinimum(2)
+        self.slider.setMinimum(1)
         self.slider.setMaximum(50)
-        self.slider.setValue(2)
-        start = QLabel('2')
+        self.slider.setValue(1)
+        start = QLabel('1')
         end = QLabel('50')
         oblicz = QPushButton('Oblicz', self)
-        self.wartosc = QLabel("Liczba node'ów: 2", self)
+        self.wartosc = QLabel("Liczba node'ów: 1", self)
         self.figure1 = Figure()
         self.canvas1 = FigureCanvas(self.figure1)
         self.figure2 = Figure()
@@ -161,6 +163,7 @@ class Oblicz(QDialog):
         layout.addLayout(layout_for_buttons, 20, 0, 1, 2)
 
         self.setLayout(layout)
+        self.setFontForLayout(layout, self.font)
         self.setWindowTitle('Oblicz')
 
 
@@ -168,11 +171,21 @@ class Oblicz(QDialog):
         self.label.setText(f"You selected: {text}")
         self.label.adjustSize()
 
+
+    def setFontForLayout(self, layout, font):
+        for i in range(layout.count()):
+            widget = layout.itemAt(i).widget()
+            if widget is not None:
+                widget.setFont(font)
+
+
     def check_errors(self):
         try:
             self.f(1)
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
             self.error_occured = True
         try:
             self.get_a_b()
@@ -185,6 +198,8 @@ class Oblicz(QDialog):
             self.f(1)
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
             self.error_occured = True
         try:
             self.get_a_b()
@@ -200,15 +215,27 @@ class Oblicz(QDialog):
             x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
             if len(x_sym_sorted) != 1:
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
+                self.l6l.setText(f"")
+                self.l6r.setText(f" ")
+                self.error_ocurred = True
+
                 return None
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
+            self.l6l.setText(f" ")
+            self.l6r.setText(f" ")
+            self.error_ocurred = True
+
             return None
         try:
             funkcja = lambdify(x_sym_sorted, rownanie_matematyczne, 'numpy')
             return funkcja(x)
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
+            self.error_ocurred = True
+
             return None
 
     def metoda_prostokatow_midpoint(self, n, a, b):
@@ -221,6 +248,8 @@ class Oblicz(QDialog):
 
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
+                self.l6l.setText(f"")
+                self.l6r.setText(f" ")
                 self.error_occured = True
                 return None
             else:
@@ -228,6 +257,8 @@ class Oblicz(QDialog):
 
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
             self.error_occured = True
             return e
 
@@ -241,6 +272,8 @@ class Oblicz(QDialog):
 
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
+                self.l6l.setText(f"")
+                self.l6r.setText(f" ")
                 self.error_occured = True
                 return None
             else:
@@ -248,6 +281,8 @@ class Oblicz(QDialog):
 
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
             self.error_occured = True
             return e
 
@@ -255,12 +290,14 @@ class Oblicz(QDialog):
         try:
             h = (b - a) / n
             wynik = 0
-            for i in range(n+1):
+            for i in range(1, n+1):
                 xi = a + i * h
                 wynik += self.f(xi) * h
 
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
+                self.l6l.setText(f"")
+                self.l6r.setText(f" ")
                 self.error_occured = True
                 return None
             else:
@@ -268,6 +305,8 @@ class Oblicz(QDialog):
 
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
             self.error_occured = True
             return e
 
@@ -279,21 +318,36 @@ class Oblicz(QDialog):
     def get_a_b(self):
         if self.rownanie.text().strip() == "":
             self.l6.setText("Error: Wpisz równanie")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
+            self.error_ocurred = True
             return
         if self.a.text().strip() == "":
             self.l6.setText("Error: a nie może być puste")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
+            self.error_ocurred = True
             return
         if self.b.text().strip() == "":
             self.l6.setText("Error: b nie może być puste")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
+            self.error_ocurred = True
             return
         try:
             a = int(self.a.text())
             b = int(self.b.text())
         except ValueError:
             self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
+            self.error_ocurred = True
             return
         if a >= b:
             self.l6.setText("Error: a powinno być mniejsze niż b.")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
+            self.error_ocurred = True
             return
 
         start_time = timeit.default_timer()
@@ -312,12 +366,13 @@ class Oblicz(QDialog):
         self.metoda_prostokatow_rightside(self.n, a, b)
         end_timer = timeit.default_timer()
         timer = end_timer - start_timer
-        self.l7r.setText(f"Czas potrzebny do obliczenia midpoint: {timer}")
-
-
+        self.l7r.setText(f"Czas potrzebny do obliczenia right side: {timer}")
         self.update_wykres_midpoint(a, b)
         self.update_wykres_leftside(a, b)
         self.update_wykres_rightside(a, b)
+
+
+
 
     def get_a_b_leftside(self):
         if self.rownanie.text().strip() == "":
