@@ -2,7 +2,7 @@ import sys
 import numpy as np
 import timeit
 import math
-from sympy import symbols, sympify, lambdify
+from sympy import sympify, lambdify, solve
 from PyQt5.QtCore import Qt, QCoreApplication
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
                              QPushButton, QDialog, QTabWidget, QVBoxLayout, QWidget)
@@ -29,8 +29,6 @@ class Oblicz(QDialog):
         abHorizontal = QHBoxLayout()
         layout_for_buttons = QHBoxLayout()
 
-
-
         combo = QComboBox(self)
         combo.addItems(["Page 1", "Page 2"])
         l1 = QLabel("Porównaj z: ", self)
@@ -48,8 +46,9 @@ class Oblicz(QDialog):
         self.l6l = QLabel(self)
         self.l6r = QLabel(self)
         self.l7 = QLabel(self)
-        self.l7l = QLabel(self)
-        self.l7r = QLabel(self)
+        self.l8 = QLabel(self)
+        self.l8l = QLabel(self)
+        self.l8r = QLabel(self)
         self.slider = QSlider(Qt.Horizontal, self)
         self.slider.setMinimum(1)
         self.slider.setMaximum(50)
@@ -124,10 +123,11 @@ class Oblicz(QDialog):
         layout.addWidget(self.l6l, 10, 0, 1, 2)
         layout.addWidget(self.l6r, 11, 0, 1, 2)
         layout.addWidget(self.l7, 12, 0, 1, 2)
-        layout.addWidget(self.l7l, 13, 0, 1, 2)
-        layout.addWidget(self.l7r, 14, 0, 1, 2)
+        layout.addWidget(self.l8, 13, 0, 1, 2)
+        layout.addWidget(self.l8l, 14, 0, 1, 2)
+        layout.addWidget(self.l8r, 15, 0, 1, 2)
 
-        #tab for canvas
+        # tab for canvas
         self.tabWidget = QTabWidget(self)
         self.tab1 = QWidget()
         self.tab1.layout = QVBoxLayout(self.tab1)
@@ -145,7 +145,7 @@ class Oblicz(QDialog):
         self.tabWidget.addTab(self.tab2, "Left side")
         self.tabWidget.addTab(self.tab3, "Right side")
 
-        #layout.addWidget(self.canvas, 0, 3, 15, 1)
+        # layout.addWidget(self.canvas, 0, 3, 15, 1)
         layout.addWidget(self.tabWidget, 0, 3, 15, 1)
 
         zamknij = QPushButton('Zamknij program')
@@ -160,17 +160,15 @@ class Oblicz(QDialog):
         layout_for_buttons.addWidget(zamknij)
         layout_for_buttons.addWidget(zamknij_okno)
 
-        layout.addLayout(layout_for_buttons, 20, 0, 1, 2)
+        layout.addLayout(layout_for_buttons, 25, 0, 1, 2)
 
         self.setLayout(layout)
         self.setFontForLayout(layout, self.font)
         self.setWindowTitle('Oblicz')
 
-
     def onActivated(self, text):
         self.label.setText(f"You selected: {text}")
         self.label.adjustSize()
-
 
     def setFontForLayout(self, layout, font):
         for i in range(layout.count()):
@@ -178,34 +176,29 @@ class Oblicz(QDialog):
             if widget is not None:
                 widget.setFont(font)
 
-
     def check_errors(self):
         try:
             self.f(1)
         except Exception as e:
-            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.")
+            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.1")
             self.l6l.setText(f"")
             self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_occured = True
+            return
         try:
             self.get_a_b()
         except Exception as e:
-            self.error_occured = True
-            return e
-
-    def check_errors_leftside(self):
-        try:
-            self.f(1)
-        except Exception as e:
-            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.")
+            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.2")
             self.l6l.setText(f"")
             self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_occured = True
-        try:
-            self.get_a_b()
-        except Exception as e:
-            self.error_occured = True
-            return e
+            return
 
     def f(self, x):
         rownanie_string = self.rownanie.text()
@@ -217,26 +210,51 @@ class Oblicz(QDialog):
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
                 self.l6l.setText(f"")
                 self.l6r.setText(f" ")
+                self.l8.setText(f"")
+                self.l8l.setText(f"")
+                self.l8r.setText(f"")
                 self.error_ocurred = True
 
                 return None
         except Exception as e:
-            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
-            self.l6l.setText(f" ")
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
+            self.l6l.setText(f"")
             self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_ocurred = True
 
             return None
         try:
             funkcja = lambdify(x_sym_sorted, rownanie_matematyczne, 'numpy')
             return funkcja(x)
-        except Exception as e:
-            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
+        except ValueError:
+            self.l6.setText("Error: Wartość nieprawidłowa.")
             self.l6l.setText(f"")
             self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
+            return
+        except Exception as e:
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.4")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
+
             self.error_ocurred = True
 
-            return None
+            return
+
+    def dzielenie_przez_zero(self, funkcja, x):
+        denominator = funkcja.as_numer_denom()[1]
+        punkty = solve(denominator, x)
+        if punkty:
+            self.l7.setText(f"Error: W zakresie [a,b] nie mogą znajdować sie te punkty: {punkty}")
+            return punkty
 
     def metoda_prostokatow_midpoint(self, n, a, b):
         try:
@@ -250,15 +268,22 @@ class Oblicz(QDialog):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
                 self.l6l.setText(f"")
                 self.l6r.setText(f" ")
+                self.l8.setText(f"")
+                self.l8l.setText(f"")
+                self.l8r.setText(f"")
                 self.error_occured = True
                 return None
             else:
                 self.l6.setText(f"Wynik dla midpoint: {wynik}")
+                return wynik
 
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
             self.l6l.setText(f"")
             self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_occured = True
             return e
 
@@ -274,15 +299,22 @@ class Oblicz(QDialog):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
                 self.l6l.setText(f"")
                 self.l6r.setText(f" ")
+                self.l8.setText(f"")
+                self.l8l.setText(f"")
+                self.l8r.setText(f"")
                 self.error_occured = True
                 return None
             else:
-                self.l6l.setText(f"Wynik da leftside: {wynik}")
+                self.l6l.setText(f"Wynik da left side: {wynik}")
+                return wynik
 
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
             self.l6l.setText(f"")
             self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_occured = True
             return e
 
@@ -290,7 +322,7 @@ class Oblicz(QDialog):
         try:
             h = (b - a) / n
             wynik = 0
-            for i in range(1, n+1):
+            for i in range(1, n + 1):
                 xi = a + i * h
                 wynik += self.f(xi) * h
 
@@ -298,15 +330,21 @@ class Oblicz(QDialog):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
                 self.l6l.setText(f"")
                 self.l6r.setText(f" ")
+                self.l8.setText(f"")
+                self.l8l.setText(f"")
+                self.l8r.setText(f"")
                 self.error_occured = True
                 return None
             else:
                 self.l6r.setText(f"Wynik rightside: {wynik}")
-
+                return wynik
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
             self.l6l.setText(f"")
             self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_occured = True
             return e
 
@@ -320,86 +358,105 @@ class Oblicz(QDialog):
             self.l6.setText("Error: Wpisz równanie")
             self.l6l.setText(f"")
             self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_ocurred = True
             return
         if self.a.text().strip() == "":
             self.l6.setText("Error: a nie może być puste")
             self.l6l.setText(f"")
             self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_ocurred = True
             return
         if self.b.text().strip() == "":
             self.l6.setText("Error: b nie może być puste")
             self.l6l.setText(f"")
             self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_ocurred = True
             return
         try:
-            a = int(self.a.text())
-            b = int(self.b.text())
+            a = float(self.a.text())
+            b = float(self.b.text())
         except ValueError:
             self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
             self.l6l.setText(f"")
             self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_ocurred = True
             return
         if a >= b:
             self.l6.setText("Error: a powinno być mniejsze niż b.")
             self.l6l.setText(f"")
             self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_ocurred = True
             return
 
-        start_time = timeit.default_timer()
-        self.metoda_prostokatow_midpoint(self.n, a, b)
-        end_time = timeit.default_timer()
-        time = end_time - start_time
-        self.l7.setText(f"Czas potrzebny do obliczenia midpoint: {time}")
+        rownanie_string = self.rownanie.text()
+        try:
+            rownanie_matematyczne = sympify(rownanie_string)
+            x_sym = rownanie_matematyczne.free_symbols
+            if not x_sym:
+                self.l6.setText("Error: Brak zmiennej w równaniu.")
+                return
+            x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+        except SympifyError:
+            self.l6.setText("Error: Nie można przekształcić wprowadzonego równania.")
+            return
+        zera = self.dzielenie_przez_zero(rownanie_matematyczne, x_sym_sorted)
 
-        start_timel = timeit.default_timer()
-        self.metoda_prostokatow_leftside(self.n, a, b)
-        end_timel = timeit.default_timer()
-        timel = end_timel - start_timel
-        self.l7l.setText(f"Czas potrzebny do obliczenia left side: {timel}")
+        if zera:
+            for i in zera:
+                if i == a or i == b or a <= i <= b:
+                    self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b. 1")
+                    return
 
-        start_timer = timeit.default_timer()
-        self.metoda_prostokatow_rightside(self.n, a, b)
-        end_timer = timeit.default_timer()
-        timer = end_timer - start_timer
-        self.l7r.setText(f"Czas potrzebny do obliczenia right side: {timer}")
+        try:
+            start_time = timeit.default_timer()
+            result_midpoint = self.metoda_prostokatow_midpoint(self.n, a, b)
+            end_time = timeit.default_timer()
+            if result_midpoint is None:
+                self.l6.setText("Error: Problem z obliczeniem wartości dla midpoint.")
+                return
+            time = end_time - start_time
+            self.l8.setText(f"Czas potrzebny do obliczenia midpoint: {time}")
+
+            start_timel = timeit.default_timer()
+            result_leftside = self.metoda_prostokatow_leftside(self.n, a, b)
+            end_timel = timeit.default_timer()
+            if result_leftside is None:
+                self.l6l.setText("Error: Problem z obliczeniem wartości dla left side.")
+                return
+            timel = end_timel - start_timel
+            self.l8l.setText(f"Czas potrzebny do obliczenia left side: {timel}")
+
+            start_timer = timeit.default_timer()
+            result_rightside = self.metoda_prostokatow_rightside(self.n, a, b)
+            end_timer = timeit.default_timer()
+            if result_rightside is None:
+                self.l6r.setText("Error: Problem z obliczeniem wartości dla right side.")
+                return
+            timer = end_timer - start_timer
+            self.l8r.setText(f"Czas potrzebny do obliczenia right side: {timer}")
+        except Exception as e:
+            self.l6.setText(f"Error: Wystąpił problem podczas obliczeń.")
+            return
+
         self.update_wykres_midpoint(a, b)
         self.update_wykres_leftside(a, b)
         self.update_wykres_rightside(a, b)
 
-
-
-
-    def get_a_b_leftside(self):
-        if self.rownanie.text().strip() == "":
-            self.l6.setText("Error: Wpisz równanie")
-            return
-        if self.a.text().strip() == "":
-            self.l6.setText("Error: a nie może być puste")
-            return
-        if self.b.text().strip() == "":
-            self.l6.setText("Error: b nie może być puste")
-            return
-        try:
-            a = int(self.a.text())
-            b = int(self.b.text())
-        except ValueError:
-            self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
-            return
-        if a >= b:
-            self.l6.setText("Error: a powinno być mniejsze niż b.")
-            return
-
-        start_time = timeit.default_timer()
-        self.metoda_prostokatow_leftside(self.n, a, b)
-        end_time = timeit.default_timer()
-        time = end_time - start_time
-        self.l7.setText(f"Czas potrzebny do obliczenia: {time}")
-        self.update_wykres_leftside(a, b)
 
     def update_wykres_midpoint(self, a, b):
         if a is None or b is None or a >= b:
