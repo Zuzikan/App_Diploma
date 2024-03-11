@@ -3,7 +3,7 @@ import numpy as np
 import timeit
 import math
 from sympy import sympify, lambdify, solve
-from PyQt5.QtCore import Qt, QCoreApplication
+from PyQt5.QtCore import Qt, QCoreApplication, QLocale
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
                              QPushButton, QDialog, QTabWidget, QVBoxLayout, QWidget)
 from PyQt5.QtGui import QDoubleValidator, QFont
@@ -69,10 +69,12 @@ class ObliczTrapezy(QDialog):
                     border-radius:4px;  
                 }
                 """)
+        validator = QDoubleValidator()
+        validator.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.a.setPlaceholderText("Wpisz wartość a")
         self.b.setPlaceholderText("Wpisz wartość b")
-        self.a.setValidator(QDoubleValidator())
-        self.b.setValidator(QDoubleValidator())
+        self.a.setValidator(validator)
+        self.b.setValidator(validator)
         self.rownanie.setPlaceholderText("Wpisz wartość całki")
         l3.setAlignment(Qt.AlignCenter)
         self.wartosc.setAlignment(Qt.AlignCenter)
