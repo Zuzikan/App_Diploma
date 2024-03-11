@@ -160,7 +160,7 @@ class Oblicz(QDialog):
         layout.addLayout(layout_for_buttons, 18, 0, 1, 2)
 
         self.setLayout(layout)
-        self.setWindowTitle('Oblicz')
+        self.setWindowTitle('Metoda prostokątów')
 
     def onActivated(self, text):
         self.label.setText(f"You selected: {text}")
