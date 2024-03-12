@@ -30,7 +30,7 @@ class Regula38(QDialog):
             "nieparzystej liczby segmentów (parzystej liczby punktów). "
         ]
 
-        l1 = QLabel("JNa przedziale [a,b], równomiernie rozmieszczamy węzły x<sub>0</sub>=a, x<sub>1</sub>=a+h, "
+        l1 = QLabel("Na przedziale [a,b], równomiernie rozmieszczamy węzły x<sub>0</sub>=a, x<sub>1</sub>=a+h, "
                     "x<sub>2</sub>=2a+h i x<sub>3</sub>=b, gdzie:")
         l2 = QLabel("n to liczba przedziałów, a w tym przypadku n=3, więc:")
         l3 = QLabel("Zatem:")

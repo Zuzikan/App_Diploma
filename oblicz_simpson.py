@@ -2,6 +2,8 @@ import sys
 import numpy as np
 import timeit
 import math
+
+from scipy.interpolate import CubicSpline
 from sympy import sympify, lambdify, solve
 from PyQt5.QtCore import Qt, QCoreApplication, QLocale
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
@@ -41,18 +43,18 @@ class ObliczTrapezy(QDialog):
         lb = QLabel("b:", self)
         self.a = QLineEdit(self)
         self.b = QLineEdit(self)
-        self.n = 1
+        self.n = 2
         self.l6 = QLabel(self)
         self.l7 = QLabel(self)
         self.l8 = QLabel(self)
         self.slider = QSlider(Qt.Horizontal, self)
-        self.slider.setMinimum(1)
+        self.slider.setMinimum(2)
         self.slider.setMaximum(50)
-        self.slider.setValue(1)
-        start = QLabel('1')
+        self.slider.setValue(2)
+        start = QLabel('2')
         end = QLabel('50')
         oblicz = QPushButton('Oblicz', self)
-        self.wartosc = QLabel("Liczba node'ów: 1", self)
+        self.wartosc = QLabel("Liczba node'ów: 2", self)
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
 
@@ -135,7 +137,7 @@ class ObliczTrapezy(QDialog):
 
         self.setLayout(layout)
         self.setFontForLayout(layout, self.font)
-        self.setWindowTitle('Obliczenia metoda trapezów')
+        self.setWindowTitle('Obliczenia metoda Simpsona')
 
     def onActivated(self, text):
         self.label.setText(f"You selected: {text}")
@@ -227,17 +229,26 @@ class ObliczTrapezy(QDialog):
             self.l7.setText(f"Error: W zakresie [a,b] nie mogą znajdować sie te punkty: {punkty}")
             return punkty
 
-    def metoda_trapezow(self, n, a, b):
+    def metoda_simpsona(self, n, a, b):
         try:
+
+            if n % 2 == 1:
+                self.l8.setText(f"")
+                raise ValueError(self.l6.setText("Metoda Simpsona przyjmuje tylko parzystą liczbę przedziałów."))
+
             h = (b - a) / n
-            wynik = 0
-            for i in range(1, n):
+            wynik = self.f(a) + self.f(b)
+
+            for i in range(1, n, 2):
                 xi = a + i * h
-                wynik += self.f(xi) * 2
+                wynik += 4 * self.f(xi)
+            for i in range(2, n - 1, 2):
+                xi = a + i * h
+                wynik += 2 * self.f(xi)
 
-            calka = (h / 2) * (self.f(a) + wynik + self.f(b))
+            wynik *= h / 3
 
-            if math.isnan(wynik) or math.isnan(calka):
+            if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
                 self.l6l.setText(f"")
                 self.l6r.setText(f" ")
@@ -247,8 +258,8 @@ class ObliczTrapezy(QDialog):
                 self.error_occured = True
                 return None
             else:
-                self.l6.setText(f"Wynik: {calka}")
-                return calka
+                self.l6.setText(f"Wynik: {wynik}")
+                return wynik
 
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
@@ -261,8 +272,11 @@ class ObliczTrapezy(QDialog):
             return e
 
     def slider_nodes(self, value):
-        self.n = value
-        self.wartosc.setText(f"Liczba node'ów: {value}")
+        if value % 2 != 0:
+            self.n = value - 1
+        else:
+            self.n = value
+        self.wartosc.setText(f"Liczba node'ów: {self.n}")
         self.get_a_b()
 
     def get_a_b(self):
@@ -336,9 +350,9 @@ class ObliczTrapezy(QDialog):
 
         try:
             start_time = timeit.default_timer()
-            result_trapezoidal = self.metoda_trapezow(self.n, a, b)
+            result_simpson = self.metoda_simpsona(self.n, a, b)
             end_time = timeit.default_timer()
-            if result_trapezoidal is None:
+            if result_simpson is None:
                 self.l6.setText("Error: Problem z obliczeniem wartości.")
                 return
             time = end_time - start_time
@@ -353,19 +367,29 @@ class ObliczTrapezy(QDialog):
         if a is None or b is None or a >= b:
             return
 
+        if self.n % 2 != 0:
+            self.n += 1
+
         self.figure.clear()
         ax = self.figure.add_subplot(111)
-        h = (b - a) / self.n
         x_points = np.linspace(a, b, self.n + 1)
         y_points = self.f(x_points)
-        ax.grid(True, alpha=0.2)
         x_fine = np.linspace(a, b, 300)
         y_fine = self.f(x_fine)
-        ax.plot(x_fine, y_fine, 'b-', linewidth=1)
-        for i in range(self.n):
-            xs = [x_points[i], x_points[i], x_points[i + 1], x_points[i + 1]]
-            ys = [0, y_points[i], y_points[i + 1], 0]
-            ax.fill(xs, ys, 'r', edgecolor='r', alpha=0.3)
+
+        ax.plot(x_fine, y_fine, 'b-', linewidth=1, label='Podana funkcja')
+
+        for i in range(0, self.n, 2):
+            x_sub = x_points[i:i + 3]
+            y_sub = y_points[i:i + 3]
+
+            cs = CubicSpline(x_sub, y_sub, bc_type='natural')
+
+            x_sub_fine = np.linspace(x_sub[0], x_sub[-1], 100)
+            ax.plot(x_sub_fine, cs(x_sub_fine), 'r-', alpha=0.7, label='Funkcja dla metody Simpsona' if i == 0 else "")
+
+        ax.grid(True, alpha=0.3)
+        ax.legend()
 
         self.canvas.draw()
 
