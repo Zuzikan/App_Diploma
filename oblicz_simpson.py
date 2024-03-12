@@ -154,22 +154,14 @@ class ObliczTrapezy(QDialog):
             self.f(1)
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.1")
-            self.l6l.setText(f"")
-            self.l6r.setText(f" ")
             self.l8.setText(f"")
-            self.l8l.setText(f"")
-            self.l8r.setText(f"")
             self.error_occured = True
             return
         try:
             self.get_a_b()
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.2")
-            self.l6l.setText(f"")
-            self.l6r.setText(f" ")
             self.l8.setText(f"")
-            self.l8l.setText(f"")
-            self.l8r.setText(f"")
             self.error_occured = True
             return
 
@@ -181,21 +173,13 @@ class ObliczTrapezy(QDialog):
             x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
             if len(x_sym_sorted) != 1:
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
-                self.l6l.setText(f"")
-                self.l6r.setText(f" ")
                 self.l8.setText(f"")
-                self.l8l.setText(f"")
-                self.l8r.setText(f"")
                 self.error_ocurred = True
 
                 return None
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
-            self.l6l.setText(f"")
-            self.l6r.setText(f" ")
             self.l8.setText(f"")
-            self.l8l.setText(f"")
-            self.l8r.setText(f"")
             self.error_ocurred = True
 
             return None
@@ -204,19 +188,11 @@ class ObliczTrapezy(QDialog):
             return funkcja(x)
         except ValueError:
             self.l6.setText("Error: Wartość nieprawidłowa.")
-            self.l6l.setText(f"")
-            self.l6r.setText(f" ")
             self.l8.setText(f"")
-            self.l8l.setText(f"")
-            self.l8r.setText(f"")
             return
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.4")
-            self.l6l.setText(f"")
-            self.l6r.setText(f" ")
             self.l8.setText(f"")
-            self.l8l.setText(f"")
-            self.l8r.setText(f"")
 
             self.error_ocurred = True
 
@@ -250,11 +226,7 @@ class ObliczTrapezy(QDialog):
 
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
-                self.l6l.setText(f"")
-                self.l6r.setText(f" ")
                 self.l8.setText(f"")
-                self.l8l.setText(f"")
-                self.l8r.setText(f"")
                 self.error_occured = True
                 return None
             else:
@@ -263,11 +235,7 @@ class ObliczTrapezy(QDialog):
 
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
-            self.l6l.setText(f"")
-            self.l6r.setText(f" ")
             self.l8.setText(f"")
-            self.l8l.setText(f"")
-            self.l8r.setText(f"")
             self.error_occured = True
             return e
 
@@ -282,29 +250,17 @@ class ObliczTrapezy(QDialog):
     def get_a_b(self):
         if self.rownanie.text().strip() == "":
             self.l6.setText("Error: Wpisz równanie")
-            self.l6l.setText(f"")
-            self.l6r.setText(f" ")
             self.l8.setText(f"")
-            self.l8l.setText(f"")
-            self.l8r.setText(f"")
             self.error_ocurred = True
             return
         if self.a.text().strip() == "":
             self.l6.setText("Error: a nie może być puste")
-            self.l6l.setText(f"")
-            self.l6r.setText(f" ")
             self.l8.setText(f"")
-            self.l8l.setText(f"")
-            self.l8r.setText(f"")
             self.error_ocurred = True
             return
         if self.b.text().strip() == "":
             self.l6.setText("Error: b nie może być puste")
-            self.l6l.setText(f"")
-            self.l6r.setText(f" ")
             self.l8.setText(f"")
-            self.l8l.setText(f"")
-            self.l8r.setText(f"")
             self.error_ocurred = True
             return
         try:
@@ -312,20 +268,12 @@ class ObliczTrapezy(QDialog):
             b = float(self.b.text())
         except ValueError:
             self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
-            self.l6l.setText(f"")
-            self.l6r.setText(f" ")
             self.l8.setText(f"")
-            self.l8l.setText(f"")
-            self.l8r.setText(f"")
             self.error_ocurred = True
             return
         if a >= b:
             self.l6.setText("Error: a powinno być mniejsze niż b.")
-            self.l6l.setText(f"")
-            self.l6r.setText(f" ")
             self.l8.setText(f"")
-            self.l8l.setText(f"")
-            self.l8r.setText(f"")
             self.error_ocurred = True
             return
 
