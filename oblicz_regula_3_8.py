@@ -15,7 +15,7 @@ from matplotlib.patches import Rectangle
 from sympy.core.sympify import SympifyError
 
 
-class ObliczSimpson(QDialog):
+class ObliczRegula(QDialog):
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -136,7 +136,7 @@ class ObliczSimpson(QDialog):
 
         self.setLayout(layout)
         self.setFontForLayout(layout, self.font)
-        self.setWindowTitle('Obliczenia metoda Simpsona')
+        self.setWindowTitle('Obliczenia reguła 3/8')
 
     def onActivated(self, text):
         self.label.setText(f"You selected: {text}")
@@ -204,24 +204,27 @@ class ObliczSimpson(QDialog):
             self.l7.setText(f"Error: W zakresie [a,b] nie mogą znajdować sie te punkty: {punkty}")
             return punkty
 
-    def metoda_simpsona(self, n, a, b):
+    def regula_3_8(self, n, a, b):
         try:
 
-            if n % 2 == 1:
+            if n % 3 == 1:
                 self.l8.setText(f"")
-                raise ValueError(self.l6.setText("Metoda Simpsona przyjmuje tylko parzystą liczbę przedziałów."))
+                raise ValueError(self.l6.setText("Reguła 3/8 przyjmuje tylko nieparzystą liczbę przedziałów."))
 
             h = (b - a) / n
             wynik = self.f(a) + self.f(b)
 
-            for i in range(1, n, 2):
+            for i in range(1, n, 3):
                 xi = a + i * h
-                wynik += 4 * self.f(xi)
-            for i in range(2, n - 1, 2):
+                wynik += 3 * self.f(xi)
+            for i in range(2, n, 3):
+                xi = a + i * h
+                wynik += 3 * self.f(xi)
+            for i in range(3, n - 2, 3):
                 xi = a + i * h
                 wynik += 2 * self.f(xi)
 
-            wynik *= h / 3
+            wynik *= 3 * h / 8
 
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
@@ -297,9 +300,9 @@ class ObliczSimpson(QDialog):
 
         try:
             start_time = timeit.default_timer()
-            result_simpson = self.metoda_simpsona(self.n, a, b)
+            result_regula = self.regula_3_8(self.n, a, b)
             end_time = timeit.default_timer()
-            if result_simpson is None:
+            if result_regula is None:
                 self.l6.setText("Error: Problem z obliczeniem wartości.")
                 return
             time = end_time - start_time
@@ -343,7 +346,7 @@ class ObliczSimpson(QDialog):
 
 def main():
     app = QApplication(sys.argv)
-    ex = ObliczSimpson()
+    ex = ObliczRegula()
     ex.show()
     sys.exit(app.exec_())
 
