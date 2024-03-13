@@ -7,11 +7,10 @@ from scipy.interpolate import CubicSpline
 from sympy import sympify, lambdify, solve
 from PyQt5.QtCore import Qt, QCoreApplication, QLocale
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
-                             QPushButton, QDialog, QTabWidget, QVBoxLayout, QWidget)
+                             QPushButton, QDialog)
 from PyQt5.QtGui import QDoubleValidator, QFont
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from matplotlib.patches import Rectangle
 from sympy.core.sympify import SympifyError
 
 

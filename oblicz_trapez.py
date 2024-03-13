@@ -3,7 +3,6 @@ import numpy as np
 import timeit
 import math
 
-from matplotlib import pyplot as plt
 from sympy import sympify, lambdify, solve
 from PyQt5.QtCore import Qt, QCoreApplication, QLocale
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
