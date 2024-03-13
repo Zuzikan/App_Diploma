@@ -459,20 +459,18 @@ class Oblicz(QDialog):
         self.update_wykres_leftside(a, b)
         self.update_wykres_rightside(a, b)
 
-
     def update_wykres_midpoint(self, a, b):
         if a is None or b is None or a >= b:
             return
 
         self.figure1.clear()
         ax = self.figure1.add_subplot(111)
-        # ax.set_xlim(a, b)
+
         h = (b - a) / self.n
         x = [a + i * h for i in range(self.n)]
         y = [self.f(a + (i + 0.5) * h) for i in range(self.n)]
         ax.grid(True, alpha=0.2)
-        y_max = max(y)
-        # ax.set_ylim(0, y_max + y_max * 0.1)
+        ax.scatter(x, y, color='red', marker=".")
 
         for i in range(self.n):
             rect = Rectangle((x[i], 0), h, y[i], linewidth=1, edgecolor='r', facecolor='r',
@@ -493,12 +491,12 @@ class Oblicz(QDialog):
 
         self.figure2.clear()
         ax = self.figure2.add_subplot(111)
-        # ax.set_xlim(a, b)
+
         h = (b - a) / self.n
         x_left = [a + i * h for i in range(self.n)]
         y_left = [self.f(x) for x in x_left]
+        ax.scatter(x_left, y_left, color='red', marker=".")
         ax.grid(True, alpha=0.2)
-        y_max = max(y_left) if y_left else 0
         for i in range(len(x_left)):
             rect = Rectangle((x_left[i], 0), h, y_left[i], linewidth=1, edgecolor='r', facecolor='r', alpha=0.5)
             ax.add_patch(rect)
@@ -518,6 +516,7 @@ class Oblicz(QDialog):
         h = (b - a) / self.n
         x_right = [a + (i + 1) * h for i in range(self.n)]
         y_right = [self.f(x) for x in x_right]
+        ax.scatter(x_right, y_right, color='red', marker=".")
         ax.grid(True, alpha=0.2)
         for i in range(self.n):
             rect = Rectangle((x_right[i] - h, 0), h, y_right[i], linewidth=1, edgecolor='r', facecolor='r', alpha=0.5)

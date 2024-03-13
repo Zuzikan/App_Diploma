@@ -323,7 +323,7 @@ class ObliczSimpson(QDialog):
         y_points = self.f(x_points)
         x_fine = np.linspace(a, b, 300)
         y_fine = self.f(x_fine)
-
+        ax.scatter(x_points, y_points, color='red', marker=".")
         ax.plot(x_fine, y_fine, 'b-', linewidth=1, label=self.rownanie.text())
 
         for i in range(0, self.n, 2):
@@ -332,7 +332,7 @@ class ObliczSimpson(QDialog):
 
             cs = CubicSpline(x_sub, y_sub, bc_type='natural')
 
-            x_sub_fine = np.linspace(x_sub[0], x_sub[-1], 100)
+            x_sub_fine = np.linspace(x_sub[0], x_sub[-1], 300)
             ax.plot(x_sub_fine, cs(x_sub_fine), 'r-', alpha=0.7, label='Funkcja dla metody Simpsona' if i == 0 else "")
 
         ax.grid(True, alpha=0.3)

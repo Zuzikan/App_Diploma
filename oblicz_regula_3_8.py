@@ -43,18 +43,18 @@ class ObliczRegula(QDialog):
         lb = QLabel("b:", self)
         self.a = QLineEdit(self)
         self.b = QLineEdit(self)
-        self.n = 2
+        self.n = 1
         self.l6 = QLabel(self)
         self.l7 = QLabel(self)
         self.l8 = QLabel(self)
         self.slider = QSlider(Qt.Horizontal, self)
-        self.slider.setMinimum(2)
+        self.slider.setMinimum(3)
         self.slider.setMaximum(50)
-        self.slider.setValue(2)
-        start = QLabel('2')
-        end = QLabel('50')
+        self.slider.setValue(3)
+        start = QLabel('3')
+        end = QLabel('60')
         oblicz = QPushButton('Oblicz', self)
-        self.wartosc = QLabel("Liczba node'ów: 2", self)
+        self.wartosc = QLabel("Liczba node'ów: 3", self)
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
 
@@ -212,17 +212,8 @@ class ObliczRegula(QDialog):
                 raise ValueError(self.l6.setText("Reguła 3/8 przyjmuje tylko nieparzystą liczbę przedziałów."))
 
             h = (b - a) / n
-            wynik = self.f(a) + self.f(b)
-
-            for i in range(1, n, 3):
-                xi = a + i * h
-                wynik += 3 * self.f(xi)
-            for i in range(2, n, 3):
-                xi = a + i * h
-                wynik += 3 * self.f(xi)
-            for i in range(3, n - 2, 3):
-                xi = a + i * h
-                wynik += 2 * self.f(xi)
+            wynik = self.f(a) + self.f(b) + 3 * sum(self.f(a + i * h) for i in range(1, n, 3)) + 3 * sum(
+                self.f(a + i * h) for i in range(2, n, 3)) + 2 * sum(self.f(a + i * h) for i in range(3, n - 1, 3))
 
             wynik *= 3 * h / 8
 
@@ -242,10 +233,10 @@ class ObliczRegula(QDialog):
             return e
 
     def slider_nodes(self, value):
-        if value % 2 != 0:
-            self.n = value - 1
-        else:
+        if value % 3 == 0:
             self.n = value
+        else:
+            self.n = value + (3 - value % 3)
         self.wartosc.setText(f"Liczba node'ów: {self.n}")
         self.get_a_b()
 
@@ -317,28 +308,32 @@ class ObliczRegula(QDialog):
         if a is None or b is None or a >= b:
             return
 
-        if self.n % 2 != 0:
-            self.n += 1
+        if (self.n - 1) % 3 != 0:
+            self.n += 3 - ((self.n - 1) % 3)
 
         self.figure.clear()
         ax = self.figure.add_subplot(111)
-        x_points = np.linspace(a, b, self.n + 1)
-        y_points = self.f(x_points)
-        x_fine = np.linspace(a, b, 300)
-        y_fine = self.f(x_fine)
+        x_points = np.linspace(a, b, self.n)
+        y_points = [self.f(x) for x in x_points]
+        ax.scatter(x_points, y_points, color='red', marker=".")
+        ax.grid(True, alpha=0.2)
+        ax.scatter(x_points, y_points, color='red')
 
+        for i in range(0, self.n - 1, 3):
+            if i + 3 < self.n:
+                x_sub = x_points[i:i + 4]
+                y_sub = y_points[i:i + 4]
+
+                cs = CubicSpline(x_sub, y_sub)
+                x_sub_fine = np.linspace(x_sub[0], x_sub[-1], 100)
+                ax.plot(x_sub_fine, cs(x_sub_fine), 'r-', alpha=0.5,
+                        label='Reguła 3/8' if i == 0 else "")
+
+
+        x_fine = np.linspace(a, b, 300)
+        y_fine = [self.f(x) for x in x_fine]
         ax.plot(x_fine, y_fine, 'b-', linewidth=1, label=self.rownanie.text())
 
-        for i in range(0, self.n, 2):
-            x_sub = x_points[i:i + 3]
-            y_sub = y_points[i:i + 3]
-
-            cs = CubicSpline(x_sub, y_sub, bc_type='natural')
-
-            x_sub_fine = np.linspace(x_sub[0], x_sub[-1], 100)
-            ax.plot(x_sub_fine, cs(x_sub_fine), 'r-', alpha=0.7, label='Funkcja dla metody Simpsona' if i == 0 else "")
-
-        ax.grid(True, alpha=0.3)
         ax.legend()
 
         self.canvas.draw()

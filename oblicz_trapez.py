@@ -2,6 +2,8 @@ import sys
 import numpy as np
 import timeit
 import math
+
+from matplotlib import pyplot as plt
 from sympy import sympify, lambdify, solve
 from PyQt5.QtCore import Qt, QCoreApplication, QLocale
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
@@ -305,6 +307,8 @@ class ObliczTrapezy(QDialog):
         h = (b - a) / self.n
         x_points = np.linspace(a, b, self.n + 1)
         y_points = self.f(x_points)
+
+        ax.scatter(x_points, y_points, color='red', marker=".")
         ax.grid(True, alpha=0.2)
         x_fine = np.linspace(a, b, 300)
         y_fine = self.f(x_fine)
