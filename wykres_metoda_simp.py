@@ -30,26 +30,28 @@ class WykresSimp(QWidget):
         ax.clear()
         ax.plot(x, y_f)
         ax.plot(x, y_f2)
-        ax.grid(True)
+        ax.set_xlabel('x')
+        ax.set_ylabel('f(x)')
+        ax.grid(True, alpha=0.2)
         idx = np.argwhere(np.diff(np.sign(y_f - y_f2))).flatten()
         intersections_x = x[idx]
         ax.plot(x[idx], y_f2[idx], 'ro')
         ax.fill_between(x, 0, y_f2, where=(x >= intersections_x[0]) & (x <= intersections_x[2]), color='orange',
                         alpha=0.3)
-        ax.text(1, self.f_2(intersections_x[0]), "a", fontsize=12, ha='right', va='bottom')
+        ax.text(1, self.f_2(intersections_x[0]), "a=x0", fontsize=12, ha='right', va='bottom')
         #ax.text(2.5, 0, "x1", fontsize=12, ha='left', va='bottom')
         ax.text(2.5, self.f_2(intersections_x[1]), "x1", fontsize=12, ha='right', va='bottom')
-        ax.text(4, self.f_2(intersections_x[2]), "b", fontsize=12, ha='left', va='bottom')
+        ax.text(4, self.f_2(intersections_x[2]), "b=x2", fontsize=12, ha='left', va='bottom')
         #ax.scatter([1, 2.5, 4], [0, 0, 0], color='red')
 
         ax.set_xlabel('x')
         ax.set_ylabel('f(x)')
+        ax.set_title("Przedział: [1;4], n = 2")
         self.show()
         self.canvas.draw()
 
     @staticmethod
     def f(x):
-        #
         return 0.8 * np.sin(x) + 0.5 * x
 
     @staticmethod

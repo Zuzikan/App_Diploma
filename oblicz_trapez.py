@@ -147,6 +147,7 @@ class ObliczTrapezy(QDialog):
         self.w = metoda_tr.MetodaTr()
         self.w.show()
         self.close()
+
     def onActivated(self, text):
         self.label.setText(f"You selected: {text}")
         self.label.adjustSize()

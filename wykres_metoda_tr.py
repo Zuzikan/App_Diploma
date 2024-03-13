@@ -30,13 +30,14 @@ class WykresTrapez(QWidget):
         ax.scatter([2, 5], [self.f(2), self.f(5)], color='r')
         ax.set_xlabel('x')
         ax.set_ylabel('f(x)')
-        ax.grid(True)
+        ax.grid(True, alpha=0.2)
         trapez_x = [2, 5, 5, 2, 2]
         trapez_y = [self.f(2), self.f(5), 0, 0, self.f(2)]
         ax.fill(trapez_x, trapez_y, color='red', alpha=0.4)
         ax.plot(trapez_x, trapez_y, color='red')
-        ax.text(2, self.f(2), "A", fontsize=10, ha='right', va='bottom')
-        ax.text(5, self.f(5), 'B', fontsize=10, ha='right', va='bottom')
+        ax.text(2, self.f(2), "a", fontsize=10, ha='right', va='bottom')
+        ax.text(5, self.f(5), 'b', fontsize=10, ha='right', va='bottom')
+        ax.set_title("Przedział: [2;5], n = 1")
         self.show()
         self.canvas.draw()
 
@@ -68,19 +69,19 @@ class WykresTrapezy(QWidget):
         x_values = np.linspace(-1, 6, 100)
         y_values = self.f(x_values)
         ax.plot(x_values, y_values, color='b')
-        ax.set_title('Wykres')
         ax.scatter([0, 1, 2, 3, 4, 5], [self.f(0), self.f(1), self.f(2), self.f(3), self.f(4), self.f(5)], color='r')
         ax.set_xlabel('x')
         ax.set_ylabel('f(x)')
-        ax.grid(True)
+        ax.grid(True, alpha=0.2)
         for i in range(5):
             trapez_x = [i, i + 1]
             trapez_y = [self.f(i), self.f(i + 1)]
             ax.fill_between(trapez_x, [0, 0], trapez_y, color='red', alpha=0.4)
-        labels = ["A = x1", "x2", "x3", "x4", "x5", "B = x6"]
+        labels = ["a = x1", "x2", "x3", "x4", "x5", "b = x6"]
         for i, label in enumerate(labels):
             ax.text(i, self.f(i), label, fontsize=10, ha='left', va='bottom')
         ax.plot([5, 5], [0, self.f(5)], color='red')
+        ax.set_title("Przedział: [0;5], n = 5")
         self.show()
         self.canvas.draw()
 

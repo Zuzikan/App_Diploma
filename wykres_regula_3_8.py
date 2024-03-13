@@ -2,6 +2,7 @@ import numpy as np
 from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+from scipy.interpolate import CubicSpline
 
 
 class WykresRegula38(QWidget):
@@ -24,23 +25,28 @@ class WykresRegula38(QWidget):
     def create_plot(self):
         self.figure.clear()
         ax = self.figure.add_subplot(111)
-        x = np.linspace(0, 13, 200)
-        y_f = self.f(x)
-        y_f2 = self.f_2(x)
-        ax.clear()
-        ax.plot(x, y_f)
-        ax.plot(x, y_f2)
-        ax.grid(True)
-        idx = np.argwhere(np.diff(np.sign(y_f - y_f2))).flatten()
-        intersections_x = x[idx]
-        ax.plot(x[idx], y_f2[idx], 'ro')
-        ax.fill_between(x, 0, y_f2, where=(x >= intersections_x[0]) & (x <= intersections_x[3]), color='orange',
-                        alpha=0.3)
-        ax.text(intersections_x[0], self.f_2(intersections_x[0]), "a", fontsize=12, ha='right', va='bottom')
-        ax.text(intersections_x[1], self.f_2(intersections_x[1]), "x1", fontsize=12, ha='left', va='bottom')
-        ax.text(intersections_x[2], self.f_2(intersections_x[2]), "x2", fontsize=12, ha='left', va='bottom')
-        ax.text(intersections_x[3], self.f_2(intersections_x[3]), "b", fontsize=12, ha='left', va='bottom')
+        x_points = np.linspace(0, 10, 7)
+        y_points = [self.f(x) for x in x_points]
+        ax.scatter(x_points, y_points, color='red', marker=".")
+        ax.grid(True, alpha=0.2)
+        ax.scatter(x_points, y_points, color='red')
 
+        for i in range(0, 6, 3):
+            if i + 3 < 7:
+                x_sub = x_points[i:i + 4]
+                y_sub = y_points[i:i + 4]
+
+                cs = CubicSpline(x_sub, y_sub)
+                x_sub_fine = np.linspace(x_sub[0], x_sub[-1], 100)
+                ax.plot(x_sub_fine, cs(x_sub_fine), 'r-', alpha=0.5)
+                ax.fill_between(x_sub_fine, cs(x_sub_fine), color='orange', alpha=0.3)
+        labels = ["a = x1", "x2", "x3", "x4", "x5", "x6", "b = x7"]
+        for x, label in zip(x_points, labels):
+            ax.text(x, self.f(x), label, fontsize=10, ha='center', va='bottom')
+        x_fine = np.linspace(0, 10, 300)
+        y_fine = [self.f(x) for x in x_fine]
+        ax.plot(x_fine, y_fine, 'b-', linewidth=1)
+        ax.set_title("Przedział: [0,10], n = 6")
         ax.set_xlabel('x')
         ax.set_ylabel('f(x)')
         self.show()

@@ -1,46 +1,72 @@
-import sympy as sp
+import sys
+
+import numpy as np
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QApplication
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+from scipy.interpolate import CubicSpline
 
 
-def estimate_rectangular_method_error(a, b, n, f_expr):
-    """
-    Estimate the error of the Rectangular (Midpoint) Method for numerical integration.
+class WykresRegula38(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
 
-    Parameters:
-    - a: The lower limit of integration.
-    - b: The upper limit of integration.
-    - n: The number of subintervals (rectangles).
-    - f_expr: A sympy expression representing the function f(x).
+    def initUI(self):
+        layout = QVBoxLayout()
+        self.setStyleSheet("background-color: white;")
+        self.figure = Figure()
+        self.canvas = FigureCanvas(self.figure)
+        layout.addWidget(self.canvas)
 
-    Returns:
-    - The estimated error of the Rectangular Method.
-    """
-    # Define the symbol
-    x = sp.symbols('x')
+        self.create_plot()
 
-    # Calculate the second derivative of the function
-    f_second_derivative = sp.diff(f_expr, x, 2)
+        self.setLayout(layout)
+        self.setWindowTitle('Przedziały Reguła 3/8')
 
-    # Find the maximum value of the second derivative in the interval [a, b]
-    # Note: For simplicity, this example just evaluates the second derivative at the endpoints
-    # and the midpoint. For a more accurate estimate, you could use optimization methods.
-    f_second_derivative_max = max(f_second_derivative.subs(x, a),
-                                  f_second_derivative.subs(x, b),
-                                  f_second_derivative.subs(x, (a + b) / 2))
+    def create_plot(self):
+        self.figure.clear()
+        ax = self.figure.add_subplot(111)
+        x_points = np.linspace(0, 10, 7)
+        y_points = [self.f(x) for x in x_points]
+        ax.scatter(x_points, y_points, color='red', marker=".")
+        ax.grid(True, alpha=0.2)
+        ax.scatter(x_points, y_points, color='red')
 
-    # Calculate the error estimate
-    error_estimate = ((b - a) ** 3 / (24 * n ** 2)) * f_second_derivative_max
+        for i in range(0, 6, 3):
+            if i + 3 < 7:
+                x_sub = x_points[i:i + 4]
+                y_sub = y_points[i:i + 4]
 
-    return error_estimate
+                cs = CubicSpline(x_sub, y_sub)
+                x_sub_fine = np.linspace(x_sub[0], x_sub[-1], 100)
+                ax.plot(x_sub_fine, cs(x_sub_fine), 'r-', alpha=0.5,
+                        label='Reguła 3/8' if i == 0 else "")
+                ax.fill_between(x_sub_fine, cs(x_sub_fine),color='orange',alpha=0.3)
+        x_fine = np.linspace(0, 10, 300)
+        y_fine = [self.f(x) for x in x_fine]
+        ax.plot(x_fine, y_fine, 'b-', linewidth=1)
+
+        ax.legend()
+        ax.legend()
+        self.show()
+        self.canvas.draw()
+
+    @staticmethod
+    def f(x):
+        return np.sin(x) + 1.5
+
+    @staticmethod
+    def f_2(x):
+        return np.sin(x + np.pi / 4) + 1.5
 
 
-# Example usage
-if __name__ == "__main__":
-    # Define the function to integrate as a sympy expression
-    f_expr = sp.sympify('x**2 + 2*x + 1')
+def main():
+    app = QApplication(sys.argv)
+    ex = WykresRegula38()
+    ex.show()
+    sys.exit(app.exec_())
 
-    # Define the integration interval and number of subintervals
-    a, b, n = 0, 10, 100
 
-    # Estimate the error
-    error_estimate = estimate_rectangular_method_error(a, b, n, f_expr)
-    print(f"Estimated error: {error_estimate}")
+if __name__ == '__main__':
+    main()

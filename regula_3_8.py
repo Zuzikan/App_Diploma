@@ -28,7 +28,7 @@ class Regula38(QDialog):
             "<h3>Reguła 3/8</h3>",
             "Jest to reguła będąca rozwinięciem metody Simpsona. Przybliżenie funkcji podcałkowej wielomianem ",
             "3-go stopnia oraz przybliżone obliczanie pola pod wielomianem. Używamy jej w przypadku",
-            "nieparzystej liczby segmentów (parzystej liczby punktów). "
+            ", gdy liczba segmentów jest podzielna przez 3."
         ]
 
         l1 = QLabel("Na przedziale [a,b], równomiernie rozmieszczamy węzły x<sub>0</sub>=a, x<sub>1</sub>=a+h, "

@@ -481,7 +481,8 @@ class Oblicz(QDialog):
         x = [a + i * h for i in range(self.n)]
         y = [self.f(a + (i + 0.5) * h) for i in range(self.n)]
         ax.grid(True, alpha=0.2)
-        ax.scatter(x, y, color='red', marker=".")
+        xi = [x[i] +h/2 for i in range(self.n)]
+        ax.scatter(xi, y, color='red', marker=".")
 
         for i in range(self.n):
             rect = Rectangle((x[i], 0), h, y[i], linewidth=1, edgecolor='r', facecolor='r',

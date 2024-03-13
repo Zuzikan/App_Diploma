@@ -136,7 +136,7 @@ class ObliczRegula(QDialog):
         layout_for_buttons.addWidget(powrot)
         layout_for_buttons.addWidget(zamknij)
         layout_for_buttons.addWidget(zamknij_okno)
-#
+
         layout.addLayout(layout_for_buttons, 18, 0, 1, 2)
 
         self.setLayout(layout)
@@ -338,7 +338,7 @@ class ObliczRegula(QDialog):
                 x_sub_fine = np.linspace(x_sub[0], x_sub[-1], 100)
                 ax.plot(x_sub_fine, cs(x_sub_fine), 'r-', alpha=0.5,
                         label='Reguła 3/8' if i == 0 else "")
-
+                ax.fill_between(x_sub_fine, cs(x_sub_fine), color='orange', alpha=0.3)
 
         x_fine = np.linspace(a, b, 300)
         y_fine = [self.f(x) for x in x_fine]
