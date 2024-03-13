@@ -1,3 +1,4 @@
+import oblicz_metoda_prostokatow
 import wykres_metoda_pr
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
 import PyQt5.QtCore as qtc
@@ -103,6 +104,7 @@ class MetodaPr(QDialog):
         zamknij_okno = QPushButton("Zamknij okno")
         obliczenia = QPushButton('Przejdź do obliczeń')
 
+        obliczenia.clicked.connect(self.open_oblicz)
         zamknij_okno.clicked.connect(self.close)
         zamknij.clicked.connect(qtc.QCoreApplication.instance().quit)
 
@@ -129,6 +131,17 @@ class MetodaPr(QDialog):
     def open_przedzial_kwadraty(self):
         self.w1 = wykres_metoda_pr.WykresKwadraty()
         self.w1.show()
+
+    def open_oblicz(self):
+        if hasattr(self, 'w') and self.w.isVisible():
+            self.w.close()
+
+        if hasattr(self, 'w1') and self.w1.isVisible():
+            self.w1.close()
+
+        self.w2 = oblicz_metoda_prostokatow.Oblicz()
+        self.w2.show()
+        self.close()
 
 
 def add_label(name, layout):

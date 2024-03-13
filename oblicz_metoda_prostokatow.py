@@ -1,21 +1,21 @@
-import sys
+
 import numpy as np
 import timeit
 import math
-
 from sympy import sympify, lambdify, solve
 from PyQt5.QtCore import Qt, QCoreApplication, QLocale
-from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
-                             QPushButton, QDialog)
+from PyQt5.QtWidgets import (QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
+                             QPushButton, QDialog, QTabWidget, QVBoxLayout, QWidget)
 from PyQt5.QtGui import QDoubleValidator, QFont
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+from matplotlib.patches import Rectangle
 from sympy.core.sympify import SympifyError
 
-import metoda_tr
+import metoda_pr
 
 
-class ObliczTrapezy(QDialog):
+class Oblicz(QDialog):
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -45,8 +45,12 @@ class ObliczTrapezy(QDialog):
         self.b = QLineEdit(self)
         self.n = 1
         self.l6 = QLabel(self)
+        self.l6l = QLabel(self)
+        self.l6r = QLabel(self)
         self.l7 = QLabel(self)
         self.l8 = QLabel(self)
+        self.l8l = QLabel(self)
+        self.l8r = QLabel(self)
         self.slider = QSlider(Qt.Horizontal, self)
         self.slider.setMinimum(1)
         self.slider.setMaximum(50)
@@ -55,8 +59,12 @@ class ObliczTrapezy(QDialog):
         end = QLabel('50')
         oblicz = QPushButton('Oblicz', self)
         self.wartosc = QLabel("Liczba node'ów: 1", self)
-        self.figure = Figure()
-        self.canvas = FigureCanvas(self.figure)
+        self.figure1 = Figure()
+        self.canvas1 = FigureCanvas(self.figure1)
+        self.figure2 = Figure()
+        self.canvas2 = FigureCanvas(self.figure2)
+        self.figure3 = Figure()
+        self.canvas3 = FigureCanvas(self.figure3)
 
         self.slider.valueChanged.connect(self.slider_nodes)
         instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
@@ -116,10 +124,33 @@ class ObliczTrapezy(QDialog):
         layout.addLayout(sliderLayout, 8, 0, 1, 2)
 
         layout.addWidget(self.l6, 9, 0, 1, 2)
-        layout.addWidget(self.l7, 10, 0, 1, 2)
-        layout.addWidget(self.l8, 11, 0, 1, 2)
+        layout.addWidget(self.l6l, 10, 0, 1, 2)
+        layout.addWidget(self.l6r, 11, 0, 1, 2)
+        layout.addWidget(self.l7, 12, 0, 1, 2)
+        layout.addWidget(self.l8, 13, 0, 1, 2)
+        layout.addWidget(self.l8l, 14, 0, 1, 2)
+        layout.addWidget(self.l8r, 15, 0, 1, 2)
 
-        layout.addWidget(self.canvas, 0, 3, 15, 1)
+        # tab for canvas
+        self.tabWidget = QTabWidget(self)
+        self.tab1 = QWidget()
+        self.tab1.layout = QVBoxLayout(self.tab1)
+        self.tab1.layout.addWidget(self.canvas1)
+
+        self.tab2 = QWidget()
+        self.tab2.layout = QVBoxLayout(self.tab2)
+        self.tab2.layout.addWidget(self.canvas2)
+
+        self.tab3 = QWidget()
+        self.tab3.layout = QVBoxLayout(self.tab3)
+        self.tab3.layout.addWidget(self.canvas3)
+
+        self.tabWidget.addTab(self.tab1, "Midpoint")
+        self.tabWidget.addTab(self.tab2, "Left side")
+        self.tabWidget.addTab(self.tab3, "Right side")
+
+        # layout.addWidget(self.canvas, 0, 3, 15, 1)
+        layout.addWidget(self.tabWidget, 0, 3, 15, 1)
 
         zamknij = QPushButton('Zamknij program')
         zamknij_okno = QPushButton("Zamknij okno")
@@ -137,16 +168,17 @@ class ObliczTrapezy(QDialog):
         layout_for_buttons.addWidget(zamknij)
         layout_for_buttons.addWidget(zamknij_okno)
 
-        layout.addLayout(layout_for_buttons, 18, 0, 1, 2)
+        layout.addLayout(layout_for_buttons, 25, 0, 1, 2)
 
         self.setLayout(layout)
         self.setFontForLayout(layout, self.font)
-        self.setWindowTitle('Obliczenia metoda trapezów')
+        self.setWindowTitle('Obliczenia metoda prostokątów')
 
     def wroc(self):
-        self.w = metoda_tr.MetodaTr()
+        self.w = metoda_pr.MetodaPr()
         self.w.show()
         self.close()
+
     def onActivated(self, text):
         self.label.setText(f"You selected: {text}")
         self.label.adjustSize()
@@ -162,14 +194,22 @@ class ObliczTrapezy(QDialog):
             self.f(1)
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.1")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_occured = True
             return
         try:
             self.get_a_b()
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.2")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_occured = True
             return
 
@@ -181,13 +221,21 @@ class ObliczTrapezy(QDialog):
             x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
             if len(x_sym_sorted) != 1:
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
+                self.l6l.setText(f"")
+                self.l6r.setText(f" ")
                 self.l8.setText(f"")
+                self.l8l.setText(f"")
+                self.l8r.setText(f"")
                 self.error_ocurred = True
 
                 return None
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_ocurred = True
 
             return None
@@ -196,11 +244,19 @@ class ObliczTrapezy(QDialog):
             return funkcja(x)
         except ValueError:
             self.l6.setText("Error: Wartość nieprawidłowa.")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             return
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.4")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
 
             self.error_ocurred = True
 
@@ -213,28 +269,95 @@ class ObliczTrapezy(QDialog):
             self.l7.setText(f"Error: W zakresie [a,b] nie mogą znajdować sie te punkty: {punkty}")
             return punkty
 
-    def metoda_trapezow(self, n, a, b):
+    def metoda_prostokatow_midpoint(self, n, a, b):
         try:
             h = (b - a) / n
             wynik = 0
-            for i in range(1, n):
-                xi = a + i * h
-                wynik += self.f(xi) * 2
+            for i in range(n):
+                xi = a + (i + 0.5) * h
+                wynik += self.f(xi) * h
 
-            calka = (h / 2) * (self.f(a) + wynik + self.f(b))
-
-            if math.isnan(wynik) or math.isnan(calka):
+            if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
+                self.l6l.setText(f"")
+                self.l6r.setText(f" ")
                 self.l8.setText(f"")
+                self.l8l.setText(f"")
+                self.l8r.setText(f"")
                 self.error_occured = True
                 return None
             else:
-                self.l6.setText(f"Wynik: {calka}")
-                return calka
+                self.l6.setText(f"Wynik dla midpoint: {wynik}")
+                return wynik
 
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
+            self.error_occured = True
+            return e
+
+    def metoda_prostokatow_leftside(self, n, a, b):
+        try:
+            h = (b - a) / n
+            wynik = 0
+            for i in range(n):
+                xi = a + i * h
+                wynik += self.f(xi) * h
+
+            if math.isnan(wynik):
+                self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
+                self.l6l.setText(f"")
+                self.l6r.setText(f" ")
+                self.l8.setText(f"")
+                self.l8l.setText(f"")
+                self.l8r.setText(f"")
+                self.error_occured = True
+                return None
+            else:
+                self.l6l.setText(f"Wynik da left side: {wynik}")
+                return wynik
+
+        except Exception as e:
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
+            self.error_occured = True
+            return e
+
+    def metoda_prostokatow_rightside(self, n, a, b):
+        try:
+            h = (b - a) / n
+            wynik = 0
+            for i in range(1, n + 1):
+                xi = a + i * h
+                wynik += self.f(xi) * h
+
+            if math.isnan(wynik):
+                self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
+                self.l6l.setText(f"")
+                self.l6r.setText(f" ")
+                self.l8.setText(f"")
+                self.l8l.setText(f"")
+                self.l8r.setText(f"")
+                self.error_occured = True
+                return None
+            else:
+                self.l6r.setText(f"Wynik rightside: {wynik}")
+                return wynik
+        except Exception as e:
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_occured = True
             return e
 
@@ -246,17 +369,29 @@ class ObliczTrapezy(QDialog):
     def get_a_b(self):
         if self.rownanie.text().strip() == "":
             self.l6.setText("Error: Wpisz równanie")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_ocurred = True
             return
         if self.a.text().strip() == "":
             self.l6.setText("Error: a nie może być puste")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_ocurred = True
             return
         if self.b.text().strip() == "":
             self.l6.setText("Error: b nie może być puste")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_ocurred = True
             return
         try:
@@ -264,12 +399,20 @@ class ObliczTrapezy(QDialog):
             b = float(self.b.text())
         except ValueError:
             self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_ocurred = True
             return
         if a >= b:
             self.l6.setText("Error: a powinno być mniejsze niż b.")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             self.error_ocurred = True
             return
 
@@ -294,48 +437,106 @@ class ObliczTrapezy(QDialog):
 
         try:
             start_time = timeit.default_timer()
-            result_trapezoidal = self.metoda_trapezow(self.n, a, b)
+            result_midpoint = self.metoda_prostokatow_midpoint(self.n, a, b)
             end_time = timeit.default_timer()
-            if result_trapezoidal is None:
-                self.l6.setText("Error: Problem z obliczeniem wartości.")
+            if result_midpoint is None:
+                self.l6.setText("Error: Problem z obliczeniem wartości dla midpoint.")
                 return
             time = end_time - start_time
-            self.l8.setText(f"Czas potrzebny do obliczenia: {time}")
+            self.l8.setText(f"Czas potrzebny do obliczenia midpoint: {time}")
+
+            start_timel = timeit.default_timer()
+            result_leftside = self.metoda_prostokatow_leftside(self.n, a, b)
+            end_timel = timeit.default_timer()
+            if result_leftside is None:
+                self.l6l.setText("Error: Problem z obliczeniem wartości dla left side.")
+                return
+            timel = end_timel - start_timel
+            self.l8l.setText(f"Czas potrzebny do obliczenia left side: {timel}")
+
+            start_timer = timeit.default_timer()
+            result_rightside = self.metoda_prostokatow_rightside(self.n, a, b)
+            end_timer = timeit.default_timer()
+            if result_rightside is None:
+                self.l6r.setText("Error: Problem z obliczeniem wartości dla right side.")
+                return
+            timer = end_timer - start_timer
+            self.l8r.setText(f"Czas potrzebny do obliczenia right side: {timer}")
         except Exception as e:
             self.l6.setText(f"Error: Wystąpił problem podczas obliczeń.")
             return
 
-        self.update_wykres(a, b)
+        self.update_wykres_midpoint(a, b)
+        self.update_wykres_leftside(a, b)
+        self.update_wykres_rightside(a, b)
 
-    def update_wykres(self, a, b):
+    def update_wykres_midpoint(self, a, b):
         if a is None or b is None or a >= b:
             return
 
-        self.figure.clear()
-        ax = self.figure.add_subplot(111)
+        self.figure1.clear()
+        ax = self.figure1.add_subplot(111)
+
         h = (b - a) / self.n
-        x_points = np.linspace(a, b, self.n + 1)
-        y_points = self.f(x_points)
-
-        ax.scatter(x_points, y_points, color='red', marker=".")
+        x = [a + i * h for i in range(self.n)]
+        y = [self.f(a + (i + 0.5) * h) for i in range(self.n)]
         ax.grid(True, alpha=0.2)
-        x_fine = np.linspace(a, b, 300)
-        y_fine = self.f(x_fine)
-        ax.plot(x_fine, y_fine, 'b-', linewidth=1)
+        ax.scatter(x, y, color='red', marker=".")
+
         for i in range(self.n):
-            xs = [x_points[i], x_points[i], x_points[i + 1], x_points[i + 1]]
-            ys = [0, y_points[i], y_points[i + 1], 0]
-            ax.fill(xs, ys, 'r', edgecolor='r', alpha=0.3)
+            rect = Rectangle((x[i], 0), h, y[i], linewidth=1, edgecolor='r', facecolor='r',
+                             alpha=0.5)
+            ax.add_patch(rect)
 
-        self.canvas.draw()
+        start = a - 2
+        stop = b + 2
+
+        x_f = np.linspace(start, stop, 300)
+        y_f = self.f(x_f)
+        ax.plot(x_f, y_f, 'b-', linewidth=1)
+        self.canvas1.draw()
+
+    def update_wykres_leftside(self, a, b):
+        if a is None or b is None or a >= b:
+            return
+
+        self.figure2.clear()
+        ax = self.figure2.add_subplot(111)
+
+        h = (b - a) / self.n
+        x_left = [a + i * h for i in range(self.n)]
+        y_left = [self.f(x) for x in x_left]
+        ax.scatter(x_left, y_left, color='red', marker=".")
+        ax.grid(True, alpha=0.2)
+        for i in range(len(x_left)):
+            rect = Rectangle((x_left[i], 0), h, y_left[i], linewidth=1, edgecolor='r', facecolor='r', alpha=0.5)
+            ax.add_patch(rect)
+
+        start, stop = a - 2, b + 2
+        x_f = np.linspace(start, stop, 300)
+        y_f = self.f(x_f)
+        ax.plot(x_f, y_f, 'b-', linewidth=1)
+        self.canvas2.draw()
+
+    def update_wykres_rightside(self, a, b):
+        if a is None or b is None or a >= b:
+            return
+
+        self.figure3.clear()
+        ax = self.figure3.add_subplot(111)
+        h = (b - a) / self.n
+        x_right = [a + (i + 1) * h for i in range(self.n)]
+        y_right = [self.f(x) for x in x_right]
+        ax.scatter(x_right, y_right, color='red', marker=".")
+        ax.grid(True, alpha=0.2)
+        for i in range(self.n):
+            rect = Rectangle((x_right[i] - h, 0), h, y_right[i], linewidth=1, edgecolor='r', facecolor='r', alpha=0.5)
+            ax.add_patch(rect)
+
+        start, stop = a - 2, b + 2
+        x_f = np.linspace(start, stop, 300)
+        y_f = self.f(x_f)
+        ax.plot(x_f, y_f, 'b-', linewidth=1)
+        self.canvas3.draw()
 
 
-def main():
-    app = QApplication(sys.argv)
-    ex = ObliczTrapezy()
-    ex.show()
-    sys.exit(app.exec_())
-
-
-if __name__ == '__main__':
-    main()

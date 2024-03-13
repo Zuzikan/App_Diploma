@@ -13,6 +13,8 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from sympy.core.sympify import SympifyError
 
+import metoda_simp
+
 
 class ObliczSimpson(QDialog):
     def __init__(self):
@@ -121,13 +123,17 @@ class ObliczSimpson(QDialog):
 
         zamknij = QPushButton('Zamknij program')
         zamknij_okno = QPushButton("Zamknij okno")
+        powrot = QPushButton("Powrót")
 
         zamknij_okno.clicked.connect(self.close)
         zamknij.clicked.connect(QCoreApplication.instance().quit)
+        powrot.clicked.connect(self.wroc)
 
+        powrot.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         zamknij.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
         zamknij_okno.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
 
+        layout_for_buttons.addWidget(powrot)
         layout_for_buttons.addWidget(zamknij)
         layout_for_buttons.addWidget(zamknij_okno)
 
@@ -137,6 +143,10 @@ class ObliczSimpson(QDialog):
         self.setFontForLayout(layout, self.font)
         self.setWindowTitle('Obliczenia metoda Simpsona')
 
+    def wroc(self):
+        self.w = metoda_simp.MetodaSimp()
+        self.w.show()
+        self.close()
     def onActivated(self, text):
         self.label.setText(f"You selected: {text}")
         self.label.adjustSize()

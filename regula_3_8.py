@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSiz
 import PyQt5.QtCore as qtc
 from PyQt5.QtGui import QPixmap, QFont
 
+import oblicz_regula_3_8
 import wykres_regula_3_8
 
 
@@ -69,6 +70,7 @@ class Regula38(QDialog):
         zamknij_okno = QPushButton("Zamknij okno")
         obliczenia = QPushButton('Przejdź do obliczeń')
 
+        obliczenia.clicked.connect(self.open_oblicz)
         zamknij_okno.clicked.connect(self.close)
         zamknij.clicked.connect(qtc.QCoreApplication.instance().quit)
 
@@ -91,6 +93,14 @@ class Regula38(QDialog):
     def open_przedzial_regula(self):
         self.w = wykres_regula_3_8.WykresRegula38()
         self.w.show()
+
+    def open_oblicz(self):
+        if hasattr(self, 'w') and self.w.isVisible():
+            self.w.close()
+
+        self.w2 = oblicz_regula_3_8.ObliczRegula()
+        self.w2.show()
+        self.close()
 
 
 def add_label(name, layout):
