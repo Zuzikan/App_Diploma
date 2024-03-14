@@ -13,6 +13,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from sympy.core.sympify import SympifyError
 
+import instrukcja
 import metoda_simp
 
 
@@ -90,6 +91,7 @@ class ObliczSimpson(QDialog):
         layout.addWidget(l2, 2, 0)
         layout.addWidget(self.rownanie, 2, 1)
         layout.addWidget(instrukcja, 3, 0, 1, 2)
+        instrukcja.clicked.connect(self.open_inst)
         layout.addWidget(l3, 4, 0, 1, 2)
 
         abHorizontal.addWidget(la)
@@ -147,6 +149,10 @@ class ObliczSimpson(QDialog):
         self.w = metoda_simp.MetodaSimp()
         self.w.show()
         self.close()
+
+    def open_inst(self):
+        self.wi = instrukcja.Instrukcja()
+        self.wi.show()
     def onActivated(self, text):
         self.label.setText(f"You selected: {text}")
         self.label.adjustSize()

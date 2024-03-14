@@ -12,6 +12,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from sympy.core.sympify import SympifyError
 
+import instrukcja
 import metoda_tr
 
 
@@ -24,7 +25,7 @@ class ObliczTrapezy(QDialog):
 
         # self.setStyleSheet("background-color: white;")
         self.font = QFont()
-        self.font.setPointSize(9)
+        self.font.setPointSize(10)
 
         layout = QGridLayout()
         sliderLayout = QHBoxLayout()
@@ -89,7 +90,7 @@ class ObliczTrapezy(QDialog):
         layout.addWidget(l2, 2, 0)
         layout.addWidget(self.rownanie, 2, 1)
         layout.addWidget(instrukcja, 3, 0, 1, 2)
-
+        instrukcja.clicked.connect(self.open_inst)
         layout.addWidget(l3, 4, 0, 1, 2)
 
         abHorizontal.addWidget(la)
@@ -140,6 +141,7 @@ class ObliczTrapezy(QDialog):
         layout.addLayout(layout_for_buttons, 18, 0, 1, 2)
 
         self.setLayout(layout)
+        self.setFontForLayout(layout_for_buttons, self.font)
         self.setFontForLayout(layout, self.font)
         self.setWindowTitle('Obliczenia metoda trapezów')
 
@@ -147,6 +149,10 @@ class ObliczTrapezy(QDialog):
         self.w = metoda_tr.MetodaTr()
         self.w.show()
         self.close()
+
+    def open_inst(self):
+        self.wi = instrukcja.Instrukcja()
+        self.wi.show()
 
     def onActivated(self, text):
         self.label.setText(f"You selected: {text}")

@@ -13,6 +13,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from sympy.core.sympify import SympifyError
 
+import instrukcja
 import regula_3_8
 
 
@@ -90,6 +91,7 @@ class ObliczRegula(QDialog):
         layout.addWidget(l2, 2, 0)
         layout.addWidget(self.rownanie, 2, 1)
         layout.addWidget(instrukcja, 3, 0, 1, 2)
+        instrukcja.clicked.connect(self.open_inst)
         layout.addWidget(l3, 4, 0, 1, 2)
 
         abHorizontal.addWidget(la)
@@ -147,6 +149,10 @@ class ObliczRegula(QDialog):
         self.w = regula_3_8.Regula38()
         self.w.show()
         self.close()
+
+    def open_inst(self):
+        self.wi = instrukcja.Instrukcja()
+        self.wi.show()
 
     def onActivated(self, text):
         self.label.setText(f"You selected: {text}")

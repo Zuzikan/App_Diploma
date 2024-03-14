@@ -88,4 +88,14 @@ if __name__ == "__main__":
     error_estimate = estimate_rectangular_method_error(a, b, n, f_expr)
     print(f"Estimated error: {error_estimate}")
 
+x<sup>i</sup> - x**i lub x^i
+&#960; = pi
+arccos(x) = acos(x)
+arcsin(x) = asin(x)
+arctg(x) = atan(x)
+arcctg(x) = acot(x)
+2×3 = 2*3
+10÷5 = 10/5
+|x-5| = abs(x-5)
+
 

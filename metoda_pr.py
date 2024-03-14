@@ -42,6 +42,7 @@ class MetodaPr(QDialog):
             "będzie",
             "długość podprzedziału (szerokość), a drugim wartość zależna od wartości funkcji (wysokość) f(x).",
             "Przyjmujemy oznaczenie h jako długość przedziału:",
+            r"$y = x^2$"
 
         ]
 
