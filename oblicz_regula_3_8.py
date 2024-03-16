@@ -3,6 +3,7 @@ import numpy as np
 import timeit
 import math
 
+from scipy.integrate import quad
 from scipy.interpolate import CubicSpline
 from sympy import sympify, lambdify, solve
 from PyQt5.QtCore import Qt, QCoreApplication, QLocale
@@ -49,6 +50,7 @@ class ObliczRegula(QDialog):
         self.l6 = QLabel(self)
         self.l7 = QLabel(self)
         self.l8 = QLabel(self)
+        self.l9 = QLabel(self)
         self.slider = QSlider(Qt.Horizontal, self)
         self.slider.setMinimum(3)
         self.slider.setMaximum(50)
@@ -120,6 +122,7 @@ class ObliczRegula(QDialog):
         layout.addWidget(self.l6, 9, 0, 1, 2)
         layout.addWidget(self.l7, 10, 0, 1, 2)
         layout.addWidget(self.l8, 11, 0, 1, 2)
+        layout.addWidget(self.l9, 12, 0, 1, 2)
 
         layout.addWidget(self.canvas, 0, 3, 15, 1)
 
@@ -170,14 +173,14 @@ class ObliczRegula(QDialog):
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.1")
             self.l8.setText(f"")
-            self.error_occured = True
+            self.l9.setText(f"")
             return
         try:
             self.get_a_b()
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.2")
             self.l8.setText(f"")
-            self.error_occured = True
+            self.l9.setText(f"")
             return
 
     def f(self, x):
@@ -195,7 +198,7 @@ class ObliczRegula(QDialog):
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
             self.l8.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
 
             return None
         try:
@@ -204,12 +207,12 @@ class ObliczRegula(QDialog):
         except ValueError:
             self.l6.setText("Error: Wartość nieprawidłowa.")
             self.l8.setText(f"")
+            self.l9.setText(f"")
             return
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.4")
             self.l8.setText(f"")
-
-            self.error_ocurred = True
+            self.l9.setText(f"")
 
             return
 
@@ -225,7 +228,7 @@ class ObliczRegula(QDialog):
 
             if n % 3 == 1:
                 self.l8.setText(f"")
-                raise ValueError(self.l6.setText("Reguła 3/8 przyjmuje tylko nieparzystą liczbę przedziałów."))
+                raise ValueError(self.l6.setText("Reguła 3/8 przyjmuje tylko liczbę przedziałów podzielną przez 3."))
 
             h = (b - a) / n
             wynik = self.f(a) + self.f(b) + 3 * sum(self.f(a + i * h) for i in range(1, n, 3)) + 3 * sum(
@@ -236,7 +239,7 @@ class ObliczRegula(QDialog):
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
                 self.l8.setText(f"")
-                self.error_occured = True
+                self.l9.setText(f"")
                 return None
             else:
                 self.l6.setText(f"Wynik: {wynik}")
@@ -245,7 +248,7 @@ class ObliczRegula(QDialog):
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
             self.l8.setText(f"")
-            self.error_occured = True
+            self.l9.setText(f"")
             return e
 
     def slider_nodes(self, value):
@@ -256,21 +259,32 @@ class ObliczRegula(QDialog):
         self.wartosc.setText(f"Liczba node'ów: {self.n}")
         self.get_a_b()
 
+    def error(self, a, b, value):
+        try:
+            accurate_result, _ = quad(self.f, a, b)
+
+            error = abs(accurate_result - value)
+            self.l9.setText(f"Błąd dla reguły 3/8: {error}")
+
+        except Exception as e:
+            self.l9.setText(f"Error: Problem z obliczeniem błędu.")
+            return e
+
     def get_a_b(self):
         if self.rownanie.text().strip() == "":
             self.l6.setText("Error: Wpisz równanie")
             self.l8.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
             return
         if self.a.text().strip() == "":
             self.l6.setText("Error: a nie może być puste")
             self.l8.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
             return
         if self.b.text().strip() == "":
             self.l6.setText("Error: b nie może być puste")
             self.l8.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
             return
         try:
             a = float(self.a.text())
@@ -278,12 +292,12 @@ class ObliczRegula(QDialog):
         except ValueError:
             self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
             self.l8.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
             return
         if a >= b:
             self.l6.setText("Error: a powinno być mniejsze niż b.")
             self.l8.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
             return
 
         rownanie_string = self.rownanie.text()
@@ -317,6 +331,14 @@ class ObliczRegula(QDialog):
         except Exception as e:
             self.l6.setText(f"Error: Wystąpił problem podczas obliczeń.")
             return
+        try:
+            self.error(a, b, result_regula)
+        except Exception as e:
+            self.l6.setText(f"Error: Błąd z errorem")
+            self.l8.setText(f"")
+            self.l9.setText(f"")
+
+            return e
 
         self.update_wykres(a, b)
 
@@ -333,7 +355,7 @@ class ObliczRegula(QDialog):
         y_points = [self.f(x) for x in x_points]
         ax.scatter(x_points, y_points, color='red', marker=".")
         ax.grid(True, alpha=0.2)
-        ax.scatter(x_points, y_points, color='red')
+
 
         for i in range(0, self.n - 1, 3):
             if i + 3 < self.n:

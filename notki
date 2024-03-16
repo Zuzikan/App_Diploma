@@ -99,3 +99,95 @@ arcctg(x) = acot(x)
 |x-5| = abs(x-5)
 
 
+from scipy.integrate import quad
+from numpy import arccos
+
+
+# Define the function to be integrated
+def f(x):
+    return arccos(x)
+
+
+# Perform the integration using scipy.integrate.quad
+result, error_estimate = quad(f, -1, 1)
+
+print(f"Integral estimate: {result}")
+print(f"Error estimate: {error_estimate}")
+
+from scipy.integrate import quad
+from numpy import arccos, linspace
+
+# Define the function to integrate
+def f(x):
+    return arccos(x)
+
+# Approximate the integral using the midpoint rectangular method
+def midpoint_rectangular_method(f, a, b, n):
+    h = (b - a) / n
+    result = 0
+    for i in range(n):
+        xi = a + (i + 0.5) * h
+        result += f(xi) * h
+    return result
+
+# Accurate integration using scipy.integrate.quad
+accurate_result, _ = quad(f, -1, 0)
+
+# Number of subintervals
+n = 100
+
+# Midpoint rectangular method approximation
+approximation = midpoint_rectangular_method(f, -1, 0, n)
+
+# Error estimation
+error = abs(accurate_result - approximation)
+
+accurate_result, approximation, error
+
+######
+        if len(symbol) != 1:
+            self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną. 2")
+            self.l6l.setText(f"")
+            self.l6r.setText(f"")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
+
+        else:
+            x = symbol[0]
+
+        values = np.linspace(a, b, n + 1)
+
+        try:
+            df = diff(rownanie, x)
+            f_prime = lambdify(symbol, df, 'numpy')
+            M1 = max(abs(f_prime(value)) for value in values)
+            d2f = diff(df, x)
+            f_double_prime = lambdify(symbol, d2f, 'numpy')
+            M2 = max(abs(f_double_prime(xi)) for xi in values)
+        except Exception as e:
+            return
+        try:
+            error_m = ((b - a)**3 / (24 * self.n**2)) * M2
+            error_l = ((b - a)**2 / (2*self.n)) * M1
+            error_r = ((b - a)**2 / (2*self.n)) * M1
+
+            self.l9.setText(f"Błąd dla midpoint: {error_m}")
+            self.l9l.setText(f"Błąd dla left side: {error_l}")
+            self.l9r.setText(f"Błąd dla right side: {error_r}")
+        except Exception as e:
+            self.l6.setText(f"Error: Nie można obliczyć błędów metody")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
+            return
+
+

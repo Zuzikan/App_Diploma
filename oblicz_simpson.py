@@ -3,6 +3,7 @@ import numpy as np
 import timeit
 import math
 
+from scipy.integrate import quad
 from scipy.interpolate import CubicSpline
 from sympy import sympify, lambdify, solve
 from PyQt5.QtCore import Qt, QCoreApplication, QLocale
@@ -49,6 +50,7 @@ class ObliczSimpson(QDialog):
         self.l6 = QLabel(self)
         self.l7 = QLabel(self)
         self.l8 = QLabel(self)
+        self.l9 = QLabel(self)
         self.slider = QSlider(Qt.Horizontal, self)
         self.slider.setMinimum(2)
         self.slider.setMaximum(50)
@@ -120,6 +122,7 @@ class ObliczSimpson(QDialog):
         layout.addWidget(self.l6, 9, 0, 1, 2)
         layout.addWidget(self.l7, 10, 0, 1, 2)
         layout.addWidget(self.l8, 11, 0, 1, 2)
+        layout.addWidget(self.l9, 12, 0, 1, 2)
 
         layout.addWidget(self.canvas, 0, 3, 15, 1)
 
@@ -169,14 +172,14 @@ class ObliczSimpson(QDialog):
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.1")
             self.l8.setText(f"")
-            self.error_occured = True
+            self.l9.setText(f"")
             return
         try:
             self.get_a_b()
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.2")
             self.l8.setText(f"")
-            self.error_occured = True
+            self.l9.setText(f"")
             return
 
     def f(self, x):
@@ -188,13 +191,13 @@ class ObliczSimpson(QDialog):
             if len(x_sym_sorted) != 1:
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
                 self.l8.setText(f"")
-                self.error_ocurred = True
+                self.l9.setText(f"")
 
                 return None
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
             self.l8.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
 
             return None
         try:
@@ -203,12 +206,14 @@ class ObliczSimpson(QDialog):
         except ValueError:
             self.l6.setText("Error: Wartość nieprawidłowa.")
             self.l8.setText(f"")
+            self.l9.setText(f"")
+
             return
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.4")
             self.l8.setText(f"")
+            self.l9.setText(f"")
 
-            self.error_ocurred = True
 
             return
 
@@ -241,7 +246,7 @@ class ObliczSimpson(QDialog):
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
                 self.l8.setText(f"")
-                self.error_occured = True
+                self.l9.setText(f"")
                 return None
             else:
                 self.l6.setText(f"Wynik: {wynik}")
@@ -250,7 +255,7 @@ class ObliczSimpson(QDialog):
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
             self.l8.setText(f"")
-            self.error_occured = True
+            self.l9.setText(f"")
             return e
 
     def slider_nodes(self, value):
@@ -261,21 +266,32 @@ class ObliczSimpson(QDialog):
         self.wartosc.setText(f"Liczba node'ów: {self.n}")
         self.get_a_b()
 
+    def error(self, a, b, value):
+        try:
+            accurate_result, _ = quad(self.f, a, b)
+
+            error = abs(accurate_result - value)
+            self.l9.setText(f"Błąd dla metody Simpsona: {error}")
+
+        except Exception as e:
+            self.l9.setText(f"Error: Problem z obliczeniem błędu.")
+            return e
+
     def get_a_b(self):
         if self.rownanie.text().strip() == "":
             self.l6.setText("Error: Wpisz równanie")
             self.l8.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
             return
         if self.a.text().strip() == "":
             self.l6.setText("Error: a nie może być puste")
             self.l8.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
             return
         if self.b.text().strip() == "":
             self.l6.setText("Error: b nie może być puste")
             self.l8.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
             return
         try:
             a = float(self.a.text())
@@ -283,12 +299,12 @@ class ObliczSimpson(QDialog):
         except ValueError:
             self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
             self.l8.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
             return
         if a >= b:
             self.l6.setText("Error: a powinno być mniejsze niż b.")
             self.l8.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
             return
 
         rownanie_string = self.rownanie.text()
@@ -322,6 +338,14 @@ class ObliczSimpson(QDialog):
         except Exception as e:
             self.l6.setText(f"Error: Wystąpił problem podczas obliczeń.")
             return
+        try:
+            self.error(a, b, result_simpson)
+        except Exception as e:
+            self.l6.setText(f"Error: Błąd z errorem")
+            self.l8.setText(f"")
+            self.l9.setText(f"")
+
+            return e
 
         self.update_wykres(a, b)
 
@@ -349,6 +373,7 @@ class ObliczSimpson(QDialog):
 
             x_sub_fine = np.linspace(x_sub[0], x_sub[-1], 300)
             ax.plot(x_sub_fine, cs(x_sub_fine), 'r-', alpha=0.7, label='Funkcja dla metody Simpsona' if i == 0 else "")
+            ax.fill_between(x_sub_fine, cs(x_sub_fine), color='orange', alpha=0.3)
 
         ax.grid(True, alpha=0.3)
         ax.legend()

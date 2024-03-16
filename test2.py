@@ -1,57 +1,34 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QComboBox, QWidget, QVBoxLayout
-import sys
+from scipy.integrate import quad
+from numpy import arccos, linspace
 
 
-# Przykładowe okna, które chcemy otworzyć
-class WindowOne(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Okno 1")
-        self.setGeometry(100, 100, 300, 300)
+# Define the function to integrate
+def f(x):
+    return x ** 2
 
 
-class WindowTwo(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Okno 2")
-        self.setGeometry(100, 100, 300, 300)
+# Approximate the integral using the midpoint rectangular method
+def midpoint_rectangular_method(f, a, b, n):
+    h = (b - a) / n
+    result = 0
+    for i in range(n):
+        xi = a + (i + 0.5) * h
+        result += f(xi) * h
+    return result
 
 
-# Główne okno aplikacji
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle('Combo Box Demo')
-        self.setGeometry(100, 100, 400, 200)
-        self.initializeUI()
+# Accurate integration using scipy.integrate.quad
+accurate_result, _ = quad(f, 0, 10)
 
-    def initializeUI(self):
-        self.centralWidget = QWidget()
-        self.setCentralWidget(self.centralWidget)
-        layout = QVBoxLayout()
+# Number of subintervals
+n = 25
 
-        self.comboBox = QComboBox()
-        self.comboBox.addItem("Wybierz okno", "none")
-        self.comboBox.addItem("Otwórz Okno 1", "window1")
-        self.comboBox.addItem("Otwórz Okno 2", "window2")
+# Midpoint rectangular method approximation
+approximation = midpoint_rectangular_method(f, 0, 10, n)
 
-        # Połączenie sygnału activated z odpowiednim slotem
-        self.comboBox.activated.connect(self.openWindow)
+# Error estimation
+error = abs(accurate_result - approximation)
 
-        layout.addWidget(self.comboBox)
-        self.centralWidget.setLayout(layout)
+accurate_result, approximation, error
 
-    def openWindow(self, index):
-        if self.comboBox.itemData(index) == "window1":
-            self.window = WindowOne()
-            self.window.show()
-        elif self.comboBox.itemData(index) == "window2":
-            self.window = WindowTwo()
-            self.window.show()
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec_())
+print(f"Error estimate: {accurate_result}, {approximation}, {error}")

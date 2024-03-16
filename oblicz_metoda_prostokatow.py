@@ -1,6 +1,8 @@
 import numpy as np
 import timeit
 import math
+
+from scipy.integrate import quad
 from sympy import sympify, lambdify, solve, diff, symbols
 from PyQt5.QtCore import Qt, QCoreApplication, QLocale
 from PyQt5.QtWidgets import (QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
@@ -149,7 +151,7 @@ class Oblicz(QDialog):
         self.tabt.layout.addWidget(self.l8r)
 
         self.tabe = QWidget()
-        self.tabe.layout = QVBoxLayout(self.tabt)
+        self.tabe.layout = QVBoxLayout(self.tabe)
         self.tabe.layout.addWidget(self.l9)
         self.tabe.layout.addWidget(self.l9l)
         self.tabe.layout.addWidget(self.l9r)
@@ -238,7 +240,9 @@ class Oblicz(QDialog):
             self.l8.setText(f"")
             self.l8l.setText(f"")
             self.l8r.setText(f"")
-            self.error_occured = True
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
             return
         try:
             self.get_a_b()
@@ -249,7 +253,9 @@ class Oblicz(QDialog):
             self.l8.setText(f"")
             self.l8l.setText(f"")
             self.l8r.setText(f"")
-            self.error_occured = True
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
             return
 
     def f(self, x):
@@ -265,7 +271,9 @@ class Oblicz(QDialog):
                 self.l8.setText(f"")
                 self.l8l.setText(f"")
                 self.l8r.setText(f"")
-                self.error_ocurred = True
+                self.l9.setText(f"")
+                self.l9l.setText(f"")
+                self.l9r.setText(f"")
 
                 return None
         except Exception as e:
@@ -275,7 +283,9 @@ class Oblicz(QDialog):
             self.l8.setText(f"")
             self.l8l.setText(f"")
             self.l8r.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
 
             return None
         try:
@@ -288,6 +298,9 @@ class Oblicz(QDialog):
             self.l8.setText(f"")
             self.l8l.setText(f"")
             self.l8r.setText(f"")
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
             return
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.4")
@@ -296,8 +309,9 @@ class Oblicz(QDialog):
             self.l8.setText(f"")
             self.l8l.setText(f"")
             self.l8r.setText(f"")
-
-            self.error_ocurred = True
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
 
             return
 
@@ -323,7 +337,9 @@ class Oblicz(QDialog):
                 self.l8.setText(f"")
                 self.l8l.setText(f"")
                 self.l8r.setText(f"")
-                self.error_occured = True
+                self.l9.setText(f"")
+                self.l9l.setText(f"")
+                self.l9r.setText(f"")
                 return None
             else:
                 self.l6.setText(f"Wynik dla midpoint: {wynik}")
@@ -336,7 +352,9 @@ class Oblicz(QDialog):
             self.l8.setText(f"")
             self.l8l.setText(f"")
             self.l8r.setText(f"")
-            self.error_occured = True
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
             return e
 
     def metoda_prostokatow_leftside(self, n, a, b):
@@ -354,7 +372,9 @@ class Oblicz(QDialog):
                 self.l8.setText(f"")
                 self.l8l.setText(f"")
                 self.l8r.setText(f"")
-                self.error_occured = True
+                self.l9.setText(f"")
+                self.l9l.setText(f"")
+                self.l9r.setText(f"")
                 return None
             else:
                 self.l6l.setText(f"Wynik da left side: {wynik}")
@@ -367,7 +387,9 @@ class Oblicz(QDialog):
             self.l8.setText(f"")
             self.l8l.setText(f"")
             self.l8r.setText(f"")
-            self.error_occured = True
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
             return e
 
     def metoda_prostokatow_rightside(self, n, a, b):
@@ -385,7 +407,9 @@ class Oblicz(QDialog):
                 self.l8.setText(f"")
                 self.l8l.setText(f"")
                 self.l8r.setText(f"")
-                self.error_occured = True
+                self.l9.setText(f"")
+                self.l9l.setText(f"")
+                self.l9r.setText(f"")
                 return None
             else:
                 self.l6r.setText(f"Wynik rightside: {wynik}")
@@ -397,48 +421,27 @@ class Oblicz(QDialog):
             self.l8.setText(f"")
             self.l8l.setText(f"")
             self.l8r.setText(f"")
-            self.error_occured = True
-            return e
-
-    def error(self, n, a, b, rownanie, symbol):
-        if len(symbol) != 1:
-            self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną. 2")
-            self.l6l.setText(f"")
-            self.l6r.setText(f"")
-            self.l8.setText(f"")
-            self.l8l.setText(f"")
-            self.l8r.setText(f"")
             self.l9.setText(f"")
             self.l9l.setText(f"")
             self.l9r.setText(f"")
+            return e
 
-        else:
-            x = symbol[0]
-
-        values = np.linspace(a, b, n + 1) # nie jestem pewna tego n+1
-        h = (b - a) / n
-        df = diff(rownanie, x)
-        f_prime = lambdify(symbol, df, 'numpy')
-        M1 = max(abs(f_prime(xi)) for xi in values)
-        d2f = diff(df, x)
-        f_double_prime = lambdify(symbol, d2f, 'numpy')
-        M2 = max(abs(f_double_prime(xi)) for xi in values)
+    def error(self, a, b, ls, rs, mp):
         try:
-            error_m = (b - a)**3 / 24 * self.n**2 * M2
-            error_l = (b - a)**2 / (2*self.n) * M1
-            error_r = (b - a)**2 / (2*self.n) * M1
+            accurate_result, _ = quad(self.f, a, b)
+
+            error_m = abs(accurate_result - mp)
+            error_l = abs(accurate_result - ls)
+            error_r = abs(accurate_result - rs)
 
             self.l9.setText(f"Błąd dla midpoint: {error_m}")
             self.l9l.setText(f"Błąd dla left side: {error_l}")
             self.l9r.setText(f"Błąd dla right side: {error_r}")
         except Exception as e:
-            self.l6.setText(f"Error: Nie można obliczyć błędów metody")
-            self.l6l.setText(f"")
-            self.l6r.setText(f" ")
-            self.l8.setText(f"")
-            self.l8l.setText(f"")
-            self.l8r.setText(f"")
-            return
+            self.l9.setText(f"Error: Problem z obliczeniem błędu.")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
+            return e
 
     def slider_nodes(self, value):
         self.n = value
@@ -453,7 +456,9 @@ class Oblicz(QDialog):
             self.l8.setText(f"")
             self.l8l.setText(f"")
             self.l8r.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
             return
         if self.a.text().strip() == "":
             self.l6.setText("Error: a nie może być puste")
@@ -462,7 +467,9 @@ class Oblicz(QDialog):
             self.l8.setText(f"")
             self.l8l.setText(f"")
             self.l8r.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
             return
         if self.b.text().strip() == "":
             self.l6.setText("Error: b nie może być puste")
@@ -471,7 +478,9 @@ class Oblicz(QDialog):
             self.l8.setText(f"")
             self.l8l.setText(f"")
             self.l8r.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
             return
         try:
             a = float(self.a.text())
@@ -483,7 +492,9 @@ class Oblicz(QDialog):
             self.l8.setText(f"")
             self.l8l.setText(f"")
             self.l8r.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
             return
         if a >= b:
             self.l6.setText("Error: a powinno być mniejsze niż b.")
@@ -492,7 +503,9 @@ class Oblicz(QDialog):
             self.l8.setText(f"")
             self.l8l.setText(f"")
             self.l8r.setText(f"")
-            self.error_ocurred = True
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
             return
 
         rownanie_string = self.rownanie.text()
@@ -524,6 +537,7 @@ class Oblicz(QDialog):
             time = end_time - start_time
             self.l8.setText(f"Czas potrzebny do obliczenia midpoint: {time}")
 
+
             start_timel = timeit.default_timer()
             result_leftside = self.metoda_prostokatow_leftside(self.n, a, b)
             end_timel = timeit.default_timer()
@@ -548,9 +562,12 @@ class Oblicz(QDialog):
             self.l8.setText(f"")
             self.l8l.setText(f"")
             self.l8r.setText(f"")
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
             return
         try:
-            self.error(self.n, a, b, rownanie_matematyczne, x_sym_sorted)
+            self.error(a, b, result_leftside, result_rightside, result_midpoint)
         except Exception as e:
             self.l6.setText(f"Error: Błąd z errorem")
             self.l6r.setText(f" ")
