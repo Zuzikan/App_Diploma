@@ -41,8 +41,8 @@ class MetodaPr(QDialog):
             "przedziału powinna maleć. W każdym z takich przedziałów umieszczamy prostokąt, którego jednym bokiem "
             "będzie",
             "długość podprzedziału (szerokość), a drugim wartość zależna od wartości funkcji (wysokość) f(x).",
-            "Przyjmujemy oznaczenie h jako długość przedziału:",
-            r"$y = x^2$"
+            "Przyjmujemy oznaczenie h jako długość przedziału:"
+
 
         ]
 

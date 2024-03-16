@@ -1,7 +1,7 @@
 import numpy as np
 import timeit
 import math
-from sympy import sympify, lambdify, solve
+from sympy import sympify, lambdify, solve, diff, symbols
 from PyQt5.QtCore import Qt, QCoreApplication, QLocale
 from PyQt5.QtWidgets import (QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
                              QPushButton, QDialog, QTabWidget, QVBoxLayout, QWidget)
@@ -53,6 +53,9 @@ class Oblicz(QDialog):
         self.l8 = QLabel(self)
         self.l8l = QLabel(self)
         self.l8r = QLabel(self)
+        self.l9 = QLabel(self)
+        self.l9l = QLabel(self)
+        self.l9r = QLabel(self)
         self.slider = QSlider(Qt.Horizontal, self)
         self.slider.setMinimum(1)
         self.slider.setMaximum(50)
@@ -134,9 +137,27 @@ class Oblicz(QDialog):
         layout.addWidget(self.l6l, 10, 0, 1, 2)
         layout.addWidget(self.l6r, 11, 0, 1, 2)
         layout.addWidget(self.l7, 12, 0, 1, 2)
-        layout.addWidget(self.l8, 13, 0, 1, 2)
-        layout.addWidget(self.l8l, 14, 0, 1, 2)
-        layout.addWidget(self.l8r, 15, 0, 1, 2)
+
+        # tab for errors and time
+
+        self.tabTimeErrors = QTabWidget(self)
+
+        self.tabt = QWidget()
+        self.tabt.layout = QVBoxLayout(self.tabt)
+        self.tabt.layout.addWidget(self.l8)
+        self.tabt.layout.addWidget(self.l8l)
+        self.tabt.layout.addWidget(self.l8r)
+
+        self.tabe = QWidget()
+        self.tabe.layout = QVBoxLayout(self.tabt)
+        self.tabe.layout.addWidget(self.l9)
+        self.tabe.layout.addWidget(self.l9l)
+        self.tabe.layout.addWidget(self.l9r)
+
+        self.tabTimeErrors.addTab(self.tabt, "Czas")
+        self.tabTimeErrors.addTab(self.tabe, "Błędy")
+
+        layout.addWidget(self.tabTimeErrors, 13, 0, 4, 2)
 
         # tab for canvas
         self.tabWidget = QTabWidget(self)
@@ -157,7 +178,7 @@ class Oblicz(QDialog):
         self.tabWidget.addTab(self.tab3, "Right side")
 
         # layout.addWidget(self.canvas, 0, 3, 15, 1)
-        layout.addWidget(self.tabWidget, 0, 3, 15, 1)
+        layout.addWidget(self.tabWidget, 0, 3, 17, 1)
 
         zamknij = QPushButton('Zamknij program')
         zamknij_okno = QPushButton("Zamknij okno")
@@ -379,6 +400,46 @@ class Oblicz(QDialog):
             self.error_occured = True
             return e
 
+    def error(self, n, a, b, rownanie, symbol):
+        if len(symbol) != 1:
+            self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną. 2")
+            self.l6l.setText(f"")
+            self.l6r.setText(f"")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
+
+        else:
+            x = symbol[0]
+
+        values = np.linspace(a, b, n + 1) # nie jestem pewna tego n+1
+        h = (b - a) / n
+        df = diff(rownanie, x)
+        f_prime = lambdify(symbol, df, 'numpy')
+        M1 = max(abs(f_prime(xi)) for xi in values)
+        d2f = diff(df, x)
+        f_double_prime = lambdify(symbol, d2f, 'numpy')
+        M2 = max(abs(f_double_prime(xi)) for xi in values)
+        try:
+            error_m = (b - a)**3 / 24 * self.n**2 * M2
+            error_l = (b - a)**2 / (2*self.n) * M1
+            error_r = (b - a)**2 / (2*self.n) * M1
+
+            self.l9.setText(f"Błąd dla midpoint: {error_m}")
+            self.l9l.setText(f"Błąd dla left side: {error_l}")
+            self.l9r.setText(f"Błąd dla right side: {error_r}")
+        except Exception as e:
+            self.l6.setText(f"Error: Nie można obliczyć błędów metody")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
+            return
+
     def slider_nodes(self, value):
         self.n = value
         self.wartosc.setText(f"Liczba node'ów: {value}")
@@ -482,7 +543,24 @@ class Oblicz(QDialog):
             self.l8r.setText(f"Czas potrzebny do obliczenia right side: {timer}")
         except Exception as e:
             self.l6.setText(f"Error: Wystąpił problem podczas obliczeń.")
+            self.l6l.setText(f"rror: Wystąpił problem podczas obliczeń.")
+            self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
             return
+        try:
+            self.error(self.n, a, b, rownanie_matematyczne, x_sym_sorted)
+        except Exception as e:
+            self.l6.setText(f"Error: Błąd z errorem")
+            self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
+            return e
 
         self.update_wykres_midpoint(a, b)
         self.update_wykres_leftside(a, b)
