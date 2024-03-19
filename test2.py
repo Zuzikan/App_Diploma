@@ -1,34 +1,39 @@
-from scipy.integrate import quad
-from numpy import arccos, linspace
+import numpy as np
+import matplotlib.pyplot as plt
+import sympy as sp
 
+x = sp.symbols('x')
 
-# Define the function to integrate
-def f(x):
-    return x ** 2
+# Define the function and its indefinite integral
+f = sp.sin(x)
+F = sp.integrate(f, x)
 
+# Convert symbolic expressions to numpy functions
+f_lambdified = sp.lambdify(x, f, 'numpy')
+F_lambdified = sp.lambdify(x, F, 'numpy')
 
-# Approximate the integral using the midpoint rectangular method
-def midpoint_rectangular_method(f, a, b, n):
-    h = (b - a) / n
-    result = 0
-    for i in range(n):
-        xi = a + (i + 0.5) * h
-        result += f(xi) * h
-    return result
+# Generate x values
+x_vals = np.linspace(-2*np.pi, 2*np.pi, 1000)
 
+# Generate y values for both the function and its integral
+f_vals = f_lambdified(x_vals)
+F_vals = F_lambdified(x_vals)
 
-# Accurate integration using scipy.integrate.quad
-accurate_result, _ = quad(f, 0, 10)
+# Plotting
+plt.figure(figsize=(10, 5))
 
-# Number of subintervals
-n = 25
+# Plot the original function
+plt.plot(x_vals, f_vals, label=r'$f(x) = \sin(x)$')
 
-# Midpoint rectangular method approximation
-approximation = midpoint_rectangular_method(f, 0, 10, n)
+# Plot the indefinite integral of the function
+plt.plot(x_vals, F_vals, label=r'$F(x) = -\cos(x) + C$', linestyle='--')
 
-# Error estimation
-error = abs(accurate_result - approximation)
+plt.title('Function and its Indefinite Integral')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.axhline(0, color='black', lw=0.5)
+plt.axvline(0, color='black', lw=0.5)
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+plt.legend()
 
-accurate_result, approximation, error
-
-print(f"Error estimate: {accurate_result}, {approximation}, {error}")
+plt.show()
