@@ -1,0 +1,247 @@
+import sys
+import numpy as np
+import timeit
+import math
+
+from scipy.integrate import quad
+from sympy import sympify, lambdify, solve, integrate, symbols
+from PyQt5.QtCore import Qt, QCoreApplication, QLocale
+from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
+                             QPushButton, QDialog)
+from PyQt5.QtGui import QDoubleValidator, QFont
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+from sympy.core.sympify import SympifyError
+
+import instrukcja
+import oblicz_regula_3_8
+import oblicz_simpson
+import oblicz_trapez
+
+
+class ObliczNieoznaczona(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+
+        # self.setStyleSheet("background-color: white;")
+        self.font = QFont()
+        self.font.setPointSize(10)
+
+        layout = QGridLayout()
+        sliderLayout = QHBoxLayout()
+
+        layout_for_buttons = QHBoxLayout()
+
+        combo = QComboBox(self)
+
+        l1 = QLabel("Porównaj z: ", self)
+        self.error_ocurred = False
+        l2 = QLabel("Wpisz równanie: ", self)
+        self.rownanie = QLineEdit(self)
+        instrukcja = QPushButton('Instrukcja', self)
+        self.l6 = QLabel(self)
+        self.l8 = QLabel(self)
+        oblicz = QPushButton('Oblicz', self)
+        self.figure = Figure()
+        self.canvas = FigureCanvas(self.figure)
+
+        instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+        oblicz.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+        l2.setAlignment(Qt.AlignCenter)
+        self.rownanie.setPlaceholderText("Wpisz wartość całki")
+
+        self.combo.addItem("Wybierz", "none")
+        self.combo.addItem("Metoda trapezów", "window1")
+        self.combo.addItem("Metoda Simpsona", "window2")
+        self.combo.addItem("Reguła 3/8", "window3")
+
+        self.combo.activated.connect(self.porownaj)
+        layout.addWidget(l1, 4, 0)
+        layout.addWidget(combo, 4, 1)
+
+        layout.addWidget(l2, 5, 0, 1, 2)
+        layout.addWidget(self.rownanie, 6, 0, 1, 2)
+        layout.addWidget(instrukcja, 7, 0)
+        instrukcja.clicked.connect(self.open_inst)
+
+        layout.addWidget(oblicz, 7, 1)
+        oblicz.clicked.connect(self.check_errors)
+
+        layout.addWidget(self.l6, 8, 0, 1, 2)
+        layout.addWidget(self.l8, 9, 0, 1, 2)
+
+        layout.addWidget(self.canvas, 0, 3, 15, 1)
+
+        zamknij = QPushButton('Zamknij program')
+        zamknij_okno = QPushButton("Zamknij okno")
+        powrot = QPushButton("Powrót")
+
+        zamknij_okno.clicked.connect(self.close)
+        zamknij.clicked.connect(QCoreApplication.instance().quit)
+        # powrot.clicked.connect(self.wroc)
+
+        powrot.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+        zamknij.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
+        zamknij_okno.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
+
+        layout_for_buttons.addWidget(powrot)
+        layout_for_buttons.addWidget(zamknij)
+        layout_for_buttons.addWidget(zamknij_okno)
+
+        layout.addLayout(layout_for_buttons, 14, 0, 1, 2)
+
+        self.setLayout(layout)
+        self.setFontForLayout(layout_for_buttons, self.font)
+        self.setFontForLayout(layout, self.font)
+        self.setWindowTitle('Obliczenia całki nieoznaczone')
+
+    """
+    def wroc(self):
+        self.w = metoda_tr.MetodaTr()
+        self.w.show()
+        self.close()
+    """
+    def porownaj(self, index):
+        if self.combo.itemData(index) == "window1":
+            self.window = oblicz_trapez.ObliczTrapezy()
+            self.window.show()
+        elif self.combo.itemData(index) == "window2":
+            self.window = oblicz_simpson.ObliczSimpson()
+            self.window.show()
+        elif self.combo.itemData(index) == "window3":
+            self.window = oblicz_regula_3_8.ObliczRegula()
+            self.window.show()
+    def open_inst(self):
+        self.wi = instrukcja.Instrukcja()
+        self.wi.show()
+
+    def onActivated(self, text):
+        self.label.setText(f"You selected: {text}")
+        self.label.adjustSize()
+
+    def setFontForLayout(self, layout, font):
+        for i in range(layout.count()):
+            widget = layout.itemAt(i).widget()
+            if widget is not None:
+                widget.setFont(font)
+
+    def check_errors(self):
+        try:
+            self.f(1)
+        except Exception as e:
+            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.1")
+            self.l8.setText(f"")
+            return
+        try:
+            self.get_a_b()
+        except Exception as e:
+            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.2")
+            self.l8.setText(f"")
+            return
+
+    def f(self, x):
+        rownanie_string = self.rownanie.text()
+        try:
+            rownanie_matematyczne = sympify(rownanie_string)
+            x_sym = rownanie_matematyczne.free_symbols
+            x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+            if len(x_sym_sorted) != 1:
+                self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
+                self.l8.setText(f"")
+                return None
+        except Exception as e:
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
+            self.l8.setText(f"")
+            return None
+        try:
+            funkcja = lambdify(x_sym_sorted, rownanie_matematyczne, 'numpy')
+            return funkcja(x)
+        except ValueError:
+            self.l6.setText("Error: Wartość nieprawidłowa.")
+            self.l8.setText(f"")
+            return
+        except Exception as e:
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.4")
+            self.l8.setText(f"")
+            return
+
+
+    def symbols(self, rownanie):
+        rownanie_matematyczne = sympify(rownanie)
+        x_sym = rownanie_matematyczne.free_symbols
+        x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+        return x_sym_sorted
+
+    def nieoznaczona(self):
+        rownanie_string = self.rownanie.text()
+        try:
+            rownanie_matematyczne = sympify(rownanie_string)
+            x_sym_sorted = self.symbols(rownanie_string)
+            if len(x_sym_sorted) != 1:
+                self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
+                self.l8.setText(f"")
+                return None
+
+            calka = integrate(rownanie_matematyczne, x_sym_sorted[0])
+
+            self.l6.setText(f"Wynik: {calka} + C")
+            return calka
+
+        except Exception as e:
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji. 1")
+            self.l8.setText(f"")
+            return e
+
+    def get_a_b(self):
+        if self.rownanie.text().strip() == "":
+            self.l6.setText("Error: Wpisz równanie")
+            self.l8.setText(f"")
+            return
+
+        try:
+            start_time = timeit.default_timer()
+            result_nieoznaczona = self.nieoznaczona()
+            end_time = timeit.default_timer()
+            if result_nieoznaczona is None:
+                self.l6.setText("Error: Problem z obliczeniem wartości. 1")
+                return
+            time = end_time - start_time
+            self.l8.setText(f"Czas potrzebny do obliczenia: {time}")
+        except Exception as e:
+            self.l6.setText(f"Error: Wystąpił problem podczas obliczeń.")
+            return
+
+        self.update_wykres(self.nieoznaczona())
+
+    def update_wykres(self, calka):
+        self.figure.clear()
+        ax = self.figure.add_subplot(111)
+        rownanie_string = self.rownanie.text()
+        x_sym_sorted = self.symbols(rownanie_string)
+        funkcja = lambdify(x_sym_sorted, calka, 'numpy')
+
+        x = np.linspace(-10, 10, 300)
+        y = self.f(x)
+        y_fine_integral = funkcja(x)
+
+        ax.plot(x, y, 'b-', linewidth=1, label=rownanie_string)
+        ax.plot(x, y_fine_integral, color="orange", linestyle='--', linewidth=1, label=calka)
+
+        ax.grid(True, alpha=0.2)
+        ax.legend()
+
+        self.canvas.draw()
+
+
+def main():
+    app = QApplication(sys.argv)
+    ex = ObliczNieoznaczona()
+    ex.show()
+    sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    main()

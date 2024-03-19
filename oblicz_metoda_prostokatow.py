@@ -15,6 +15,7 @@ from sympy.core.sympify import SympifyError
 
 import instrukcja
 import metoda_pr
+import oblicz_nieoznaczone
 import oblicz_regula_3_8
 import oblicz_simpson
 import oblicz_trapez
@@ -100,6 +101,7 @@ class Oblicz(QDialog):
         self.combo.addItem("Metoda trapezów", "window1")
         self.combo.addItem("Metoda Simpsona", "window2")
         self.combo.addItem("Reguła 3/8", "window3")
+        self.combo.addItem("Całki nieoznaczone", "window9")
 
         self.combo.activated.connect(self.porownaj)
         layout.addWidget(l1, 1, 0)
@@ -222,6 +224,9 @@ class Oblicz(QDialog):
             self.window.show()
         elif self.combo.itemData(index) == "window3":
             self.window = oblicz_regula_3_8.ObliczRegula()
+            self.window.show()
+        elif self.combo.itemData(index) == "window9":
+            self.window = oblicz_nieoznaczone.ObliczNieoznaczona()
             self.window.show()
 
     def setFontForLayout(self, layout, font):
