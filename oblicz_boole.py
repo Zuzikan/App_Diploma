@@ -358,6 +358,7 @@ class ObliczBoole(QDialog):
         self.canvas.draw()
 
 
+
 def main():
     app = QApplication(sys.argv)
     ex = ObliczBoole()
