@@ -46,7 +46,7 @@ class ObliczRegula(QDialog):
         lb = QLabel("b:", self)
         self.a = QLineEdit(self)
         self.b = QLineEdit(self)
-        self.n = 1
+        self.n = 3
         self.l6 = QLabel(self)
         self.l7 = QLabel(self)
         self.l8 = QLabel(self)

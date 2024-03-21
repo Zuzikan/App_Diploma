@@ -2,9 +2,12 @@ import sys
 import PyQt5.QtWidgets as qtw
 import PyQt5.QtCore as qtc
 import PyQt5.QtGui as qtg
+
+import metoda_boolea
 import metoda_pr
 import metoda_tr
 import metoda_simp
+import nieoznaczone
 import regula_3_8
 
 
@@ -42,6 +45,11 @@ class MainWindow(qtw.QDialog):
         self.regula_3_8.clicked.connect(self.open_regula_3_8)
         self.regula_3_8.setSizePolicy(qtw.QSizePolicy.Expanding, qtw.QSizePolicy.Expanding)
 
+        self.metoda_boole = qtw.QPushButton("Metoda Boole'a")
+        self.layout().addWidget(self.metoda_boole)
+        self.metoda_boole.clicked.connect(self.open_metoda_boole)
+        self.metoda_boole.setSizePolicy(qtw.QSizePolicy.Expanding, qtw.QSizePolicy.Expanding)
+
         self.kwadratura_g_c = qtw.QPushButton("Kwadratura Gaussa-Czebyszewa")
         self.layout().addWidget(self.kwadratura_g_c)
         self.kwadratura_g_c.clicked.connect(self.open_kwadratura_g_c)
@@ -61,6 +69,13 @@ class MainWindow(qtw.QDialog):
         self.layout().addWidget(self.metoda_m_c_2)
         self.metoda_m_c_2.clicked.connect(self.open_metoda_m_c_2)
         self.metoda_m_c_2.setSizePolicy(qtw.QSizePolicy.Expanding, qtw.QSizePolicy.Expanding)
+
+
+        self.nieoznaczone = qtw.QPushButton("Całki nieoznaczone")
+        self.layout().addWidget(self.nieoznaczone)
+        self.nieoznaczone.clicked.connect(self.open_nieoznaczone)
+        self.nieoznaczone.setSizePolicy(qtw.QSizePolicy.Expanding, qtw.QSizePolicy.Expanding)
+        self.nieoznaczone.setStyleSheet("border-radius : 3px; background-color : #E1D9E2")
 
         self.zamknij = qtw.QPushButton('Zamknij')
         self.layout().addWidget(self.zamknij)
@@ -83,8 +98,12 @@ class MainWindow(qtw.QDialog):
         self.p3.show()
 
     def open_regula_3_8(self):
-        self.w = regula_3_8.Regula38()
-        self.w.show()
+        self.p4 = regula_3_8.Regula38()
+        self.p4.show()
+
+    def open_metoda_boole(self):
+        self.p5 = metoda_boolea.MetodaBoole()
+        self.p5.show()
 
     def open_kwadratura_g_c(self):
         self.w = metoda_pr.MetodaPr()
@@ -102,6 +121,9 @@ class MainWindow(qtw.QDialog):
         self.w = metoda_pr.MetodaPr()
         self.w.show()
 
+    def open_nieoznaczone(self):
+        self.p10 = nieoznaczone.Nieoznaczone()
+        self. p10.show()
 
 if __name__ == "__main__":
     app = qtw.QApplication([])

@@ -241,6 +241,7 @@ class ObliczBoole(QDialog):
             self.l7.setText(f"Error: W zakresie [a,b] nie mogą znajdować sie te punkty: {punkty}")
             return punkty
 
+
     def metoda_zlozona_boole(self, n, a, b):
         try:
             if n % 4 != 0:
