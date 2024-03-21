@@ -3,7 +3,7 @@ import timeit
 import math
 
 from scipy.integrate import quad
-from sympy import sympify, lambdify, solve, diff, symbols
+from sympy import sympify, lambdify, solve
 from PyQt5.QtCore import Qt, QCoreApplication, QLocale
 from PyQt5.QtWidgets import (QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
                              QPushButton, QDialog, QTabWidget, QVBoxLayout, QWidget)
@@ -15,6 +15,7 @@ from sympy.core.sympify import SympifyError
 
 import instrukcja
 import metoda_pr
+import oblicz_boole
 import oblicz_nieoznaczone
 import oblicz_regula_3_8
 import oblicz_simpson
@@ -101,6 +102,7 @@ class Oblicz(QDialog):
         self.combo.addItem("Metoda trapezów", "window1")
         self.combo.addItem("Metoda Simpsona", "window2")
         self.combo.addItem("Reguła 3/8", "window3")
+        self.combo.addItem("Metoda Boole'a", "window4")
         self.combo.addItem("Całki nieoznaczone", "window9")
 
         self.combo.activated.connect(self.porownaj)
@@ -218,16 +220,46 @@ class Oblicz(QDialog):
     def porownaj(self, index):
         if self.combo.itemData(index) == "window1":
             self.window = oblicz_trapez.ObliczTrapezy()
+            self.pass_data(self.window)
             self.window.show()
         elif self.combo.itemData(index) == "window2":
             self.window = oblicz_simpson.ObliczSimpson()
+            self.pass_data(self.window)
             self.window.show()
         elif self.combo.itemData(index) == "window3":
             self.window = oblicz_regula_3_8.ObliczRegula()
+            self.pass_data(self.window)
+            self.window.show()
+        elif self.combo.itemData(index) == "window4":
+            self.window = oblicz_boole.ObliczBoole()
+            self.pass_data(self.window)
             self.window.show()
         elif self.combo.itemData(index) == "window9":
             self.window = oblicz_nieoznaczone.ObliczNieoznaczona()
+            self.pass_data_n(self.window)
             self.window.show()
+
+    def pass_data(self, window):
+        try:
+            a = self.a.text()
+            b = self.b.text()
+            rownanie = self.rownanie.text()
+
+            self.window.a.setText(a)
+            self.window.b.setText(b)
+            self.window.rownanie.setText(rownanie)
+            self.window.check_errors()
+        except Exception as e:
+            return
+
+    def pass_data_n(self, window):
+        try:
+            rownanie = self.rownanie.text()
+            self.window.rownanie.setText(rownanie)
+            self.window.check_errors()
+        except Exception as e:
+            return
+
 
     def setFontForLayout(self, layout, font):
         for i in range(layout.count()):

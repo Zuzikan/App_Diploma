@@ -15,6 +15,11 @@ from matplotlib.figure import Figure
 from sympy.core.sympify import SympifyError
 
 import instrukcja
+import oblicz_boole
+import oblicz_metoda_prostokatow
+import oblicz_nieoznaczone
+import oblicz_simpson
+import oblicz_trapez
 import regula_3_8
 
 
@@ -34,8 +39,7 @@ class ObliczRegula(QDialog):
         abHorizontal = QHBoxLayout()
         layout_for_buttons = QHBoxLayout()
 
-        combo = QComboBox(self)
-        combo.addItems(["Page 1", "Page 2"])
+        self.combo = QComboBox(self)
         l1 = QLabel("Porównaj z: ", self)
         self.error_ocurred = False
         l2 = QLabel("Wpisz równanie: ", self)
@@ -85,10 +89,16 @@ class ObliczRegula(QDialog):
         l3.setAlignment(Qt.AlignCenter)
         self.wartosc.setAlignment(Qt.AlignCenter)
 
-        # Connect the combo box's signal to the slot
-        # self.combo.activated[str].connect(self.onActivated)
+        self.combo.addItem("Wybierz", "none")
+        self.combo.addItem("Metoda prostokątów", "window1")
+        self.combo.addItem("Metoda trapezów", "window2")
+        self.combo.addItem("Metoda Simpsona", "window3")
+        self.combo.addItem("Metoda Boole'a", "window4")
+        self.combo.addItem("Całki nieoznaczone", "window9")
+
+        self.combo.activated.connect(self.porownaj)
         layout.addWidget(l1, 1, 0)
-        layout.addWidget(combo, 1, 1)
+        layout.addWidget(self.combo, 1, 1)
 
         layout.addWidget(l2, 2, 0)
         layout.addWidget(self.rownanie, 2, 1)
@@ -157,9 +167,48 @@ class ObliczRegula(QDialog):
         self.wi = instrukcja.Instrukcja()
         self.wi.show()
 
-    def onActivated(self, text):
-        self.label.setText(f"You selected: {text}")
-        self.label.adjustSize()
+    def porownaj(self, index):
+        if self.combo.itemData(index) == "window1":
+            self.window = oblicz_metoda_prostokatow.Oblicz()
+            self.pass_data(self.window)
+            self.window.show()
+        elif self.combo.itemData(index) == "window2":
+            self.window = oblicz_trapez.ObliczTrapezy()
+            self.pass_data(self.window)
+            self.window.show()
+        elif self.combo.itemData(index) == "window3":
+            self.window = oblicz_simpson.ObliczSimpson()
+            self.pass_data(self.window)
+            self.window.show()
+        elif self.combo.itemData(index) == "window4":
+            self.window = oblicz_boole.ObliczBoole()
+            self.pass_data(self.window)
+            self.window.show()
+        elif self.combo.itemData(index) == "window9":
+            self.window = oblicz_nieoznaczone.ObliczNieoznaczona()
+            self.pass_data_n(self.window)
+            self.window.show()
+
+    def pass_data(self, window):
+        try:
+            a = self.a.text()
+            b = self.b.text()
+            rownanie = self.rownanie.text()
+
+            self.window.a.setText(a)
+            self.window.b.setText(b)
+            self.window.rownanie.setText(rownanie)
+            self.window.check_errors()
+        except Exception as e:
+            return
+
+    def pass_data_n(self, window):
+        try:
+            rownanie = self.rownanie.text()
+            self.window.rownanie.setText(rownanie)
+            self.window.check_errors()
+        except Exception as e:
+            return
 
     def setFontForLayout(self, layout, font):
         for i in range(layout.count()):
@@ -355,7 +404,6 @@ class ObliczRegula(QDialog):
         y_points = [self.f(x) for x in x_points]
         ax.scatter(x_points, y_points, color='red', marker=".")
         ax.grid(True, alpha=0.2)
-
 
         for i in range(0, self.n - 1, 3):
             if i + 3 < self.n:

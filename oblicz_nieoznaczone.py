@@ -1,19 +1,17 @@
 import sys
-import numpy as np
 import timeit
-import math
-
-from scipy.integrate import quad
-from sympy import sympify, lambdify, solve, integrate, symbols
-from PyQt5.QtCore import Qt, QCoreApplication, QLocale
-from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
+import numpy as np
+from PyQt5.QtCore import Qt, QCoreApplication
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QComboBox, QLineEdit, QHBoxLayout,
                              QPushButton, QDialog)
-from PyQt5.QtGui import QDoubleValidator, QFont
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from sympy.core.sympify import SympifyError
+from sympy import sympify, lambdify, integrate
 
 import instrukcja
+import oblicz_boole
+import oblicz_metoda_prostokatow
 import oblicz_regula_3_8
 import oblicz_simpson
 import oblicz_trapez
@@ -35,7 +33,7 @@ class ObliczNieoznaczona(QDialog):
 
         layout_for_buttons = QHBoxLayout()
 
-        combo = QComboBox(self)
+        self.combo = QComboBox(self)
 
         l1 = QLabel("Porównaj z: ", self)
         self.error_ocurred = False
@@ -54,13 +52,15 @@ class ObliczNieoznaczona(QDialog):
         self.rownanie.setPlaceholderText("Wpisz wartość całki")
 
         self.combo.addItem("Wybierz", "none")
-        self.combo.addItem("Metoda trapezów", "window1")
-        self.combo.addItem("Metoda Simpsona", "window2")
-        self.combo.addItem("Reguła 3/8", "window3")
+        self.combo.addItem("Metoda prostokątów", "window1")
+        self.combo.addItem("Metoda trapezów", "window2")
+        self.combo.addItem("Metoda Simpsona", "window3")
+        self.combo.addItem("Reguła 3/8", "window4")
+        self.combo.addItem("Metoda Boole'a", "window5")
 
         self.combo.activated.connect(self.porownaj)
         layout.addWidget(l1, 4, 0)
-        layout.addWidget(combo, 4, 1)
+        layout.addWidget(self.combo, 4, 1)
 
         layout.addWidget(l2, 5, 0, 1, 2)
         layout.addWidget(self.rownanie, 6, 0, 1, 2)
@@ -104,23 +104,40 @@ class ObliczNieoznaczona(QDialog):
         self.w.show()
         self.close()
     """
+
     def porownaj(self, index):
         if self.combo.itemData(index) == "window1":
-            self.window = oblicz_trapez.ObliczTrapezy()
+            self.window = oblicz_metoda_prostokatow.Oblicz()
+            self.pass_data(self.window)
             self.window.show()
         elif self.combo.itemData(index) == "window2":
-            self.window = oblicz_simpson.ObliczSimpson()
+            self.window = oblicz_trapez.ObliczTrapezy()
+            self.pass_data(self.window)
             self.window.show()
         elif self.combo.itemData(index) == "window3":
-            self.window = oblicz_regula_3_8.ObliczRegula()
+            self.window = oblicz_simpson.ObliczSimpson()
+            self.pass_data(self.window)
             self.window.show()
+        elif self.combo.itemData(index) == "window4":
+            self.window = oblicz_regula_3_8.ObliczRegula()
+            self.pass_data(self.window)
+            self.window.show()
+        elif self.combo.itemData(index) == "window5":
+            self.window = oblicz_boole.ObliczBoole()
+            self.pass_data(self.window)
+            self.window.show()
+
+    def pass_data(self, window):
+        try:
+            rownanie = self.rownanie.text()
+            self.window.rownanie.setText(rownanie)
+            self.window.check_errors()
+        except Exception as e:
+            return
+
     def open_inst(self):
         self.wi = instrukcja.Instrukcja()
         self.wi.show()
-
-    def onActivated(self, text):
-        self.label.setText(f"You selected: {text}")
-        self.label.adjustSize()
 
     def setFontForLayout(self, layout, font):
         for i in range(layout.count()):
@@ -167,7 +184,6 @@ class ObliczNieoznaczona(QDialog):
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.4")
             self.l8.setText(f"")
             return
-
 
     def symbols(self, rownanie):
         rownanie_matematyczne = sympify(rownanie)
