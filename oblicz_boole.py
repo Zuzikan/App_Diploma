@@ -45,19 +45,22 @@ class ObliczBoole(QDialog):
         lb = QLabel("b:", self)
         self.a = QLineEdit(self)
         self.b = QLineEdit(self)
-        self.n = 1
+        self.n = 4
         self.l6 = QLabel(self)
+        self.l6p = QLabel(self)
         self.l7 = QLabel(self)
         self.l8 = QLabel(self)
+        self.l8p = QLabel(self)
         self.l9 = QLabel(self)
+        self.l9p = QLabel(self)
         self.slider = QSlider(Qt.Horizontal, self)
-        self.slider.setMinimum(1)
-        self.slider.setMaximum(50)
-        self.slider.setValue(1)
-        start = QLabel('1')
-        end = QLabel('50')
+        self.slider.setMinimum(4)
+        self.slider.setMaximum(80)
+        self.slider.setValue(4)
+        start = QLabel('4')
+        end = QLabel('80')
         oblicz = QPushButton('Oblicz', self)
-        self.wartosc = QLabel("Liczba node'ów: 1", self)
+        self.wartosc = QLabel("Liczba node'ów: 4", self)
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
 
@@ -119,11 +122,14 @@ class ObliczBoole(QDialog):
         layout.addLayout(sliderLayout, 8, 0, 1, 2)
 
         layout.addWidget(self.l6, 9, 0, 1, 2)
-        layout.addWidget(self.l7, 10, 0, 1, 2)
-        layout.addWidget(self.l8, 11, 0, 1, 2)
-        layout.addWidget(self.l9, 12, 0, 1, 2)
+        layout.addWidget(self.l6p, 10, 0, 1, 2)
+        layout.addWidget(self.l7, 11, 0, 1, 2)
+        layout.addWidget(self.l8, 12, 0, 1, 2)
+        layout.addWidget(self.l8p, 13, 0, 1, 2)
+        layout.addWidget(self.l9, 14, 0, 1, 2)
+        layout.addWidget(self.l9p, 15, 0, 1, 2)
 
-        layout.addWidget(self.canvas, 0, 3, 15, 1)
+        layout.addWidget(self.canvas, 0, 3, 18, 1)
 
         zamknij = QPushButton('Zamknij program')
         zamknij_okno = QPushButton("Zamknij okno")
@@ -141,7 +147,7 @@ class ObliczBoole(QDialog):
         layout_for_buttons.addWidget(zamknij)
         layout_for_buttons.addWidget(zamknij_okno)
 
-        layout.addLayout(layout_for_buttons, 18, 0, 1, 2)
+        layout.addLayout(layout_for_buttons, 20, 0, 1, 2)
 
         self.setLayout(layout)
         self.setFontForLayout(layout_for_buttons, self.font)
@@ -172,15 +178,21 @@ class ObliczBoole(QDialog):
             self.f(1)
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.1")
+            self.l6p.setText(f"")
             self.l8.setText(f"")
+            self.l8p.setText(f"")
             self.l9.setText(f"")
+            self.l9p.setText(f"")
             return
         try:
             self.get_a_b()
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.2")
+            self.l6p.setText(f"")
             self.l8.setText(f"")
+            self.l8p.setText(f"")
             self.l9.setText(f"")
+            self.l9p.setText(f"")
             return
 
     def f(self, x):
@@ -191,14 +203,20 @@ class ObliczBoole(QDialog):
             x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
             if len(x_sym_sorted) != 1:
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
+                self.l6p.setText(f"")
                 self.l8.setText(f"")
+                self.l8p.setText(f"")
                 self.l9.setText(f"")
+                self.l9p.setText(f"")
 
                 return None
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
+            self.l6p.setText(f"")
             self.l8.setText(f"")
+            self.l8p.setText(f"")
             self.l9.setText(f"")
+            self.l9p.setText(f"")
 
             return None
         try:
@@ -223,43 +241,94 @@ class ObliczBoole(QDialog):
             self.l7.setText(f"Error: W zakresie [a,b] nie mogą znajdować sie te punkty: {punkty}")
             return punkty
 
-    def metoda_trapezow(self, n, a, b):
+    def metoda_zlozona_boole(self, n, a, b):
         try:
+            if n % 4 != 0:
+                raise ValueError("Liczba podprzedziałów (n) musi być podzielna przez.")
+
             h = (b - a) / n
             wynik = 0
-            for i in range(1, n):
-                xi = a + i * h
-                wynik += self.f(xi) * 2
+            for i in range(0, n, 4):
+                x0 = a + i * h
+                x1 = x0 + h
+                x2 = x1 + h
+                x3 = x2 + h
+                x4 = x3 + h
 
-            calka = (h / 2) * (self.f(a) + wynik + self.f(b))
+                wynik += (2 * h / 45) * (
+                        7 * self.f(x0) + 32 * self.f(x1) + 12 * self.f(x2) + 32 * self.f(x3) + 7 * self.f(x4))
 
-            if math.isnan(wynik) or math.isnan(calka):
+            if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
+                self.l6p.setText(f"")
                 self.l8.setText(f"")
+                self.l8p.setText(f"")
                 self.l9.setText(f"")
+                self.l9p.setText(f"")
                 return None
             else:
-                self.l6.setText(f"Wynik: {calka}")
-                return calka
+                self.l6.setText(f"Wynik dla złożonej metody: {wynik}")
+                return wynik
 
         except Exception as e:
-            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.9")
+            self.l6p.setText(f"")
             self.l8.setText(f"")
+            self.l8p.setText(f"")
             self.l9.setText(f"")
+            self.l9p.setText(f"")
+            return e
+
+    def metoda_prosta_boole(self, a, b):
+        try:
+            h = (b - a) / 4
+            wynik = 0
+            x0 = a
+            x1 = a + h
+            x2 = a + 2 * h
+            x3 = a + 3 * h
+            x4 = b
+
+            wynik += (2 * h / 45) * (
+                    7 * self.f(x0) + 32 * self.f(x1) + 12 * self.f(x2) + 32 * self.f(x3) + 7 * self.f(x4))
+
+            if math.isnan(wynik):
+                self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
+                self.l6p.setText(f"")
+                self.l8.setText(f"")
+                self.l8p.setText(f"")
+                self.l9.setText(f"")
+                self.l9p.setText(f"")
+                return None
+            else:
+                self.l6p.setText(f"Wynik dla prostej metody: {wynik}")
+                return wynik
+
+        except Exception as e:
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji. 0")
+            self.l6p.setText(f"")
+            self.l8.setText(f"")
+            self.l8p.setText(f"")
+            self.l9.setText(f"")
+            self.l9p.setText(f"")
             return e
 
     def slider_nodes(self, value):
-        self.n = value
-        self.wartosc.setText(f"Liczba node'ów: {value}")
+        if value % 4 == 0:
+            self.n = value
+        else:
+            self.n = value + (4 - value % 4)
+        self.wartosc.setText(f"Liczba node'ów: {self.n}")
         self.get_a_b()
 
-    def error(self, a, b, value):
+    def error(self, a, b, zl, pr):
         try:
             accurate_result, _ = quad(self.f, a, b)
 
-            error = abs(accurate_result - value)
-            self.l9.setText(f"Błąd dla metody trapezów: {error}")
-
+            error_z = abs(accurate_result - zl)
+            error_p = abs(accurate_result - pr)
+            self.l9.setText(f"Błąd dla metody Boole'a złożonej: {error_z}")
+            self.l9p.setText(f"Błąd dla metody Boole'a prostej: {error_p}")
         except Exception as e:
             self.l9.setText(f"Error: Problem z obliczeniem błędu.")
             return e
@@ -267,31 +336,46 @@ class ObliczBoole(QDialog):
     def get_a_b(self):
         if self.rownanie.text().strip() == "":
             self.l6.setText("Error: Wpisz równanie")
+            self.l6p.setText(f"")
             self.l8.setText(f"")
+            self.l8p.setText(f"")
             self.l9.setText(f"")
+            self.l9p.setText(f"")
             return
         if self.a.text().strip() == "":
             self.l6.setText("Error: a nie może być puste")
+            self.l6p.setText(f"")
             self.l8.setText(f"")
+            self.l8p.setText(f"")
             self.l9.setText(f"")
+            self.l9p.setText(f"")
             return
         if self.b.text().strip() == "":
             self.l6.setText("Error: b nie może być puste")
+            self.l6p.setText(f"")
             self.l8.setText(f"")
+            self.l8p.setText(f"")
             self.l9.setText(f"")
+            self.l9p.setText(f"")
             return
         try:
             a = float(self.a.text())
             b = float(self.b.text())
         except ValueError:
             self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
+            self.l6p.setText(f"")
             self.l8.setText(f"")
+            self.l8p.setText(f"")
             self.l9.setText(f"")
+            self.l9p.setText(f"")
             return
         if a >= b:
             self.l6.setText("Error: a powinno być mniejsze niż b.")
+            self.l6p.setText(f"")
             self.l8.setText(f"")
+            self.l8p.setText(f"")
             self.l9.setText(f"")
+            self.l9p.setText(f"")
             return
 
         rownanie_string = self.rownanie.text()
@@ -315,22 +399,35 @@ class ObliczBoole(QDialog):
 
         try:
             start_time = timeit.default_timer()
-            result_trapez = self.metoda_trapezow(self.n, a, b)
+            result_zlozona = self.metoda_zlozona_boole(self.n, a, b)
             end_time = timeit.default_timer()
-            if result_trapez is None:
+            if result_zlozona is None:
                 self.l6.setText("Error: Problem z obliczeniem wartości.")
                 return
             time = end_time - start_time
-            self.l8.setText(f"Czas potrzebny do obliczenia: {time}")
+            self.l8.setText(f"Czas potrzebny do obliczenia złożona: {time}")
+
+            start_timep = timeit.default_timer()
+            result_prosta = self.metoda_prosta_boole(a, b)
+            end_timep = timeit.default_timer()
+            if result_prosta is None:
+                self.l6.setText("Error: Problem z obliczeniem wartości.")
+                return
+            timep = end_timep - start_timep
+            self.l8p.setText(f"Czas potrzebny do obliczenia prosta: {timep}")
+
         except Exception as e:
             self.l6.setText(f"Error: Wystąpił problem podczas obliczeń.")
             return
         try:
-            self.error(a, b, result_trapez)
+            self.error(a, b, result_zlozona,result_prosta)
         except Exception as e:
             self.l6.setText(f"Error: Błąd z errorem")
+            self.l6p.setText(f"")
             self.l8.setText(f"")
+            self.l8p.setText(f"")
             self.l9.setText(f"")
+            self.l9p.setText(f"")
 
             return e
         self.update_wykres(a, b)
@@ -341,22 +438,34 @@ class ObliczBoole(QDialog):
 
         self.figure.clear()
         ax = self.figure.add_subplot(111)
-        h = (b - a) / self.n
+
+        if self.n % 4 != 0:
+            self.n += 4 - self.n % 4
+
         x_points = np.linspace(a, b, self.n + 1)
         y_points = self.f(x_points)
 
-        ax.scatter(x_points, y_points, color='red', marker=".")
-        ax.grid(True, alpha=0.2)
         x_fine = np.linspace(a, b, 300)
         y_fine = self.f(x_fine)
         ax.plot(x_fine, y_fine, 'b-', linewidth=1)
-        for i in range(self.n):
-            xs = [x_points[i], x_points[i], x_points[i + 1], x_points[i + 1]]
-            ys = [0, y_points[i], y_points[i + 1], 0]
-            ax.fill(xs, ys, 'r', edgecolor='r', alpha=0.3)
+        h = (b - a) / 4
+        x0 = a
+        x1 = a + h
+        x2 = a + 2 * h
+        x3 = a + 3 * h
+        x4 = b
+        punkty = x0, x1, x2, x3, x4
+        for punkt in punkty:
+            ax.scatter(punkt, self.f(punkt), color='purple', s=50)
 
+        for i in range(0, self.n, 4):
+            xs = x_points[i:i + 5]
+            ys = y_points[i:i + 5]
+            ax.fill_between(xs, 0, ys, color='red', alpha=0.3, step='pre', linewidth=0.5, edgecolor='r')
+            ax.scatter(xs, ys, color='red', marker=".")
+
+        ax.grid(True, alpha=0.2)
         self.canvas.draw()
-
 
 
 def main():
