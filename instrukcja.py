@@ -37,6 +37,7 @@ class Instrukcja(QDialog):
             "10÷5 = 10/5",
             "|x-5| = abs(x-5)",
             "√i = sqrt(i)",
+            "ln(x) = log(x)",
             "                                                ",
         ]
 

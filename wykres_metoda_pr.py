@@ -11,8 +11,8 @@ def create_square(ax, x_values, y_values):
     ax.plot(kwadrat_x, kwadrat_y, color='red')
     ax.fill_between(x_values, -3, y_values, where=(x_values >= -1) & (x_values <= 1), linewidth=1, edgecolor='r',
                     facecolor='r', alpha=0.5)
-    ax.text(-1, -1, 'a', fontsize=10, ha='right', va='bottom')
-    ax.text(1, 3, 'b', fontsize=10, ha='right', va='bottom')
+    ax.text(-1, -1, 'a=x0', fontsize=10, ha='right', va='bottom')
+    ax.text(1, 3, 'b=x1', fontsize=10, ha='right', va='bottom')
 
 
 class WykresKwadrat(QWidget):
@@ -58,6 +58,7 @@ class WykresKwadraty(QWidget):
         self.initUI()
 
     def initUI(self):
+        self.setStyleSheet("background-color: white;")
         self.resize(600, 500)
         layout = QVBoxLayout()
 

@@ -1,4 +1,5 @@
 import oblicz_boole
+import oblicz_nieoznaczone
 import oblicz_trapez
 import wykres_metoda_tr
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout,QSizePolicy, QDialog)
@@ -129,7 +130,7 @@ class Nieoznaczone(QDialog):
         if hasattr(self, 'w1') and self.w1.isVisible():
             self.w1.close()
 
-        self.w2 = oblicz_boole.ObliczBoole()
+        self.w2 = oblicz_nieoznaczone.ObliczNieoznaczona()
         self.w2.show()
         self.close()
 
