@@ -246,7 +246,7 @@ class ObliczTrapezy(QDialog):
 
                 return None
         except Exception as e:
-            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
             self.l8.setText(f"")
             self.l9.setText(f"")
 
@@ -308,7 +308,7 @@ class ObliczTrapezy(QDialog):
             accurate_result, _ = quad(self.f, a, b)
 
             error = abs(accurate_result - value)
-            self.l9.setText(f"Błąd dla metody trapezów: {error}")
+            self.l9.setText(f"Błąd dla metody trapezów: +-{error}")
 
         except Exception as e:
             self.l9.setText(f"Error: Problem z obliczeniem błędu.")
@@ -388,23 +388,33 @@ class ObliczTrapezy(QDialog):
     def update_wykres(self, a, b):
         if a is None or b is None or a >= b:
             return
-
+        #Czyszczenie poprzedniego wykresu:
         self.figure.clear()
+
+        #Dodawanie osi do figury:
         ax = self.figure.add_subplot(111)
-        h = (b - a) / self.n
+
+        #Generowanie punktów x i y:
         x_points = np.linspace(a, b, self.n + 1)
         y_points = self.f(x_points)
 
+        #Rysowanie punktów:
         ax.scatter(x_points, y_points, color='red', marker=".")
+
+        #Dodawanie siatki, wygładzenie linii funkcji
+        #oraz Generowanie punktów x i y dla przedziału [a;b]:
         ax.grid(True, alpha=0.2)
         x_fine = np.linspace(a, b, 300)
         y_fine = self.f(x_fine)
         ax.plot(x_fine, y_fine, 'b-', linewidth=1)
+
+        #Wypełnienie obszaru pod wykresem
         for i in range(self.n):
             xs = [x_points[i], x_points[i], x_points[i + 1], x_points[i + 1]]
             ys = [0, y_points[i], y_points[i + 1], 0]
             ax.fill(xs, ys, 'r', edgecolor='r', alpha=0.3)
 
+        #Dodanie wykresu do canvas, wyświetlenie:
         self.canvas.draw()
 
 

@@ -1,39 +1,26 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import sympy as sp
+from cmath import acos
 
-x = sp.symbols('x')
+import sympy
+from sympy import symbols, S, sqrt, log, solveset, Interval, acos
 
-# Define the function and its indefinite integral
-f = sp.sin(x)
-F = sp.integrate(f, x)
+x = symbols('x')
 
-# Convert symbolic expressions to numpy functions
-f_lambdified = sp.lambdify(x, f, 'numpy')
-F_lambdified = sp.lambdify(x, F, 'numpy')
+# Dla funkcji z pierwiastkiem kwadratowym
+expr1_domain = solveset(sqrt(x - 2) > 0, x, domain=S.Reals)
 
-# Generate x values
-x_vals = np.linspace(-2*np.pi, 2*np.pi, 1000)
+# Dla funkcji logarytmicznej
+expr2_domain = solveset(2/(x-3) > 0, x, domain=S.Reals)
 
-# Generate y values for both the function and its integral
-f_vals = f_lambdified(x_vals)
-F_vals = F_lambdified(x_vals)
+# Przygotowanie formatowania na przedziały (a, b)
+def format_interval(interval):
+    if isinstance(interval, Interval):
+        return f"({interval.start}; {interval.end})"
+    else:
+        # Jeśli rozwiązanie nie jest przedziałem, zwróć oryginalny format
+        return str(interval)
 
-# Plotting
-plt.figure(figsize=(10, 5))
+# Formatowanie i wyświetlanie wyników
+expr1_domain_formatted = format_interval(expr1_domain)
+expr2_domain_formatted = format_interval(expr2_domain)
 
-# Plot the original function
-plt.plot(x_vals, f_vals, label=r'$f(x) = \sin(x)$')
-
-# Plot the indefinite integral of the function
-plt.plot(x_vals, F_vals, label=r'$F(x) = -\cos(x) + C$', linestyle='--')
-
-plt.title('Function and its Indefinite Integral')
-plt.xlabel('x')
-plt.ylabel('y')
-plt.axhline(0, color='black', lw=0.5)
-plt.axvline(0, color='black', lw=0.5)
-plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-plt.legend()
-
-plt.show()
+print(expr1_domain_formatted, expr2_domain_formatted)
