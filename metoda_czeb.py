@@ -1,4 +1,5 @@
-import oblicz_trapez
+
+import obliczenia_czeb
 import wykres_metoda_tr
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout,QSizePolicy, QDialog)
 import PyQt5.QtCore as qtc
@@ -104,7 +105,7 @@ class MetodaCzeb(QDialog):
         if hasattr(self, 'w1') and self.w1.isVisible():
             self.w1.close()
 
-        self.w2 = oblicz_trapez.ObliczTrapezy()
+        self.w2 = obliczenia_czeb.ObliczCzeb()
         self.w2.show()
         self.close()
 
