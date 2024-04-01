@@ -29,6 +29,7 @@ class Instrukcja(QDialog):
             "",
             "x<sup>i</sup> = x**i lub x^i",
             "π = pi lub 3.14",
+            "nieskończoność = inf lub -inf"
             "arccos(x) = acos(x)",
             "arcsin(x) = asin(x)",
             "arctg(x) = atan(x)",
