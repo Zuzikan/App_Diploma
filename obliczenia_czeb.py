@@ -279,11 +279,17 @@ class ObliczCzeb(QDialog):
     def czebyszew(self, n, a, b):
         try:
             if a == -1 and b == 1:
+                start_time = timeit.default_timer()
+
                 x, w = np.polynomial.chebyshev.chebgauss(n)
 
                 wynik = np.sum(w * self.f(x))
 
+                end_time = timeit.default_timer()
+                time = end_time - start_time
+
             else:
+                start_time = timeit.default_timer()
 
                 d = (b - a)
                 c = 0.5 * np.pi * d / n
@@ -292,6 +298,9 @@ class ObliczCzeb(QDialog):
                 v = 0.5 * (cn + 1) * d + a
                 wynik = c * np.sum(self.f(v) * np.sqrt(1 - cn ** 2))
 
+                end_time = timeit.default_timer()
+                time = end_time - start_time
+
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
                 self.l8.setText(f"")
@@ -299,6 +308,7 @@ class ObliczCzeb(QDialog):
                 return None
             else:
                 self.l6.setText(f"Wynik: {wynik}")
+                self.l8.setText(f"Czas potrzebny do obliczenia: {time}")
                 return wynik
 
         except Exception as e:
@@ -373,14 +383,12 @@ class ObliczCzeb(QDialog):
                     return
 
         try:
-            start_time = timeit.default_timer()
+
             result_czeb = self.czebyszew(self.n, a, b)
-            end_time = timeit.default_timer()
             if result_czeb is None:
                 self.l6.setText("Error: Problem z obliczeniem wartości.")
                 return
-            time = end_time - start_time
-            self.l8.setText(f"Czas potrzebny do obliczenia: {time}")
+
         except Exception as e:
             self.l6.setText(f"Error: Wystąpił problem podczas obliczeń.")
             return
@@ -402,19 +410,16 @@ class ObliczCzeb(QDialog):
         self.figure.clear()
         ax = self.figure.add_subplot(111)
 
-        # Zmiana zmiennych do przedziału [-1, 1]
         t_points, _ = roots_chebyt(self.n)
         x_points = (b - a) / 2 * t_points + (b + a) / 2
         y_points = [self.f(x) for x in x_points]
-        ax.scatter(x_points, y_points, color='red', marker=".")
+        ax.scatter(x_points, y_points, color='red', marker=".", label="Węzły Czebyszewa")
         ax.grid(True, alpha=0.2)
 
-        # Rysowanie krzywej funkcji
         x_fine = np.linspace(a, b, 300)
         y_fine = [self.f(x) for x in x_fine]
         ax.plot(x_fine, y_fine, 'b-', linewidth=1, label=self.rownanie.text())
 
-        # Dodaj legendę i odśwież wykres
         ax.legend()
         self.canvas.draw()
 

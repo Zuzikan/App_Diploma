@@ -5,6 +5,8 @@ import PyQt5.QtGui as qtg
 
 import metoda_boolea
 import metoda_czeb
+import metoda_herm
+import metoda_monte
 import metoda_pr
 import metoda_tr
 import metoda_simp
@@ -61,16 +63,10 @@ class MainWindow(qtw.QDialog):
         self.kwadratura_g_h.clicked.connect(self.open_kwadratura_g_h)
         self.kwadratura_g_h.setSizePolicy(qtw.QSizePolicy.Expanding, qtw.QSizePolicy.Expanding)
 
-        self.metoda_m_c_1 = qtw.QPushButton("Metoda Monte-Carlo 1D")
-        self.layout().addWidget(self.metoda_m_c_1)
-        self.metoda_m_c_1.clicked.connect(self.open_metoda_m_c_1)
-        self.metoda_m_c_1.setSizePolicy(qtw.QSizePolicy.Expanding, qtw.QSizePolicy.Expanding)
-
-        self.metoda_m_c_2 = qtw.QPushButton("Metoda Monte-Carlo 2D")
-        self.layout().addWidget(self.metoda_m_c_2)
-        self.metoda_m_c_2.clicked.connect(self.open_metoda_m_c_2)
-        self.metoda_m_c_2.setSizePolicy(qtw.QSizePolicy.Expanding, qtw.QSizePolicy.Expanding)
-
+        self.metoda_m_c = qtw.QPushButton("Metoda Monte-Carlo 1D i 2D")
+        self.layout().addWidget(self.metoda_m_c)
+        self.metoda_m_c.clicked.connect(self.open_metoda_m_c)
+        self.metoda_m_c.setSizePolicy(qtw.QSizePolicy.Expanding, qtw.QSizePolicy.Expanding)
 
         self.nieoznaczone = qtw.QPushButton("Całki nieoznaczone")
         self.layout().addWidget(self.nieoznaczone)
@@ -111,16 +107,13 @@ class MainWindow(qtw.QDialog):
         self.w.show()
 
     def open_kwadratura_g_h(self):
-        self.w = metoda_pr.MetodaPr()
+        self.w = metoda_herm.MetodaHerm()
         self.w.show()
 
-    def open_metoda_m_c_1(self):
-        self.w = metoda_pr.MetodaPr()
+    def open_metoda_m_c(self):
+        self.w = metoda_monte.MetodaMonte()
         self.w.show()
 
-    def open_metoda_m_c_2(self):
-        self.w = metoda_pr.MetodaPr()
-        self.w.show()
 
     def open_nieoznaczone(self):
         self.p10 = nieoznaczone.Nieoznaczone()

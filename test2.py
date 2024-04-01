@@ -1,35 +1,37 @@
-import numpy as np
+import matplotlib.pyplot as plt
+from numpy import linspace, sqrt, log
+from scipy.special import roots_chebyt
 
+# Definicja funkcji
+def f(x):
+    return sqrt(3 * x**2 + 7) / (5 + log(2*x))
 
-def czebyszew_nodes(n):
-    return np.cos(0.5 * np.pi * (2 * np.arange(1, n + 1) - 1) / n)
+# Przedział
+a, b = 2, 3
 
+# Liczba węzłów
+n = 3
 
-def chebyshev_solver(f, a, b, n):
-    d = (b - a)
-    c = 0.5 * np.pi * d / n
+# Zmiana zmiennych dla węzłów Czebyszewa
+t_nodes, _ = roots_chebyt(n)
+x_nodes = (b - a) / 2 * t_nodes + (b + a) / 2
+y_nodes = f(x_nodes)
 
-    cn = czebyszew_nodes(n)
-    v = 0.5 * (cn + 1) * d + a
-    return c * np.sum(f(v) * np.sqrt(1 - cn**2))
+# Rysowanie funkcji
+x = linspace(a, b, 400)
+y = f(x)
+plt.plot(x, y, label='Funkcja $\\sqrt{3x^2 + 7} / (5 + \\log(2x))$', color='blue')
 
+# Zaznaczenie węzłów kwadratury Gaussa-Czebyszewa
+plt.scatter(x_nodes, y_nodes, color='red', label='Węzły Gaussa-Czebyszewa')
 
-def efunc(x):
-    return np.sqrt(3 * x**2 + 7) / (5 + np.log(2*x))
+plt.fill_between(x, y, color='skyblue', alpha=0.3)
+plt.title('Wykres funkcji i węzły kwadratury Gaussa-Czebyszewa')
+plt.xlabel('x')
+plt.ylabel('f(x)')
+plt.legend()
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+plt.tight_layout()
 
-print(chebyshev_solver(efunc,2 , 3, 3))
-
-
-def gauss_chebyshev_quadrature(deg):
-    # Compute sample points and weights
-    x, w = np.polynomial.chebyshev.chebgauss(deg)
-
-    # Example: Integrate f(x) = x^2 over [-1, 1]
-    integral_approximation = np.sum(w * (x**2))
-
-    return integral_approximation
-
-# Example usage
-degree = 60  # Choose the degree (number of sample points)
-result = gauss_chebyshev_quadrature(degree)
-print(f"Approximate integral: {result:.6f}")
+# Wyświetlenie wykresu
+plt.show()

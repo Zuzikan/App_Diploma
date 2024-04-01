@@ -5,7 +5,7 @@ import PyQt5.QtCore as qtc
 from PyQt5.QtGui import QPixmap, QFont
 
 
-class MetodaCzeb(QDialog):
+class MetodaHerm(QDialog):
     def __init__(self):
         super().__init__()
 
@@ -22,25 +22,23 @@ class MetodaCzeb(QDialog):
         font.setPointSize(10)
 
         labels_1 = [
-            "<h3>Kwadratura Gaussa-Czebyszewa</h3>",
-            "W tej metodzie jako wielomiany ortogonalne  wykorzystywane są wielomiany Czebyszewa. ",
-            "Natomiast wielomiany ortogonalne to sekwencja wielomianów, które są ortogonalne względem ",
-            "pewnego iloczynu skalarnego.",
-            "Kwadratura jest szczególnie efektywna przy całkowaniu funkcji z dużą osobliwością  w ",
-            "punktach końcowych przedziału, to znaczy gdy funkcja doświadcza silnej zmienności w tych punktach. "
+            "<h3>Kwadratura Gaussa-Hermite'a</h3>",
+            "W kwadraturze Gaussa-Hermite’a przedział całkowania jest nieskończony co wyróżnia ją spośród innych ",
+            "kwadratur Gaussa. Kwadratura ta umożliwia dokładne przybliżenie całki przy użyciu niewielkiej liczby ",
+            "punktów. W tej metodzie jako wielomiany ortogonalne wykorzystywane są wielomiany Hermite’a."
 
         ]
 
-        l1 = QLabel("Wielomiany ortogonalne Czebyszewa są postaci:")
-        l2 = QLabel("Jest to jeden z czterech najczęściej używanych rodzajów wielomianów ortogonalnych, które są ")
-        l2c = QLabel("związane z odpowiadającymi im kwadraturami Gaussa.")
-        l4 = QLabel("Funkcja wagowa, czyli 'waga' wkładu poszczególnych części przedziału całkowania, dla tych "
+        l1 = QLabel("Wielomiany ortogonalne Hermite’a mają postać:")
+        l2 = QLabel("Funkcja wagowa, czyli 'waga' wkładu poszczególnych części przedziału całkowania, dla tych "
                     "wielomianów to:")
-        l5 = QLabel("a przedział całkowania [-1,1].")
-        l6 = QLabel("Całkę poniżej możemy przybliżać kwadraturami Gaussa-Czebyszewa:")
-        l7 = QLabel("w której węzły x<sub>i</sub> są pierwiastkami wielomianu ortogonalnego Czebyszewa stopnia (n+1), ")
-        l7c = QLabel("a wartości A<sub>i</sub> są odpowiadającymi im współczynnikami.")
-        l8 = QLabel("Wartości węzłów i współczynników dla kwadratur Gaussa-Czebyszewa wyraża się wzorami:")
+
+        l4 = QLabel("a przedział całkowania (-∞,∞).")
+        l5 = QLabel("Zatem całkę poniżej można przybliżyć za pomocą kwadratur Gaussa-Hermite’a:")
+        l6 = QLabel("W tych kwadraturach węzły x<sub>i</sub> są pierwiastkami wielomianu ortogonalnego Hermite’a "
+                    "stopnia (n+1),")
+        l6c = QLabel("a wartości A<sub>i</sub> odpowiadającymi im współczynnikami. W poniższej tabeli przedstawiono ")
+        l6cc=QLabel("wartości współczynników dla wielomianów stopnia 1-4.")
 
 
         for text in labels_1:
@@ -49,21 +47,23 @@ class MetodaCzeb(QDialog):
 
         add_label(l1, layout)
 
-        add_pic("zdjecia/Czebyszew/wielomiany.png", layout)
-        add_label(QLabel(""), layout)
+        add_pic("zdjecia/Hermit/wielomiany_orto.png", layout)
+
         add_label(l2, layout)
-        add_label(l2c, layout)
+        add_pic("zdjecia/Hermit/wagowa.png", layout)
         add_label(l4, layout)
 
-        add_pic("zdjecia/Czebyszew/funkcja_w.png", layout)
+
         add_label(l5, layout)
-        add_label(QLabel(""), layout)
+
+
+        add_pic("zdjecia/Hermit/calka.png", layout)
+
         add_label(l6, layout)
-        add_pic("zdjecia/Czebyszew/kwadratura.png", layout)
-        add_label(l7, layout)
-        add_label(l7c, layout)
-        add_label(l8, layout)
-        add_pic("zdjecia/Czebyszew/wzory.png", layout)
+        add_label(l6c, layout)
+        add_label(l6cc, layout)
+        add_label(QLabel(""), layout)
+        add_pic("zdjecia/Hermit/tabela.png", layout)
         add_label(QLabel(""), layout)
 
         zamknij = QPushButton('Zamknij program')
