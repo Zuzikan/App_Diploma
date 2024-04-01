@@ -15,6 +15,9 @@ def chebyshev_solver(f, a, b, n):
 
 
 def efunc(x):
-    return np.sqrt(3 * x**2 + 7) / (5 + np.log(2*x))
+    return (x**2-1)**3*np.cos(x)
 
-print(chebyshev_solver(efunc, 2, 3, 3))
+print(chebyshev_solver(efunc,0 , 2, 3))
+
+
+

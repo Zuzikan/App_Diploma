@@ -4,6 +4,7 @@ import PyQt5.QtCore as qtc
 import PyQt5.QtGui as qtg
 
 import metoda_boolea
+import metoda_czeb
 import metoda_pr
 import metoda_tr
 import metoda_simp
@@ -106,7 +107,7 @@ class MainWindow(qtw.QDialog):
         self.p5.show()
 
     def open_kwadratura_g_c(self):
-        self.w = metoda_pr.MetodaPr()
+        self.w = metoda_czeb.MetodaCzeb()
         self.w.show()
 
     def open_kwadratura_g_h(self):
