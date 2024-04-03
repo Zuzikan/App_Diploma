@@ -1,24 +1,26 @@
-from scipy.integrate import quad
 import numpy as np
 
-# Define the function for Gauss-Chebyshev quadrature (since the weighting function is part of the method, we use f(x) = 1)
+
+n=1000
+a=0
+b=10
 def f(x):
     return x**2
 
-# Number of nodes for Gauss-Chebyshev quadrature
-n = 10
+def punkty( n, a, b):
 
-# Gauss-Chebyshev nodes and weights (for Chebyshev polynomials of the first kind)
-nodes = np.cos(np.pi * (np.arange(1, n + 1) - 0.5) / n)
-weights = np.pi / n * np.ones(n)
+    random_points_x = np.random.uniform(a, b, n)
+    random_points_y = np.random.uniform(f(a), f(b), n)
+    return random_points_x, random_points_y
 
-# Approximate integral using Gauss-Chebyshev quadrature
-approx_integral = sum(weights * f(nodes))
 
-# Exact integral of 1/sqrt(1-x^2) over [-1, 1] is pi
-exact_integral = np.pi
+ar_x, ar_y = punkty(n, a, b)
+f_values_at_ar_x = np.array([f(x) for x in ar_x])
 
-# Calculate the error
-error = np.abs(approx_integral - exact_integral)
+points_under_or_on_curve = ar_y <= f_values_at_ar_x
+points_above_curve = ~points_under_or_on_curve
+num_points_under_or_on_curve = np.sum(points_under_or_on_curve)
+num_points_above_curve = np.sum(points_above_curve)
 
-print(approx_integral, exact_integral, error)
+
+print(num_points_under_or_on_curve, num_points_above_curve)

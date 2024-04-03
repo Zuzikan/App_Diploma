@@ -1,4 +1,4 @@
-import obliczenia_czeb
+import oblicz_herm
 import wykres_metoda_tr
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
 import PyQt5.QtCore as qtc
@@ -105,7 +105,7 @@ class MetodaHerm(QDialog):
         if hasattr(self, 'w1') and self.w1.isVisible():
             self.w1.close()
 
-        self.w2 = obliczenia_czeb.ObliczCzeb()
+        self.w2 = oblicz_herm.ObliczHerm()
         self.w2.show()
         self.close()
 

@@ -160,15 +160,8 @@ class ObliczNieoznaczona(QDialog):
             return
 
     def f(self, x):
-        rownanie_string = self.rownanie.text()
         try:
-            rownanie_matematyczne = sympify(rownanie_string)
-            x_sym = rownanie_matematyczne.free_symbols
-            x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
-            if len(x_sym_sorted) != 1:
-                self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
-                self.l8.setText(f"")
-                return None
+            rownanie_matematyczne, x_sym_sorted = self.converter()
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
             self.l8.setText(f"")
@@ -191,17 +184,31 @@ class ObliczNieoznaczona(QDialog):
         x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
         return x_sym_sorted
 
-    def nieoznaczona(self):
-        rownanie_string = self.rownanie.text()
+    def converter(self):
         try:
+            rownanie_string = self.rownanie.text()
             rownanie_matematyczne = sympify(rownanie_string)
             x_sym_sorted = self.symbols(rownanie_string)
             if len(x_sym_sorted) != 1:
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
                 self.l8.setText(f"")
                 return None
+            return rownanie_matematyczne, x_sym_sorted
 
+        except Exception as e:
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji. 1")
+            self.l8.setText(f"")
+            return e
+
+    def nieoznaczona(self):
+        try:
+
+            rownanie_matematyczne, x_sym_sorted = self.converter()
+            start_time = timeit.default_timer()
             calka = integrate(rownanie_matematyczne, x_sym_sorted[0])
+            end_time = timeit.default_timer()
+            time = end_time - start_time
+            self.l8.setText(f"Czas potrzebny do obliczenia: {time}")
 
             self.l6.setText(f"Wynik: {calka} + C")
             return calka
@@ -218,14 +225,11 @@ class ObliczNieoznaczona(QDialog):
             return
 
         try:
-            start_time = timeit.default_timer()
+
             result_nieoznaczona = self.nieoznaczona()
-            end_time = timeit.default_timer()
             if result_nieoznaczona is None:
                 self.l6.setText("Error: Problem z obliczeniem wartości. 1")
                 return
-            time = end_time - start_time
-            self.l8.setText(f"Czas potrzebny do obliczenia: {time}")
         except Exception as e:
             self.l6.setText(f"Error: Wystąpił problem podczas obliczeń.")
             return
