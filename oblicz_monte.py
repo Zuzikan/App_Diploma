@@ -3,13 +3,14 @@ import numpy as np
 import timeit
 import math
 
+from scipy.optimize import minimize
 from scipy.special import roots_chebyt
 from scipy.integrate import quad
 from scipy.interpolate import CubicSpline
 from sympy import sympify, lambdify, solve
 from PyQt5.QtCore import Qt, QCoreApplication, QLocale
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
-                             QPushButton, QDialog)
+                             QPushButton, QDialog, QTabWidget, QVBoxLayout, QWidget)
 from PyQt5.QtGui import QDoubleValidator, QFont
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -51,35 +52,29 @@ class ObliczMonte(QDialog):
         lb = QLabel("b:", self)
         self.a = QLineEdit(self)
         self.b = QLineEdit(self)
-        self.n = 100
+        self.n = QLineEdit(self)
         self.l6 = QLabel(self)
+        self.l6l = QLabel(self)
+        self.l6r = QLabel(self)
         self.l7 = QLabel(self)
         self.l8 = QLabel(self)
+        self.l8l = QLabel(self)
+        self.l8r = QLabel(self)
         self.l9 = QLabel(self)
-        self.slider = QSlider(Qt.Horizontal, self)
-        self.slider.setMinimum(100)
-        self.slider.setMaximum(500)
-        self.slider.setValue(100)
-        start = QLabel('100')
-        end = QLabel('500')
+        self.l9l = QLabel(self)
+        self.l9r = QLabel(self)
         oblicz = QPushButton('Oblicz', self)
-        self.wartosc = QLabel("Liczba node'ów: 100", self)
+        self.wartosc = QLabel("Liczba punktów:", self)
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
+        self.figure2 = Figure()
+        self.canvas2 = FigureCanvas(self.figure2)
+        self.figure3 = Figure()
+        self.canvas3 = FigureCanvas(self.figure3)
 
-        self.slider.valueChanged.connect(self.slider_nodes)
         instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         oblicz.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
-        self.slider.setStyleSheet("""
-                QSlider::handle:horizontal {
-                    background: #333;
-                    border: 1px solid #555;
-                    width: 8px;
-                    height: 8px;
-                    margin: -8px 0;  
-                    border-radius:4px;  
-                }
-                """)
+
         validator = QDoubleValidator()
         validator.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.a.setPlaceholderText("Wpisz wartość a")
@@ -87,6 +82,7 @@ class ObliczMonte(QDialog):
         self.a.setValidator(validator)
         self.b.setValidator(validator)
         self.rownanie.setPlaceholderText("Wpisz wartość całki")
+        self.n.setPlaceholderText("Wpisz ilość punktów")
         l3.setAlignment(Qt.AlignCenter)
         self.wartosc.setAlignment(Qt.AlignCenter)
 
@@ -115,27 +111,62 @@ class ObliczMonte(QDialog):
 
         layout.addLayout(abHorizontal, 5, 0, 1, 2)
 
-        layout.addWidget(oblicz, 6, 0, 1, 2)
+        sliderLayout.addWidget(self.wartosc)
+        sliderLayout.addWidget(self.n)
+        layout.addLayout(sliderLayout, 6, 0, 1, 2)
+
+        layout.addWidget(oblicz, 7, 0, 1, 2)
         oblicz.clicked.connect(self.check_errors)
 
         layout.addWidget(self.wartosc, 7, 0, 1, 2)
 
-        sliderLayout.addWidget(start)
-        sliderLayout.addWidget(self.slider)
-        sliderLayout.addWidget(end)
-
-        sliderLayout.setStretch(0, 1)
-        sliderLayout.setStretch(1, 50)
-        sliderLayout.setStretch(2, 1)
-
-        layout.addLayout(sliderLayout, 8, 0, 1, 2)
-
         layout.addWidget(self.l6, 9, 0, 1, 2)
-        layout.addWidget(self.l7, 10, 0, 1, 2)
-        layout.addWidget(self.l8, 11, 0, 1, 2)
-        layout.addWidget(self.l9, 12, 0, 1, 2)
+        layout.addWidget(self.l6l, 10, 0, 1, 2)
+        layout.addWidget(self.l6r, 11, 0, 1, 2)
+        layout.addWidget(self.l7, 12, 0, 1, 2)
+        # layout.addWidget(self.l8, 11, 0, 1, 2)
+        # layout.addWidget(self.l9, 12, 0, 1, 2)
 
-        layout.addWidget(self.canvas, 0, 3, 15, 1)
+        # layout.addWidget(self.canvas, 0, 3, 15, 1)
+        self.tabTimeErrors = QTabWidget(self)
+
+        self.tabt = QWidget()
+        self.tabt.layout = QVBoxLayout(self.tabt)
+        self.tabt.layout.addWidget(self.l8)
+        self.tabt.layout.addWidget(self.l8l)
+        self.tabt.layout.addWidget(self.l8r)
+
+        self.tabe = QWidget()
+        self.tabe.layout = QVBoxLayout(self.tabe)
+        self.tabe.layout.addWidget(self.l9)
+        self.tabe.layout.addWidget(self.l9l)
+        self.tabe.layout.addWidget(self.l9r)
+
+        self.tabTimeErrors.addTab(self.tabt, "Czas")
+        self.tabTimeErrors.addTab(self.tabe, "Błędy")
+
+        layout.addWidget(self.tabTimeErrors, 14, 0, 4, 2)
+
+        # tab for canvas
+        self.tabWidget = QTabWidget(self)
+        self.tab1 = QWidget()
+        self.tab1.layout = QVBoxLayout(self.tab1)
+        self.tab1.layout.addWidget(self.canvas)
+
+        self.tab2 = QWidget()
+        self.tab2.layout = QVBoxLayout(self.tab2)
+        self.tab2.layout.addWidget(self.canvas2)
+
+        self.tab3 = QWidget()
+        self.tab3.layout = QVBoxLayout(self.tab3)
+        self.tab3.layout.addWidget(self.canvas3)
+
+        self.tabWidget.addTab(self.tab1, "Midpoint")
+        self.tabWidget.addTab(self.tab2, "Left side")
+        self.tabWidget.addTab(self.tab3, "Right side")
+
+        # layout.addWidget(self.canvas, 0, 3, 15, 1)
+        layout.addWidget(self.tabWidget, 0, 3, 18, 1)
 
         zamknij = QPushButton('Zamknij program')
         zamknij_okno = QPushButton("Zamknij okno")
@@ -285,19 +316,32 @@ class ObliczMonte(QDialog):
             self.l7.setText(f"Error: W zakresie [a,b] nie mogą znajdować sie te punkty: {punkty}")
             return punkty
 
-    def punkty(self, n, a, b):
+    def min_max(self, a, b):
+        min_val = float('inf')
+        max_val = float('-inf')
+        min_x = None
+        max_x = None
+        for x in np.arange(a, b, 0.01):
+            y = self.f(x)
+            if y < min_val:
+                min_val = y
+                min_x = x
+            if y > max_val:
+                max_val = y
+                max_x = x
+        return max_x, min_x
 
+    def punkty(self, n, a, b):
         random_points_x = np.random.uniform(a, b, n)
-        random_points_y = np.random.uniform(self.f(a), self.f(b), n)
+        random_points_y = np.random.uniform(self.f(self.minimum), self.f(self.maximum), n)
         return random_points_x, random_points_y
 
     def monte_carlo(self, n, a, b):
         try:
+            num_on_under, num_above = self.ilosc_punktow(a, b, n)
             start_time = timeit.default_timer()
 
-            num_on_under, num_above = self.ilosc_punktow(a, b)
-
-            h = self.f(b) - self.f(a)
+            h = self.f(self.maximum) - self.f(self.minimum)
             A = h * (b - a)
             wynik = A * (num_on_under / n)
 
@@ -320,18 +364,42 @@ class ObliczMonte(QDialog):
             self.l9.setText(f"")
             return e
 
-    def slider_nodes(self, value):
-        self.n = value
-        self.wartosc.setText(f"Liczba node'ów: {value}")
-        self.get_a_b()
+    def monte_carlo_2(self, n, a, b):
+        try:
+            ar_x, ar_y = self.punkty(n, a, b)
+            start_time = timeit.default_timer()
+            calka = 0.0
+            for i in ar_x:
+                calka += self.f(i)
+            wynik = (b - a) / float(n) * calka
 
-    def error(self, a, b, value):
+            end_time = timeit.default_timer()
+            time = end_time - start_time
+
+            if math.isnan(wynik):
+                self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
+                self.l8.setText(f"")
+                self.l9.setText(f"")
+                return None
+            else:
+                self.l6l.setText(f"Wynik2: {wynik}")
+                self.l8l.setText(f"Czas potrzebny do obliczenia2: {time}")
+                return wynik
+
+        except Exception as e:
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
+            self.l8.setText(f"")
+            self.l9.setText(f"")
+            return e
+
+    def error(self, a, b, value, value2):
         try:
             accurate_result, _ = quad(self.f, a, b)
 
             error = abs(accurate_result - value)
-            self.l9.setText(f"Błąd dla kwadratury Gaussa-Czebyszewa: {error}")
-
+            error2 = abs(accurate_result - value2)
+            self.l9.setText(f"Błąd dla Metody Monte Carlo 1D: {error}")
+            self.l9l.setText(f"Błąd dla Metody Monte Carlo 1D2: {error2}")
         except Exception as e:
             self.l9.setText(f"Error: Problem z obliczeniem błędu.")
             return e
@@ -352,9 +420,16 @@ class ObliczMonte(QDialog):
             self.l8.setText(f"")
             self.l9.setText(f"")
             return
+        if self.n.text().strip() == "":
+            self.l6.setText("Error: Wpisz wartość n")
+            self.l8.setText(f"")
+            self.l9.setText(f"")
+            return
         try:
             a = float(self.a.text())
             b = float(self.b.text())
+            self.maximum, self.minimum = self.min_max(a, b)
+            n = int(self.n.text())
         except ValueError:
             self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
             self.l8.setText(f"")
@@ -377,8 +452,12 @@ class ObliczMonte(QDialog):
 
         try:
 
-            result_monte = self.monte_carlo(self.n, a, b)
+            result_monte = self.monte_carlo(n, a, b)
             if result_monte is None:
+                self.l6.setText("Error: Problem z obliczeniem wartości.")
+                return
+            result_monte2 = self.monte_carlo_2(n, a, b)
+            if result_monte2 is None:
                 self.l6.setText("Error: Problem z obliczeniem wartości.")
                 return
 
@@ -386,7 +465,7 @@ class ObliczMonte(QDialog):
             self.l6.setText(f"Error: Wystąpił problem podczas obliczeń.")
             return
         try:
-            self.error(a, b, result_monte)
+            self.error(a, b, result_monte, result_monte2)
         except Exception as e:
             self.l6.setText(f"Error: Błąd z errorem")
             self.l8.setText(f"")
@@ -394,10 +473,11 @@ class ObliczMonte(QDialog):
 
             return e
 
-        self.update_wykres(a, b)
+        self.update_wykres(a, b, n)
+        self.update_wykres2(a, b, n)
 
-    def ilosc_punktow(self, a, b):
-        ar_x, ar_y = self.punkty(self.n, a, b)
+    def ilosc_punktow(self, a, b, n):
+        ar_x, ar_y = self.punkty(n, a, b)
         f_values_at_ar_x = np.array([self.f(x) for x in ar_x])
 
         points_under_or_on_curve = ar_y <= f_values_at_ar_x
@@ -406,13 +486,13 @@ class ObliczMonte(QDialog):
         num_above = np.sum(points_above_curve)
         return num_on_under, num_above
 
-    def update_wykres(self, a, b):
+    def update_wykres(self, a, b, n):
         if a is None or b is None or a >= b:
             return
 
         self.figure.clear()
         ax = self.figure.add_subplot(111)
-        ar_x, ar_y = self.punkty(self.n, a, b)
+        ar_x, ar_y = self.punkty(n, a, b)
 
         f_values_at_ar_x = np.array([self.f(x) for x in ar_x])
 
@@ -420,18 +500,37 @@ class ObliczMonte(QDialog):
         points_above_curve = ~points_under_or_on_curve
 
         ax.scatter(ar_x[points_under_or_on_curve], ar_y[points_under_or_on_curve], color='green', marker=".",
-                   label="Under/On Curve")
-        ax.scatter(ar_x[points_above_curve], ar_y[points_above_curve], color='red', marker=".", label="Above Curve")
+                   label="W obszarze")
+        ax.scatter(ar_x[points_above_curve], ar_y[points_above_curve], color='red', marker=".", label="Poza obszarem")
         x_fine = np.linspace(a, b, 300)
         y_fine = [self.f(x) for x in x_fine]
         ax.plot(x_fine, y_fine, 'b-', linewidth=1, label=self.rownanie.text())
 
-        # Enhance plot with grid, legend, and possibly other labels as needed
         ax.grid(True, which='both', linestyle='--', linewidth=0.5)
-        ax.legend()
+        ax.legend(loc='upper left')
 
-        # Redraw the canvas to show the updated plot
         self.canvas.draw()
+
+    def update_wykres2(self, a, b, n):
+        if a is None or b is None or a >= b:
+            return
+
+        self.figure2.clear()
+        ax = self.figure2.add_subplot(111)
+
+        ar_x, ar_y = self.punkty(n, a, b)
+        y_random = [self.f(x) for x in ar_x]
+
+        ax.scatter(ar_x, y_random, color='red', marker=".", label="Punkty Monte Carlo")
+
+        x_fine = np.linspace(a, b, 3000)
+        y_fine = [self.f(x) for x in x_fine]
+        ax.plot(x_fine, y_fine, 'b-', linewidth=1, label=self.rownanie.text())
+
+        ax.legend(loc='upper left')
+        ax.grid(True, alpha=0.2)
+
+        self.canvas2.draw()
 
 
 def main():

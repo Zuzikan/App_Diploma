@@ -53,7 +53,7 @@ class ObliczHerm(QDialog):
         self.l8 = QLabel(self)
         self.l9 = QLabel(self)
         oblicz = QPushButton('Oblicz', self)
-        self.wartosc = QLabel("Liczba node'ów: ", self)
+        self.wartosc = QLabel("Liczba punktów: ", self)
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
 
@@ -64,6 +64,7 @@ class ObliczHerm(QDialog):
         validator.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
 
         self.rownanie.setPlaceholderText("Wpisz wartość całki")
+        self.n.setPlaceholderText("Wpisz ilość punktów")
         l3.setAlignment(Qt.AlignCenter)
         self.wartosc.setAlignment(Qt.AlignCenter)
 
@@ -234,7 +235,7 @@ class ObliczHerm(QDialog):
             self.l7.setText(f"Error: W zakresie [a,b] nie mogą znajdować sie te punkty: {punkty}")
             return punkty
 
-    def czebyszew(self, n):
+    def hermit(self, n):
         try:
 
             start_time = timeit.default_timer()
@@ -262,10 +263,6 @@ class ObliczHerm(QDialog):
             self.l9.setText(f"")
             return e
 
-    def slider_nodes(self, value):
-        self.n = value
-        self.wartosc.setText(f"Liczba node'ów: {value}")
-        self.get_a_b()
 
     def do_errora(self, x):
         return np.exp(-x ** 2)
@@ -305,8 +302,8 @@ class ObliczHerm(QDialog):
 
         try:
 
-            result_czeb = self.czebyszew(n)
-            if result_czeb is None:
+            result_herm = self.hermit(n)
+            if result_herm is None:
                 self.l6.setText("Error: Problem z obliczeniem wartości.")
                 return
 
@@ -314,7 +311,7 @@ class ObliczHerm(QDialog):
             self.l6.setText(f"Error: Wystąpił problem podczas obliczeń.")
             return
         try:
-            self.error(result_czeb)
+            self.error(result_herm)
         except Exception as e:
             self.l6.setText(f"Error: Błąd z errorem")
             self.l8.setText(f"")
