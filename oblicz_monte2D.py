@@ -5,7 +5,7 @@ import math
 
 from scipy.optimize import minimize
 from scipy.special import roots_chebyt
-from scipy.integrate import quad
+from scipy.integrate import quad, nquad
 from scipy.interpolate import CubicSpline
 from sympy import sympify, lambdify, solve
 from PyQt5.QtCore import Qt, QCoreApplication, QLocale
@@ -69,10 +69,6 @@ class ObliczMonte(QDialog):
         self.wartosc = QLabel("Liczba punktów:", self)
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
-        self.figure2 = Figure()
-        self.canvas2 = FigureCanvas(self.figure2)
-
-
 
         instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         oblicz.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
@@ -124,47 +120,12 @@ class ObliczMonte(QDialog):
 
         layout.addWidget(self.l6, 9, 0, 1, 2)
         layout.addWidget(self.l6l, 10, 0, 1, 2)
-        layout.addWidget(self.l7, 11, 0, 1, 2)
-        # layout.addWidget(self.l8, 11, 0, 1, 2)
-        # layout.addWidget(self.l9, 12, 0, 1, 2)
+        layout.addWidget(self.l6r, 11, 0, 1, 2)
+        layout.addWidget(self.l7, 12, 0, 1, 2)
+        layout.addWidget(self.l8, 13, 0, 1, 2)
+        layout.addWidget(self.l9, 14, 0, 1, 2)
 
-        # layout.addWidget(self.canvas, 0, 3, 15, 1)
-        self.tabTimeErrors = QTabWidget(self)
-
-        self.tabt = QWidget()
-        self.tabt.layout = QVBoxLayout(self.tabt)
-        self.tabt.layout.addWidget(self.l8)
-        self.tabt.layout.addWidget(self.l8l)
-
-
-        self.tabe = QWidget()
-        self.tabe.layout = QVBoxLayout(self.tabe)
-        self.tabe.layout.addWidget(self.l9)
-        self.tabe.layout.addWidget(self.l9l)
-
-
-        self.tabTimeErrors.addTab(self.tabt, "Czas")
-        self.tabTimeErrors.addTab(self.tabe, "Błędy")
-
-        layout.addWidget(self.tabTimeErrors, 14, 0, 4, 2)
-
-        # tab for canvas
-        self.tabWidget = QTabWidget(self)
-        self.tab1 = QWidget()
-        self.tab1.layout = QVBoxLayout(self.tab1)
-        self.tab1.layout.addWidget(self.canvas)
-
-        self.tab2 = QWidget()
-        self.tab2.layout = QVBoxLayout(self.tab2)
-        self.tab2.layout.addWidget(self.canvas2)
-
-
-        self.tabWidget.addTab(self.tab1, "Hit or miss")
-        self.tabWidget.addTab(self.tab2, "Średniej wartości")
-
-
-        # layout.addWidget(self.canvas, 0, 3, 15, 1)
-        layout.addWidget(self.tabWidget, 0, 3, 18, 1)
+        layout.addWidget(self.canvas, 0, 3, 15, 1)
 
         zamknij = QPushButton('Zamknij program')
         zamknij_okno = QPushButton("Zamknij okno")
@@ -186,7 +147,7 @@ class ObliczMonte(QDialog):
 
         self.setLayout(layout)
         self.setFontForLayout(layout, self.font)
-        self.setWindowTitle('Obliczenia metoda Monte Carlo 1D')
+        self.setWindowTitle('Obliczenia metoda Monte Carlo 1D i 2D')
 
     def wroc(self):
         self.w = regula_3_8.Regula38()
@@ -248,7 +209,7 @@ class ObliczMonte(QDialog):
 
     def check_errors(self):
         try:
-            self.f(1)
+            self.fxy(1, 1)
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.1")
             self.l8.setText(f"")
@@ -273,7 +234,7 @@ class ObliczMonte(QDialog):
             rownanie_string = self.rownanie.text()
             rownanie_matematyczne = sympify(rownanie_string)
             x_sym_sorted = self.symbols(rownanie_string)
-            if len(x_sym_sorted) != 1:
+            if len(x_sym_sorted) != 2:
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
                 self.l8.setText(f"")
                 return None
@@ -284,17 +245,26 @@ class ObliczMonte(QDialog):
             self.l8.setText(f"")
             return e
 
-    def f(self, x):
+    def fxy(self, x, y):
+        rownanie_string = self.rownanie.text()
         try:
-            rownanie_matematyczne, x_sym_sorted = self.converter()
+            rownanie_matematyczne = sympify(rownanie_string)
+            x_sym = rownanie_matematyczne.free_symbols
+            x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+            if len(x_sym_sorted) != 2:
+                self.l6.setText("Error: Funkcja powinna zawierać dwie zmienne.")
+                self.l8.setText(f"")
+                self.l9.setText(f"")
+                return None
         except Exception as e:
-            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
             self.l8.setText(f"")
             self.l9.setText(f"")
+
             return None
         try:
             funkcja = lambdify(x_sym_sorted, rownanie_matematyczne, 'numpy')
-            return funkcja(x)
+            return funkcja(x, y)
         except ValueError:
             self.l6.setText("Error: Wartość nieprawidłowa.")
             self.l8.setText(f"")
@@ -306,7 +276,6 @@ class ObliczMonte(QDialog):
             self.l9.setText(f"")
 
             return
-
 
     def dzielenie_przez_zero(self, funkcja, x):
         denominator = funkcja.as_numer_denom()[1]
@@ -332,45 +301,17 @@ class ObliczMonte(QDialog):
 
     def punkty(self, n, a, b):
         random_points_x = np.random.uniform(a, b, n)
-        random_points_y = np.random.uniform(self.f(self.minimum), self.f(self.maximum), n)
+        random_points_y = np.random.uniform(a, b, n)
         return random_points_x, random_points_y
 
-    def monte_carlo(self, n, a, b):
-        try:
-            num_on_under, num_above = self.ilosc_punktow(a, b, n)
-            start_time = timeit.default_timer()
-
-            h = self.f(self.maximum) - self.f(self.minimum)
-            A = h * (b - a)
-            wynik = A * (num_on_under / n)
-
-            end_time = timeit.default_timer()
-            time = end_time - start_time
-
-            if math.isnan(wynik):
-                self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
-                self.l8.setText(f"")
-                self.l9.setText(f"")
-                return None
-            else:
-                self.l6.setText(f"Wynik: {wynik}")
-                self.l8.setText(f"Czas potrzebny do obliczenia: {time}")
-                return wynik
-
-        except Exception as e:
-            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
-            self.l8.setText(f"")
-            self.l9.setText(f"")
-            return e
-
-    def monte_carlo_2(self, n, a, b):
+    def monte_carlo_3(self, n, a, b):
         try:
             ar_x, ar_y = self.punkty(n, a, b)
+            f = self.fxy(ar_x, ar_y)
             start_time = timeit.default_timer()
-            calka = 0.0
-            for i in ar_x:
-                calka += self.f(i)
-            wynik = (b - a) / float(n) * calka
+
+            pole = (b - a) * (b - a)
+            wynik = pole * np.mean(f)
 
             end_time = timeit.default_timer()
             time = end_time - start_time
@@ -381,25 +322,23 @@ class ObliczMonte(QDialog):
                 self.l9.setText(f"")
                 return None
             else:
-                self.l6l.setText(f"Wynik2: {wynik}")
-                self.l8l.setText(f"Czas potrzebny do obliczenia2: {time}")
+                self.l6.setText(f"Wynik3: {wynik}")
+                self.l8.setText(f"Czas potrzebny do obliczenia2: {time}")
                 return wynik
-
         except Exception as e:
-            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.2")
             self.l8.setText(f"")
             self.l9.setText(f"")
             return e
 
-
-    def error(self, a, b, value, value2):
+    def error(self, a, b, value):
         try:
-            accurate_result, _ = quad(self.f, a, b)
+            accurate_result, _ = nquad(self.fxy, [(a, b), (a, b)])
 
             error = abs(accurate_result - value)
-            error2 = abs(accurate_result - value2)
-            self.l9.setText(f"Błąd dla Metody Monte Carlo 1D: {error}")
-            self.l9l.setText(f"Błąd dla Metody Monte Carlo 1D2: {error2}")
+
+            self.l9.setText(f"Błąd dla Metody Monte Carlo 2D: {error}")
+
         except Exception as e:
             self.l9.setText(f"Error: Problem z obliczeniem błędu.")
             return e
@@ -428,7 +367,7 @@ class ObliczMonte(QDialog):
         try:
             a = float(self.a.text())
             b = float(self.b.text())
-            self.maximum, self.minimum = self.min_max(a, b)
+            #self.maximum, self.minimum = self.min_max(a, b)
             n = int(self.n.text())
         except ValueError:
             self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
@@ -452,12 +391,8 @@ class ObliczMonte(QDialog):
 
         try:
 
-            result_monte = self.monte_carlo(n, a, b)
-            if result_monte is None:
-                self.l6.setText("Error: Problem z obliczeniem wartości.")
-                return
-            result_monte2 = self.monte_carlo_2(n, a, b)
-            if result_monte2 is None:
+            result_monte3 = self.monte_carlo_3(n, a, b)
+            if result_monte3 is None:
                 self.l6.setText("Error: Problem z obliczeniem wartości.")
                 return
 
@@ -465,17 +400,17 @@ class ObliczMonte(QDialog):
             self.l6.setText(f"Error: Wystąpił problem podczas obliczeń.")
             return
         try:
-            self.error(a, b, result_monte, result_monte2)
+            self.error(a, b, result_monte3)
         except Exception as e:
             self.l6.setText(f"Error: Błąd z errorem")
             self.l8.setText(f"")
             self.l9.setText(f"")
 
             return e
-
-        self.update_wykres(a, b, n)
-        self.update_wykres2(a, b, n)
-
+        try:
+            self.update_wykres3(a, b, n)
+        except Exception as e:
+            return None
 
     def ilosc_punktow(self, a, b, n):
         ar_x, ar_y = self.punkty(n, a, b)
@@ -487,52 +422,39 @@ class ObliczMonte(QDialog):
         num_above = np.sum(points_above_curve)
         return num_on_under, num_above
 
-    def update_wykres(self, a, b, n):
+    def update_wykres3(self, a, b, n):
         if a is None or b is None or a >= b:
             return
 
         self.figure.clear()
-        ax = self.figure.add_subplot(111)
+        ax = self.figure.add_subplot(111, projection='3d')
+
+        # Assuming self.punkty(n, a, b) generates arrays of points in the domain [a, b]
         ar_x, ar_y = self.punkty(n, a, b)
+        f_values = self.fxy(ar_x, ar_y)  # Evaluate the function at those points
 
-        f_values_at_ar_x = np.array([self.f(x) for x in ar_x])
+        # Generate a meshgrid for the surface plot
+        x = np.linspace(a, b, 100)
+        y = np.linspace(a, b, 100)
+        x, y = np.meshgrid(x, y)
+        z = self.fxy(x, y)  # Evaluate the function over the grid
 
-        points_under_or_on_curve = ar_y <= f_values_at_ar_x
-        points_above_curve = ~points_under_or_on_curve
+        # Scatter plot for Monte Carlo points
+        ax.scatter(ar_x, ar_y, f_values, color='red', marker=".", label="Punkty Monte Carlo")
 
-        ax.scatter(ar_x[points_under_or_on_curve], ar_y[points_under_or_on_curve], color='green', marker=".",
-                   label="W obszarze")
-        ax.scatter(ar_x[points_above_curve], ar_y[points_above_curve], color='red', marker=".", label="Poza obszarem")
-        x_fine = np.linspace(a, b, 300)
-        y_fine = [self.f(x) for x in x_fine]
-        ax.plot(x_fine, y_fine, 'b-', linewidth=1, label=self.rownanie.text())
+        # Surface plot
+        surf = ax.plot_surface(x, y, z, cmap='viridis', alpha=0.5, linewidth=0, antialiased=False, label="Funkcja")
 
-        ax.grid(True, which='both', linestyle='--', linewidth=0.2)
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('f(x, y)')
+
+        surf._facecolors2d = surf._facecolor3d
+        surf._edgecolors2d = surf._edgecolor3d
         ax.legend(loc='upper left')
 
-        self.canvas.draw()
-
-    def update_wykres2(self, a, b, n):
-        if a is None or b is None or a >= b:
-            return
-
-        self.figure2.clear()
-        ax = self.figure2.add_subplot(111)
-
-        ar_x, ar_y = self.punkty(n, a, b)
-        y_random = [self.f(x) for x in ar_x]
-
-        ax.scatter(ar_x, y_random, color='red', marker=".", label="Punkty Monte Carlo")
-
-        x_fine = np.linspace(a, b, 3000)
-        y_fine = [self.f(x) for x in x_fine]
-        ax.plot(x_fine, y_fine, 'b-', linewidth=1, label=self.rownanie.text())
-
-        ax.legend(loc='upper left')
         ax.grid(True, alpha=0.2)
-
-        self.canvas2.draw()
-
+        self.canvas.draw()
 
 
 def main():

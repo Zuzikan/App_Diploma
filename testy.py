@@ -1,30 +1,47 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
-# Define the function
-def f(x):
-    return x**2
 
-# Define the range and step size
-start = 0
-end = 5
-step = 0.01
+def f(x, y):
+    return x ** 2 + y ** 2
 
-# Initialize minimum and maximum values
-min_val = float('inf')
-max_val = float('-inf')
-min_x = None
-max_x = None
 
-# Loop over the range and compute function values
-for x in np.arange(start, end, step):
-    y = f(x)
-    if y < min_val:
-        min_val = y
-        min_x = x
-    if y > max_val:
-        max_val = y
-        max_x = x
+def monte_carlo_2D_integration(f, a, b, n):
+    x_random = np.random.uniform(a, b, n)
+    y_random = np.random.uniform(a, b, n)
+    f_values = f(x_random, y_random)
+    area = (b - a) * (b - a)
+    integral_estimate = area * np.mean(f_values)
+    return x_random, y_random, f_values, integral_estimate
 
-# Print results
-print("Minimum value:", min_val, "at x =", min_x)
-print("Maximum value:", max_val, "at x =", max_x)
+
+# Domain boundaries
+a, b, = -1, 1
+n = 10000  # Number of points
+
+# Monte Carlo Integration
+x_random, y_random, f_values, integral_estimate = monte_carlo_2D_integration(f, a, b, n)
+
+# Plotting
+fig = plt.figure(figsize=(12, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+# Generate grid for plotting
+x = np.linspace(a, b, 100)
+y = np.linspace(a, b, 100)
+x, y = np.meshgrid(x, y)
+z = f(x, y)
+
+# Plot the surface
+ax.plot_surface(x, y, z, cmap='viridis', alpha=0.7)
+
+# Plot the points
+ax.scatter(x_random, y_random, f_values, color='r', marker='o')
+
+ax.set_xlabel('X axis')
+ax.set_ylabel('Y axis')
+ax.set_zlabel('f(x, y)')
+ax.set_title(f'Monte Carlo 2D Integration Estimate: {integral_estimate:.4f}')
+
+plt.show()
