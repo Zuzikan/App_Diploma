@@ -28,6 +28,8 @@ import regula_3_8
 class ObliczMonte(QDialog):
     def __init__(self):
         super().__init__()
+        self.ar_x = None
+        self.ar_y = None
         self.maximum = None
         self.minimum = None
         self.initUI()
@@ -71,8 +73,6 @@ class ObliczMonte(QDialog):
         self.canvas = FigureCanvas(self.figure)
         self.figure2 = Figure()
         self.canvas2 = FigureCanvas(self.figure2)
-
-
 
         instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         oblicz.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
@@ -136,12 +136,10 @@ class ObliczMonte(QDialog):
         self.tabt.layout.addWidget(self.l8)
         self.tabt.layout.addWidget(self.l8l)
 
-
         self.tabe = QWidget()
         self.tabe.layout = QVBoxLayout(self.tabe)
         self.tabe.layout.addWidget(self.l9)
         self.tabe.layout.addWidget(self.l9l)
-
 
         self.tabTimeErrors.addTab(self.tabt, "Czas")
         self.tabTimeErrors.addTab(self.tabe, "Błędy")
@@ -158,10 +156,8 @@ class ObliczMonte(QDialog):
         self.tab2.layout = QVBoxLayout(self.tab2)
         self.tab2.layout.addWidget(self.canvas2)
 
-
         self.tabWidget.addTab(self.tab1, "Hit or miss")
         self.tabWidget.addTab(self.tab2, "Średniej wartości")
-
 
         # layout.addWidget(self.canvas, 0, 3, 15, 1)
         layout.addWidget(self.tabWidget, 0, 3, 18, 1)
@@ -307,7 +303,6 @@ class ObliczMonte(QDialog):
 
             return
 
-
     def dzielenie_przez_zero(self, funkcja, x):
         denominator = funkcja.as_numer_denom()[1]
         punkty = solve(denominator, x)
@@ -335,9 +330,9 @@ class ObliczMonte(QDialog):
         random_points_y = np.random.uniform(self.f(self.minimum), self.f(self.maximum), n)
         return random_points_x, random_points_y
 
-    def monte_carlo(self, n, a, b):
+    def monte_carlo(self, n, a, b, ar_x, ar_y):
         try:
-            num_on_under, num_above = self.ilosc_punktow(a, b, n)
+            num_on_under, num_above = self.ilosc_punktow()
             start_time = timeit.default_timer()
 
             h = self.f(self.maximum) - self.f(self.minimum)
@@ -391,7 +386,6 @@ class ObliczMonte(QDialog):
             self.l9.setText(f"")
             return e
 
-
     def error(self, a, b, value, value2):
         try:
             accurate_result, _ = quad(self.f, a, b)
@@ -430,6 +424,7 @@ class ObliczMonte(QDialog):
             b = float(self.b.text())
             self.maximum, self.minimum = self.min_max(a, b)
             n = int(self.n.text())
+            self.ar_x, self.ar_y = self.punkty(n, a, b)
         except ValueError:
             self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
             self.l8.setText(f"")
@@ -452,7 +447,7 @@ class ObliczMonte(QDialog):
 
         try:
 
-            result_monte = self.monte_carlo(n, a, b)
+            result_monte = self.monte_carlo(n, a, b, self.ar_x, self.ar_y)
             if result_monte is None:
                 self.l6.setText("Error: Problem z obliczeniem wartości.")
                 return
@@ -473,36 +468,38 @@ class ObliczMonte(QDialog):
 
             return e
 
-        self.update_wykres(a, b, n)
+        self.update_wykres(a, b, self.ar_x, self.ar_y)
         self.update_wykres2(a, b, n)
 
-
-    def ilosc_punktow(self, a, b, n):
-        ar_x, ar_y = self.punkty(n, a, b)
-        f_values_at_ar_x = np.array([self.f(x) for x in ar_x])
-
-        points_under_or_on_curve = ar_y <= f_values_at_ar_x
-        points_above_curve = ~points_under_or_on_curve
-        num_on_under = np.sum(points_under_or_on_curve)
+    def ilosc_punktow(self):
+        f_values_at_ar_x = np.array([self.f(x) for x in self.ar_x])
+        threshold = 0.001
+        points_on_curve = np.abs(f_values_at_ar_x - self.ar_y) < threshold
+        points_under_curve = self.ar_y < f_values_at_ar_x
+        points_above_curve = self.ar_y > f_values_at_ar_x
+        num_on_under = np.sum(points_on_curve) + np.sum(points_under_curve)
         num_above = np.sum(points_above_curve)
         return num_on_under, num_above
 
-    def update_wykres(self, a, b, n):
+    def update_wykres(self, a, b, ar_x, ar_y):
         if a is None or b is None or a >= b:
             return
 
         self.figure.clear()
         ax = self.figure.add_subplot(111)
-        ar_x, ar_y = self.punkty(n, a, b)
 
         f_values_at_ar_x = np.array([self.f(x) for x in ar_x])
 
-        points_under_or_on_curve = ar_y <= f_values_at_ar_x
-        points_above_curve = ~points_under_or_on_curve
+        threshold = 0.001
+        points_on_curve = np.abs(f_values_at_ar_x - ar_y) < threshold
+        points_under_curve = ar_y < f_values_at_ar_x
+        points_above_curve = ~points_under_curve
 
-        ax.scatter(ar_x[points_under_or_on_curve], ar_y[points_under_or_on_curve], color='green', marker=".",
+        ax.scatter(ar_x[points_under_curve], ar_y[points_under_curve], color='green', marker=".",
                    label="W obszarze")
+        ax.scatter(ar_x[points_on_curve], ar_y[points_on_curve], color='green', marker=".")
         ax.scatter(ar_x[points_above_curve], ar_y[points_above_curve], color='red', marker=".", label="Poza obszarem")
+
         x_fine = np.linspace(a, b, 300)
         y_fine = [self.f(x) for x in x_fine]
         ax.plot(x_fine, y_fine, 'b-', linewidth=1, label=self.rownanie.text())
@@ -532,7 +529,6 @@ class ObliczMonte(QDialog):
         ax.grid(True, alpha=0.2)
 
         self.canvas2.draw()
-
 
 
 def main():
