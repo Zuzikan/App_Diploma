@@ -330,7 +330,7 @@ class ObliczMonte(QDialog):
         random_points_y = np.random.uniform(self.f(self.minimum), self.f(self.maximum), n)
         return random_points_x, random_points_y
 
-    def monte_carlo(self, n, a, b, ar_x, ar_y):
+    def monte_carlo(self, n, a, b):
         try:
             num_on_under, num_above = self.ilosc_punktow()
             start_time = timeit.default_timer()
@@ -358,9 +358,8 @@ class ObliczMonte(QDialog):
             self.l9.setText(f"")
             return e
 
-    def monte_carlo_2(self, n, a, b):
+    def monte_carlo_2(self, n, a, b, ar_x):
         try:
-            ar_x, ar_y = self.punkty(n, a, b)
             start_time = timeit.default_timer()
             calka = 0.0
             for i in ar_x:
@@ -422,10 +421,16 @@ class ObliczMonte(QDialog):
         try:
             a = float(self.a.text())
             b = float(self.b.text())
-            self.maximum, self.minimum = self.min_max(a, b)
             n = int(self.n.text())
-            self.ar_x, self.ar_y = self.punkty(n, a, b)
         except ValueError:
+            self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a, b lub n.")
+            self.l8.setText(f"")
+            self.l9.setText(f"")
+            return
+        try:
+            self.maximum, self.minimum = self.min_max(a, b)
+            self.ar_x, self.ar_y = self.punkty(n, a, b)
+        except Exception as e:
             self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
             self.l8.setText(f"")
             self.l9.setText(f"")
@@ -447,11 +452,11 @@ class ObliczMonte(QDialog):
 
         try:
 
-            result_monte = self.monte_carlo(n, a, b, self.ar_x, self.ar_y)
+            result_monte = self.monte_carlo(n, a, b)
             if result_monte is None:
                 self.l6.setText("Error: Problem z obliczeniem wartości.")
                 return
-            result_monte2 = self.monte_carlo_2(n, a, b)
+            result_monte2 = self.monte_carlo_2(n, a, b, self.ar_x)
             if result_monte2 is None:
                 self.l6.setText("Error: Problem z obliczeniem wartości.")
                 return
@@ -469,30 +474,30 @@ class ObliczMonte(QDialog):
             return e
 
         self.update_wykres(a, b, self.ar_x, self.ar_y)
-        self.update_wykres2(a, b, n)
+        self.update_wykres2(a, b, self.ar_x)
 
     def ilosc_punktow(self):
-        f_values_at_ar_x = np.array([self.f(x) for x in self.ar_x])
+        f_values = np.array([self.f(x) for x in self.ar_x])
         threshold = 0.001
-        points_on_curve = np.abs(f_values_at_ar_x - self.ar_y) < threshold
-        points_under_curve = self.ar_y < f_values_at_ar_x
-        points_above_curve = self.ar_y > f_values_at_ar_x
+        points_on_curve = np.abs(f_values - self.ar_y) < threshold
+        points_under_curve = self.ar_y < f_values
+        points_above_curve = self.ar_y > f_values
         num_on_under = np.sum(points_on_curve) + np.sum(points_under_curve)
         num_above = np.sum(points_above_curve)
         return num_on_under, num_above
 
-    def update_wykres(self, a, b, ar_x, ar_y):
+    def update_wykres(self, a, b, ar_x, ar_y, ):
         if a is None or b is None or a >= b:
             return
 
         self.figure.clear()
         ax = self.figure.add_subplot(111)
 
-        f_values_at_ar_x = np.array([self.f(x) for x in ar_x])
+        f_values = np.array([self.f(x) for x in ar_x])
 
         threshold = 0.001
-        points_on_curve = np.abs(f_values_at_ar_x - ar_y) < threshold
-        points_under_curve = ar_y < f_values_at_ar_x
+        points_on_curve = np.abs(f_values - ar_y) < threshold
+        points_under_curve = ar_y < f_values
         points_above_curve = ~points_under_curve
 
         ax.scatter(ar_x[points_under_curve], ar_y[points_under_curve], color='green', marker=".",
@@ -505,18 +510,20 @@ class ObliczMonte(QDialog):
         ax.plot(x_fine, y_fine, 'b-', linewidth=1, label=self.rownanie.text())
 
         ax.grid(True, which='both', linestyle='--', linewidth=0.2)
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+
         ax.legend(loc='upper left')
 
         self.canvas.draw()
 
-    def update_wykres2(self, a, b, n):
+    def update_wykres2(self, a, b, ar_x):
         if a is None or b is None or a >= b:
             return
 
         self.figure2.clear()
         ax = self.figure2.add_subplot(111)
 
-        ar_x, ar_y = self.punkty(n, a, b)
         y_random = [self.f(x) for x in ar_x]
 
         ax.scatter(ar_x, y_random, color='red', marker=".", label="Punkty Monte Carlo")
@@ -524,6 +531,8 @@ class ObliczMonte(QDialog):
         x_fine = np.linspace(a, b, 3000)
         y_fine = [self.f(x) for x in x_fine]
         ax.plot(x_fine, y_fine, 'b-', linewidth=1, label=self.rownanie.text())
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
 
         ax.legend(loc='upper left')
         ax.grid(True, alpha=0.2)
