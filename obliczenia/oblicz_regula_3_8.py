@@ -15,12 +15,9 @@ from matplotlib.figure import Figure
 from sympy.core.sympify import SympifyError
 
 import instrukcja
-import oblicz_boole
-import oblicz_metoda_prostokatow
-import oblicz_nieoznaczone
-import oblicz_simpson
-import oblicz_trapez
-import regula_3_8
+from metody import regula_3_8
+from obliczenia import (obliczenia_czeb, oblicz_herm, oblicz_monte, oblicz_monte2D, oblicz_boole,
+                        oblicz_metoda_prostokatow, oblicz_nieoznaczone, oblicz_simpson, oblicz_trapez)
 
 
 class ObliczRegula(QDialog):
@@ -95,6 +92,10 @@ class ObliczRegula(QDialog):
         self.combo.addItem("Metoda trapezów", "window2")
         self.combo.addItem("Metoda Simpsona", "window3")
         self.combo.addItem("Metoda Boole'a", "window4")
+        self.combo.addItem("Kwadratura Gaussa-Czebyszewa", "window5")
+        self.combo.addItem("Kwadratura Gaussa-Hermite'a", "window6")
+        self.combo.addItem("Metoda Monte Carlo 1D", "window7")
+        self.combo.addItem("Metoda Monte Carlo 2D", "window8")
         self.combo.addItem("Całki nieoznaczone", "window9")
 
         self.combo.activated.connect(self.porownaj)
@@ -185,6 +186,22 @@ class ObliczRegula(QDialog):
             self.window = oblicz_boole.ObliczBoole()
             self.pass_data(self.window)
             self.window.show()
+        elif self.combo.itemData(index) == "window5":
+            self.window = obliczenia_czeb.ObliczCzeb()
+            self.pass_data(self.window)
+            self.window.show()
+        elif self.combo.itemData(index) == "window6":
+            self.window = oblicz_herm.ObliczHerm()
+            self.pass_data_n(self.window)
+            self.window.show()
+        elif self.combo.itemData(index) == "window7":
+            self.window = oblicz_monte.ObliczMonte()
+            self.pass_data(self.window)
+            self.window.show()
+        elif self.combo.itemData(index) == "window8":
+            self.window = oblicz_monte2D.ObliczMonte2()
+            self.pass_data(self.window)
+            self.window.show()
         elif self.combo.itemData(index) == "window9":
             self.window = oblicz_nieoznaczone.ObliczNieoznaczona()
             self.pass_data_n(self.window)
@@ -196,18 +213,18 @@ class ObliczRegula(QDialog):
             b = self.b.text()
             rownanie = self.rownanie.text()
 
-            self.window.a.setText(a)
-            self.window.b.setText(b)
-            self.window.rownanie.setText(rownanie)
-            self.window.check_errors()
+            window.a.setText(a)
+            window.b.setText(b)
+            window.rownanie.setText(rownanie)
+            window.check_errors()
         except Exception as e:
             return
 
     def pass_data_n(self, window):
         try:
             rownanie = self.rownanie.text()
-            self.window.rownanie.setText(rownanie)
-            self.window.check_errors()
+            window.rownanie.setText(rownanie)
+            window.check_errors()
         except Exception as e:
             return
 
@@ -233,6 +250,7 @@ class ObliczRegula(QDialog):
             self.l8.setText(f"")
             self.l9.setText(f"")
             return
+
     def symbols(self, rownanie):
         rownanie_matematyczne = sympify(rownanie)
         x_sym = rownanie_matematyczne.free_symbols

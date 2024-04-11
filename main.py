@@ -2,16 +2,10 @@ import sys
 import PyQt5.QtWidgets as qtw
 import PyQt5.QtCore as qtc
 import PyQt5.QtGui as qtg
-
-import metoda_boolea
-import metoda_czeb
-import metoda_herm
-import metoda_monte
-import metoda_pr
-import metoda_tr
-import metoda_simp
-import nieoznaczone
-import regula_3_8
+sys.path.append('metody')
+sys.path.append('obliczenia')
+from metody import (metoda_czeb, metoda_herm, metoda_monte, metoda_pr, metoda_tr, metoda_simp, nieoznaczone,
+                    regula_3_8, metoda_boolea)
 
 
 class MainWindow(qtw.QDialog):
@@ -115,12 +109,12 @@ class MainWindow(qtw.QDialog):
         self.w = metoda_monte.MetodaMonte()
         self.w.show()
 
-
     def open_nieoznaczone(self):
         self.p10 = nieoznaczone.Nieoznaczone()
-        self. p10.show()
+        self.p10.show()
 
-if __name__ == "__main__":
+
+def main():
     app = qtw.QApplication([])
 
     appFont = qtg.QFont()
@@ -130,3 +124,7 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+    main()

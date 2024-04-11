@@ -10,11 +10,9 @@ from matplotlib.figure import Figure
 from sympy import sympify, lambdify, integrate
 
 import instrukcja
-import oblicz_boole
-import oblicz_metoda_prostokatow
-import oblicz_regula_3_8
-import oblicz_simpson
-import oblicz_trapez
+from metody import nieoznaczone
+from obliczenia import (oblicz_boole, oblicz_herm, obliczenia_czeb, oblicz_monte, oblicz_regula_3_8,
+                        oblicz_metoda_prostokatow, oblicz_monte2D, oblicz_simpson, oblicz_trapez)
 
 
 class ObliczNieoznaczona(QDialog):
@@ -57,6 +55,10 @@ class ObliczNieoznaczona(QDialog):
         self.combo.addItem("Metoda Simpsona", "window3")
         self.combo.addItem("Reguła 3/8", "window4")
         self.combo.addItem("Metoda Boole'a", "window5")
+        self.combo.addItem("Kwadratura Gaussa-Czebyszewa", "window6")
+        self.combo.addItem("Kwadratura Gaussa-Hermite'a", "window7")
+        self.combo.addItem("Metoda Monte Carlo 1D", "window8")
+        self.combo.addItem("Metoda Monte Carlo 2D", "window9")
 
         self.combo.activated.connect(self.porownaj)
         layout.addWidget(l1, 4, 0)
@@ -98,12 +100,12 @@ class ObliczNieoznaczona(QDialog):
         self.setFontForLayout(layout, self.font)
         self.setWindowTitle('Obliczenia całki nieoznaczone')
 
-    """
+
     def wroc(self):
-        self.w = metoda_tr.MetodaTr()
+        self.w = nieoznaczone.Nieoznaczone()
         self.w.show()
         self.close()
-    """
+
 
     def porownaj(self, index):
         if self.combo.itemData(index) == "window1":
@@ -126,12 +128,28 @@ class ObliczNieoznaczona(QDialog):
             self.window = oblicz_boole.ObliczBoole()
             self.pass_data(self.window)
             self.window.show()
+        elif self.combo.itemData(index) == "window6":
+            self.window = obliczenia_czeb.ObliczCzeb()
+            self.pass_data(self.window)
+            self.window.show()
+        elif self.combo.itemData(index) == "window7":
+            self.window = oblicz_herm.ObliczHerm()
+            self.pass_data(self.window)
+            self.window.show()
+        elif self.combo.itemData(index) == "window8":
+            self.window = oblicz_monte.ObliczMonte()
+            self.pass_data(self.window)
+            self.window.show()
+        elif self.combo.itemData(index) == "window9":
+            self.window = oblicz_monte2D.ObliczMonte2()
+            self.pass_data(self.window)
+            self.window.show()
 
     def pass_data(self, window):
         try:
             rownanie = self.rownanie.text()
-            self.window.rownanie.setText(rownanie)
-            self.window.check_errors()
+            window.rownanie.setText(rownanie)
+            window.check_errors()
         except Exception as e:
             return
 

@@ -17,12 +17,10 @@ from matplotlib.figure import Figure
 from sympy.core.sympify import SympifyError
 
 import instrukcja
-import oblicz_boole
-import oblicz_metoda_prostokatow
-import oblicz_nieoznaczone
-import oblicz_simpson
-import oblicz_trapez
-import regula_3_8
+
+from metody import metoda_herm
+from obliczenia import (oblicz_boole, obliczenia_czeb, oblicz_monte, oblicz_monte2D, oblicz_regula_3_8,
+                        oblicz_metoda_prostokatow, oblicz_nieoznaczone, oblicz_simpson, oblicz_trapez)
 
 
 class ObliczHerm(QDialog):
@@ -73,7 +71,11 @@ class ObliczHerm(QDialog):
         self.combo.addItem("Metoda prostokątów", "window1")
         self.combo.addItem("Metoda trapezów", "window2")
         self.combo.addItem("Metoda Simpsona", "window3")
-        self.combo.addItem("Metoda Boole'a", "window4")
+        self.combo.addItem("Reguła 3/8", "window4")
+        self.combo.addItem("Metoda Boole'a", "window5")
+        self.combo.addItem("Kwadratura Gaussa-Czebyszewa", "window6")
+        self.combo.addItem("Metoda Monte Carlo 1D", "window7")
+        self.combo.addItem("Metoda Monte Carlo 2D", "window8")
         self.combo.addItem("Całki nieoznaczone", "window9")
 
         self.combo.activated.connect(self.porownaj)
@@ -123,7 +125,7 @@ class ObliczHerm(QDialog):
         self.setWindowTitle("Obliczenia kwadratura Gaussa-Hermite'a")
 
     def wroc(self):
-        self.w = regula_3_8.Regula38()
+        self.w = metoda_herm.MetodaHerm()
         self.w.show()
         self.close()
 
@@ -145,7 +147,23 @@ class ObliczHerm(QDialog):
             self.pass_data(self.window)
             self.window.show()
         elif self.combo.itemData(index) == "window4":
+            self.window = oblicz_regula_3_8.ObliczRegula()
+            self.pass_data(self.window)
+            self.window.show()
+        elif self.combo.itemData(index) == "window5":
             self.window = oblicz_boole.ObliczBoole()
+            self.pass_data(self.window)
+            self.window.show()
+        elif self.combo.itemData(index) == "window6":
+            self.window = obliczenia_czeb.ObliczCzeb()
+            self.pass_data(self.window)
+            self.window.show()
+        elif self.combo.itemData(index) == "window7":
+            self.window = oblicz_monte.ObliczMonte()
+            self.pass_data(self.window)
+            self.window.show()
+        elif self.combo.itemData(index) == "window8":
+            self.window = oblicz_monte2D.ObliczMonte2()
             self.pass_data(self.window)
             self.window.show()
         elif self.combo.itemData(index) == "window9":
@@ -159,18 +177,18 @@ class ObliczHerm(QDialog):
             b = self.b.text()
             rownanie = self.rownanie.text()
 
-            self.window.a.setText(a)
-            self.window.b.setText(b)
-            self.window.rownanie.setText(rownanie)
-            self.window.check_errors()
+            window.a.setText(a)
+            window.b.setText(b)
+            window.rownanie.setText(rownanie)
+            window.check_errors()
         except Exception as e:
             return
 
     def pass_data_n(self, window):
         try:
             rownanie = self.rownanie.text()
-            self.window.rownanie.setText(rownanie)
-            self.window.check_errors()
+            window.rownanie.setText(rownanie)
+            window.check_errors()
         except Exception as e:
             return
 
@@ -202,6 +220,7 @@ class ObliczHerm(QDialog):
         x_sym = rownanie_matematyczne.free_symbols
         x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
         return x_sym_sorted
+
     def converter(self):
         try:
             rownanie_string = self.rownanie.text()
@@ -278,7 +297,6 @@ class ObliczHerm(QDialog):
             self.l8.setText(f"")
             self.l9.setText(f"")
             return e
-
 
     def do_errora(self, x):
         return np.exp(-x ** 2)
