@@ -449,7 +449,6 @@ class ObliczCzeb(QDialog):
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.legend(loc='upper left')
-        ax.legend()
         self.canvas.draw()
 
 

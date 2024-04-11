@@ -571,7 +571,7 @@ class ObliczMonte(QDialog):
         num_above = np.sum(points_above_curve)
         return num_on_under, num_above
 
-    def update_wykres(self, a, b, ar_x, ar_y, ):
+    def update_wykres(self, a, b, ar_x, ar_y):
         if a is None or b is None or a >= b:
             return
 

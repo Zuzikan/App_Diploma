@@ -83,7 +83,7 @@ class ObliczNieoznaczona(QDialog):
 
         zamknij_okno.clicked.connect(self.close)
         zamknij.clicked.connect(QCoreApplication.instance().quit)
-        # powrot.clicked.connect(self.wroc)
+        powrot.clicked.connect(self.wroc)
 
         powrot.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         zamknij.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
@@ -100,12 +100,10 @@ class ObliczNieoznaczona(QDialog):
         self.setFontForLayout(layout, self.font)
         self.setWindowTitle('Obliczenia całki nieoznaczone')
 
-
     def wroc(self):
         self.w = nieoznaczone.Nieoznaczone()
         self.w.show()
         self.close()
-
 
     def porownaj(self, index):
         if self.combo.itemData(index) == "window1":
