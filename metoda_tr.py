@@ -1,4 +1,4 @@
-import oblicz_trapez
+from obliczenia import oblicz_trapez
 import wykres_metoda_tr
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout,QSizePolicy, QDialog)
 import PyQt5.QtCore as qtc
@@ -48,11 +48,11 @@ class MetodaTr(QDialog):
             label = QLabel(text)
             add_label(label, layout)
 
-        add_pic("zdjecia/metoda_tr_jeden_trapez.png", layout)
+        add_pic("zdjecia/Trapezy/metoda_tr_jeden_trapez.png", layout)
 
         add_label(l1, layout)
 
-        add_pic("zdjecia/metoda_tr_jeden_blad.png", layout)
+        add_pic("zdjecia/Trapezy/metoda_tr_jeden_blad.png", layout)
 
         add_label(l2, layout_horizontal)
         add_pic("zdjecia/ksi.png", layout_horizontal)
@@ -66,7 +66,7 @@ class MetodaTr(QDialog):
         add_label(l3, layout)
         add_label(l4, layout)
 
-        add_pic("zdjecia/metoda_pr_przedzial.png", layout)
+        add_pic("zdjecia/Prostokaty/metoda_pr_przedzial.png", layout)
 
         add_label(l5, layout)
 
@@ -74,11 +74,11 @@ class MetodaTr(QDialog):
 
         add_label(l6, layout)
 
-        add_pic("zdjecia/metoda_tr_wiele_trapezow.png", layout)
+        add_pic("zdjecia/Trapezy/metoda_tr_wiele_trapezow.png", layout)
 
         add_label(l7, layout)
 
-        add_pic("zdjecia/metoda_tr_wiele_blad.png", layout)
+        add_pic("zdjecia/Trapezy/metoda_tr_wiele_blad.png", layout)
 
         add_label(l8, layout_horizontal_new)
         add_pic("zdjecia/ksi.png", layout_horizontal_new)

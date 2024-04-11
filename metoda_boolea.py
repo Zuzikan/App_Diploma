@@ -1,9 +1,9 @@
-import oblicz_boole
-import oblicz_trapez
-import wykres_metoda_tr
-from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout,QSizePolicy, QDialog)
 import PyQt5.QtCore as qtc
 from PyQt5.QtGui import QPixmap, QFont
+from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
+
+import wykres_metoda_tr
+from obliczenia import oblicz_boole
 
 
 class MetodaBoole(QDialog):
@@ -34,11 +34,11 @@ class MetodaBoole(QDialog):
         ]
 
         l1 = QLabel("<h3>Metoda Boole'a</h3>")
-        l2 = QLabel("Polega na przybliżeniu całki f(x) w przedziale [x<sub>0</sub>,x<sub>4</sub>], czyli n=4, a liczba punktów to 5.")
+        l2 = QLabel(
+            "Polega na przybliżeniu całki f(x) w przedziale [x<sub>0</sub>,x<sub>4</sub>], czyli n=4, a liczba punktów to 5.")
         l3 = QLabel("gdzie: ")
         l4 = QLabel("Jest to wzór prostej metody Boole’a (Simple Boole’s Rule). ")
         l5 = QLabel("")
-
 
         add_label(l1, layout)
         add_label(l2, layout)
@@ -51,7 +51,6 @@ class MetodaBoole(QDialog):
             add_label(label, layout)
 
         add_pic("zdjecia/Boole/boole_3.png", layout)
-
 
         zamknij = QPushButton('Zamknij program')
         zamknij_okno = QPushButton("Zamknij okno")
@@ -95,6 +94,7 @@ class MetodaBoole(QDialog):
         self.w2 = oblicz_boole.ObliczBoole()
         self.w2.show()
         self.close()
+
 
 def add_label(name, layout):
     layout.addWidget(name)

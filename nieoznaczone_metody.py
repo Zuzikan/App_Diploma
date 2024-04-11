@@ -1,12 +1,8 @@
 import sys
 
-import oblicz_boole
-import oblicz_nieoznaczone
-import oblicz_trapez
-import wykres_metoda_tr
-from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog, QApplication)
 import PyQt5.QtCore as qtc
-from PyQt5.QtGui import QPixmap, QFont
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QDialog, QApplication)
 
 
 class Podstawienie(QDialog):

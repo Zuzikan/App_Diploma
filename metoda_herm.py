@@ -1,4 +1,4 @@
-import oblicz_herm
+from obliczenia import oblicz_herm
 import wykres_metoda_tr
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
 import PyQt5.QtCore as qtc

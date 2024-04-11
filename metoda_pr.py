@@ -1,4 +1,4 @@
-import oblicz_metoda_prostokatow
+from obliczenia import oblicz_metoda_prostokatow
 import wykres_metoda_pr
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
 import PyQt5.QtCore as qtc
@@ -58,14 +58,14 @@ class MetodaPr(QDialog):
             label = QLabel(text)
             add_label(label, layout)
 
-        add_pic("zdjecia/metoda_pr_jeden_kwadrat.png", layout)
+        add_pic("zdjecia/Prostokaty/metoda_pr_jeden_kwadrat.png", layout)
 
         add_label(l1, layout)
 
-        add_pic("zdjecia/metoda_pr_jeden_blad.png", layout)
+        add_pic("zdjecia/Prostokaty/metoda_pr_jeden_blad.png", layout)
 
         add_label(l2, layout_horizontal)
-        add_pic("zdjecia/eta_1.png", layout_horizontal)
+        add_pic("zdjecia/Prostokaty/eta_1.png", layout_horizontal)
         layout.addLayout(layout_horizontal)
 
         wykres_kwadrat = QPushButton('Pokaż wykres z jednym kwadratem')
@@ -76,7 +76,7 @@ class MetodaPr(QDialog):
         add_label(l3, layout)
         add_label(l4, layout)
 
-        add_pic("zdjecia/metoda_pr_przedzial.png", layout)
+        add_pic("zdjecia/Prostokaty/metoda_pr_przedzial.png", layout)
 
         for text in labels_2:
             label = QLabel(text)
@@ -86,14 +86,14 @@ class MetodaPr(QDialog):
 
         add_label(l5, layout)
 
-        add_pic("zdjecia/metoda_pr_wiele_kwadratow.png", layout)
+        add_pic("zdjecia/Prostokaty/metoda_pr_wiele_kwadratow.png", layout)
 
         add_label(l6, layout)
 
-        add_pic("zdjecia/metoda_pr_wiele_blad.png", layout)
+        add_pic("zdjecia/Prostokaty/metoda_pr_wiele_blad.png", layout)
 
         add_label(l7, layout_horizontal_new)
-        add_pic("zdjecia/eta_1.png", layout_horizontal_new)
+        add_pic("zdjecia/Prostokaty/eta_1.png", layout_horizontal_new)
         layout.addLayout(layout_horizontal_new)
 
         wykres_kwadraty = QPushButton('Pokaż wykres z wieloma kwadratami')

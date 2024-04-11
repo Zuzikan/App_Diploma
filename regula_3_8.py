@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSiz
 import PyQt5.QtCore as qtc
 from PyQt5.QtGui import QPixmap, QFont
 
-import oblicz_regula_3_8
+from obliczenia import oblicz_regula_3_8
 import wykres_regula_3_8
 
 

@@ -1,4 +1,4 @@
-import obliczenia_czeb
+from obliczenia import obliczenia_czeb
 import wykres_metoda_tr
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
 import PyQt5.QtCore as qtc

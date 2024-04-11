@@ -22,6 +22,7 @@ class MainWindow(qtw.QDialog):
 
     def initUI(self):
         self.setWindowTitle("Menu")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
 
         self.setLayout(qtw.QVBoxLayout())
         self.intro = qtw.QLabel("<h3>Wybierz metodę</h3>")
