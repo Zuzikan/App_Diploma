@@ -25,70 +25,33 @@ class MetodaBoole(QDialog):
         font.setPointSize(10)
 
         labels_1 = [
-            "<h3>Metoda trapezów</h3>",
-            "Metoda prostokątów nie jest zbyt dokładna, ponieważ użyte w niej pola prostokątów ",
-            "źle odwzorowują powierzchnię pola pod krzywą.",
-            "Lepszą opcja jest podstawienie trapezów zamiast prostokątów o wysokości dx.",
-            "Aby przybliżyć sobie metodę trapezów zacznijmy od rozważenia przypadku dla n=1, czyli dla dwóch węzłów. ",
-            "Wzór trapezów dla jednego przedziału, gdzie początek przedziału to a, natomiast koniec to b.",
-            "Przybliżoną wartość całki wyraża się wzorem:"
+
+            "Złożona metoda Boole’a (Composite Boole’s Rule) jest ulepszeniem prostej metody. Przedział [x<sub>0</sub>,x<sub>4</sub>] ",
+            "możemy podzielić na małe podprzedziały o szerokości 4h i dla każdego z nich zastosować regułę Boole’a. ",
+            "Suma pól wszystkich podprzedziałów jest całką przedziału [x<sub>0</sub>,x<sub>4</sub>]. ",
+            "Mimo tego, że jest to metoda bardziej pracochłonna, oferuje większą precyzję i elastyczność."
 
         ]
 
-        l1 = QLabel("Błąd tej metody dla jednego przedziału wynosi:")
-        l2 = QLabel("gdzie: ")
-        l3 = QLabel("Jeśli przedział [a,b] jest duży możemy podzielić go na n segmentów i do każdego z nich "
-                    "zastosować metodę trapezów. ")
-        l4 = QLabel("Przedział całkowania [a, b] dzielimy na podprzedziały punktami:")
-        l5 = QLabel("Przyjmujemy oznaczenie h jako długość przedziału:")
-        l6 = QLabel("Więc wzór możemy zapisać:")
-        l7 = QLabel("Natomiast błąd tej metody wyraża się wzorem:")
-        l8 = QLabel("gdzie: ")
+        l1 = QLabel("<h3>Metoda Boole'a</h3>")
+        l2 = QLabel("Polega na przybliżeniu całki f(x) w przedziale [x<sub>0</sub>,x<sub>4</sub>], czyli n=4, a liczba punktów to 5.")
+        l3 = QLabel("gdzie: ")
+        l4 = QLabel("Jest to wzór prostej metody Boole’a (Simple Boole’s Rule). ")
+        l5 = QLabel("")
 
+
+        add_label(l1, layout)
+        add_label(l2, layout)
+        add_pic("zdjecia/Boole/boole_1.png", layout)
+        add_label(l3, layout)
+        add_pic("zdjecia/Boole/boole_2.png", layout)
+        add_label(l4, layout)
         for text in labels_1:
             label = QLabel(text)
             add_label(label, layout)
 
-        add_pic("zdjecia/metoda_tr_jeden_trapez.png", layout)
+        add_pic("zdjecia/Boole/boole_3.png", layout)
 
-        add_label(l1, layout)
-
-        add_pic("zdjecia/metoda_tr_jeden_blad.png", layout)
-
-        add_label(l2, layout_horizontal)
-        add_pic("zdjecia/ksi.png", layout_horizontal)
-        layout.addLayout(layout_horizontal)
-
-        wykres_kwadrat = QPushButton('Pokaż wykres z jednym trapezem')
-        wykres_kwadrat.clicked.connect(self.open_przedzial_trapez)
-        layout.addWidget(wykres_kwadrat)
-        wykres_kwadrat.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
-
-        add_label(l3, layout)
-        add_label(l4, layout)
-
-        add_pic("zdjecia/metoda_pr_przedzial.png", layout)
-
-        add_label(l5, layout)
-
-        add_pic("zdjecia/podprzedzial_h_2.png", layout)
-
-        add_label(l6, layout)
-
-        add_pic("zdjecia/metoda_tr_wiele_trapezow.png", layout)
-
-        add_label(l7, layout)
-
-        add_pic("zdjecia/metoda_tr_wiele_blad.png", layout)
-
-        add_label(l8, layout_horizontal_new)
-        add_pic("zdjecia/ksi.png", layout_horizontal_new)
-        layout.addLayout(layout_horizontal_new)
-
-        wykres_kwadraty = QPushButton('Pokaż wykres z wieloma trapezami')
-        wykres_kwadraty.clicked.connect(self.open_przedzial_trapezy)
-        layout.addWidget(wykres_kwadraty)
-        wykres_kwadraty.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
 
         zamknij = QPushButton('Zamknij program')
         zamknij_okno = QPushButton("Zamknij okno")

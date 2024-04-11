@@ -123,7 +123,7 @@ if __name__ == "__main__":
     app = qtw.QApplication([])
 
     appFont = qtg.QFont()
-    appFont.setPointSize(10)  # Adjust application-wide font size as needed
+    appFont.setPointSize(10)
     app.setFont(appFont)
 
     window = MainWindow()

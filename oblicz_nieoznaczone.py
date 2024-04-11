@@ -148,6 +148,7 @@ class ObliczNieoznaczona(QDialog):
     def check_errors(self):
         try:
             self.f(1)
+            self.l7.setText("")
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.1")
             self.l8.setText(f"")
@@ -249,10 +250,10 @@ class ObliczNieoznaczona(QDialog):
 
         ax.plot(x, y, 'b-', linewidth=1, label=rownanie_string)
         ax.plot(x, y_fine_integral, color="orange", linestyle='--', linewidth=1, label=calka)
-
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
         ax.grid(True, alpha=0.2)
-        ax.legend()
-
+        ax.legend(loc='upper left')
         self.canvas.draw()
 
 

@@ -1,8 +1,11 @@
+import sys
+
+import nieoznaczone_metody
 import oblicz_boole
 import oblicz_nieoznaczone
 import oblicz_trapez
 import wykres_metoda_tr
-from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout,QSizePolicy, QDialog)
+from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog, QApplication)
 import PyQt5.QtCore as qtc
 from PyQt5.QtGui import QPixmap, QFont
 
@@ -26,71 +29,65 @@ class Nieoznaczone(QDialog):
         font.setPointSize(10)
 
         labels_1 = [
-            "<h3>Metoda trapezów</h3>",
-            "Metoda prostokątów nie jest zbyt dokładna, ponieważ użyte w niej pola prostokątów ",
-            "źle odwzorowują powierzchnię pola pod krzywą.",
-            "Lepszą opcja jest podstawienie trapezów zamiast prostokątów o wysokości dx.",
-            "Aby przybliżyć sobie metodę trapezów zacznijmy od rozważenia przypadku dla n=1, czyli dla dwóch węzłów. ",
-            "Wzór trapezów dla jednego przedziału, gdzie początek przedziału to a, natomiast koniec to b.",
-            "Przybliżoną wartość całki wyraża się wzorem:"
+            "<h3>Całki nieoznaczone</h3>",
+            "Całki nieoznaczone odgrywają dużą role w obliczeniach pola powierzchni figur lub pola pod funkcją. ",
+            "Całkowanie nieoznaczone polega na znalezieniu tak zwanej funkcji pierwotnej, czyli funkcji której pochodna ",
+            "jest równa danej funkcji podcałkowej. Nie obowiązuje ograniczenie pola poddawanego całkowaniu.",
+            "Całka nieoznaczona funkcji f(x) to:",
+
+
+        ]
+        labels_2 = [
+
+
+            "Całki nieoznaczone nie są unikatowe. Istnieje nieskończona ilość całek każdej funkcji, które można ",
+            "uzyskać wybierając dowolne C ze zbioru liczb rzeczywistych. Dlatego C jest zwykle określane jako stała arbitralna.",
 
         ]
 
-        l1 = QLabel("Błąd tej metody dla jednego przedziału wynosi:")
-        l2 = QLabel("gdzie: ")
-        l3 = QLabel("Jeśli przedział [a,b] jest duży możemy podzielić go na n segmentów i do każdego z nich "
-                    "zastosować metodę trapezów. ")
-        l4 = QLabel("Przedział całkowania [a, b] dzielimy na podprzedziały punktami:")
-        l5 = QLabel("Przyjmujemy oznaczenie h jako długość przedziału:")
-        l6 = QLabel("Więc wzór możemy zapisać:")
-        l7 = QLabel("Natomiast błąd tej metody wyraża się wzorem:")
-        l8 = QLabel("gdzie: ")
+        l1 = QLabel("Dzięki znajomości wzorów pochodnych wielu ważnych funkcji, możemy wywnioskować formuły ich całkowania np.:")
+        l2 = QLabel("Niestety nie zawsze jest proste do zauważenia przez co musimy stosować inne metody obliczania")
+        l3 = QLabel("całek nieoznaczonych, w tym:")
 
         for text in labels_1:
             label = QLabel(text)
             add_label(label, layout)
 
-        add_pic("zdjecia/metoda_tr_jeden_trapez.png", layout)
+        add_pic("zdjecia/Nieoznaczone/nieoznaczone_1.png", layout)
+
+        for text in labels_2:
+            label = QLabel(text)
+            add_label(label, layout)
+
+        add_pic("zdjecia/Nieoznaczone/nieoznaczone_2.png", layout)
 
         add_label(l1, layout)
+        add_pic("zdjecia/Nieoznaczone/nieoznaczone_3.png", layout)
 
-        add_pic("zdjecia/metoda_tr_jeden_blad.png", layout)
-
-        add_label(l2, layout_horizontal)
-        add_pic("zdjecia/ksi.png", layout_horizontal)
-        layout.addLayout(layout_horizontal)
-
-        wykres_kwadrat = QPushButton('Pokaż wykres z jednym trapezem')
-        wykres_kwadrat.clicked.connect(self.open_przedzial_trapez)
-        layout.addWidget(wykres_kwadrat)
-        wykres_kwadrat.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
-
+        add_label(l2, layout)
         add_label(l3, layout)
-        add_label(l4, layout)
 
-        add_pic("zdjecia/metoda_pr_przedzial.png", layout)
+        #metody
+        podstawianie = QPushButton("Całkowanie przez podstawienie")
+        czesci = QPushButton("Całkowanie przez części")
+        rozklad = QPushButton("Rozkład na ułamki proste")
 
-        add_label(l5, layout)
+        podstawianie.clicked.connect(self.podstawienie)
+        czesci.clicked.connect(self.czesci)
+        rozklad.clicked.connect(self.rozklad)
 
-        add_pic("zdjecia/podprzedzial_h_2.png", layout)
+        layout_horizontal.addWidget(podstawianie)
+        layout_horizontal.addWidget(czesci)
+        layout_horizontal.addWidget(rozklad)
 
-        add_label(l6, layout)
+        podstawianie.setStyleSheet("border-radius : 5px; background-color : #d1d1d1")
+        czesci.setStyleSheet("border-radius : 5px; background-color : #d1d1d1")
+        rozklad.setStyleSheet("border-radius : 5px; background-color : #d1d1d1")
 
-        add_pic("zdjecia/metoda_tr_wiele_trapezow.png", layout)
+        layout.addLayout(layout_horizontal)
+        layout.addWidget(QLabel(""))
 
-        add_label(l7, layout)
-
-        add_pic("zdjecia/metoda_tr_wiele_blad.png", layout)
-
-        add_label(l8, layout_horizontal_new)
-        add_pic("zdjecia/ksi.png", layout_horizontal_new)
-        layout.addLayout(layout_horizontal_new)
-
-        wykres_kwadraty = QPushButton('Pokaż wykres z wieloma trapezami')
-        wykres_kwadraty.clicked.connect(self.open_przedzial_trapezy)
-        layout.addWidget(wykres_kwadraty)
-        wykres_kwadraty.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
-
+        #podstawowe
         zamknij = QPushButton('Zamknij program')
         zamknij_okno = QPushButton("Zamknij okno")
         obliczenia = QPushButton('Przejdź do obliczeń')
@@ -115,13 +112,17 @@ class Nieoznaczone(QDialog):
         self.setLayout(layout)
         self.setWindowTitle("Całki nieoznaczone")
 
-    def open_przedzial_trapez(self):
-        self.w = wykres_metoda_tr.WykresTrapez()
+    def podstawienie(self):
+        self.w = nieoznaczone_metody.Podstawienie()
         self.w.show()
 
-    def open_przedzial_trapezy(self):
-        self.w1 = wykres_metoda_tr.WykresTrapezy()
+    def czesci(self):
+        self.w1 = nieoznaczone_metody.Czesci()
         self.w1.show()
+
+    def rozklad(self):
+        self.w2 = nieoznaczone_metody.Rozklad()
+        self.w2.show()
 
     def open_oblicz(self):
         if hasattr(self, 'w') and self.w.isVisible():
@@ -144,3 +145,14 @@ def add_pic(path, layout_name):
     label_pic.setPixmap(QPixmap(path))
     label_pic.setAlignment(qtc.Qt.AlignCenter)
     layout_name.addWidget(label_pic)
+
+
+def main():
+    app = QApplication(sys.argv)
+    ex = Nieoznaczone()
+    ex.show()
+    sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    main()

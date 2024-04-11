@@ -98,6 +98,7 @@ class Oblicz(QDialog):
         self.rownanie.setPlaceholderText("Wpisz wartość całki")
         l3.setAlignment(Qt.AlignCenter)
         self.wartosc.setAlignment(Qt.AlignCenter)
+        self.l7.setStyleSheet('color: red')
 
         self.combo.addItem("Wybierz", "none")
         self.combo.addItem("Metoda trapezów", "window1")
@@ -262,7 +263,6 @@ class Oblicz(QDialog):
         except Exception as e:
             return
 
-
     def setFontForLayout(self, layout, font):
         for i in range(layout.count()):
             widget = layout.itemAt(i).widget()
@@ -272,6 +272,7 @@ class Oblicz(QDialog):
     def check_errors(self):
         try:
             self.errory.setText("")
+            self.l7.setText("")
             self.f(1)
         except Exception as e:
             self.errory.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.")
@@ -300,15 +301,20 @@ class Oblicz(QDialog):
             self.l9r.setText(f"")
             return
 
-    def f(self, x):
-        rownanie_string = self.rownanie.text()
+    def symbols(self, rownanie):
+        rownanie_matematyczne = sympify(rownanie)
+        x_sym = rownanie_matematyczne.free_symbols
+        x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+        return x_sym_sorted
+
+    def converter(self):
         try:
+            rownanie_string = self.rownanie.text()
             rownanie_matematyczne = sympify(rownanie_string)
-            x_sym = rownanie_matematyczne.free_symbols
-            x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+            x_sym_sorted = self.symbols(rownanie_string)
             if len(x_sym_sorted) != 1:
-                self.errory.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
-                self.l6.setText("")
+                self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
+                self.l6.setText(f"")
                 self.l6l.setText(f"")
                 self.l6r.setText(f" ")
                 self.l8.setText(f"")
@@ -317,8 +323,25 @@ class Oblicz(QDialog):
                 self.l9.setText(f"")
                 self.l9l.setText(f"")
                 self.l9r.setText(f"")
-
                 return None
+            return rownanie_matematyczne, x_sym_sorted
+
+        except Exception as e:
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji. 1")
+            self.l6.setText(f"")
+            self.l6l.setText(f"")
+            self.l6r.setText(f" ")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l8r.setText(f"")
+            self.l9.setText(f"")
+            self.l9l.setText(f"")
+            self.l9r.setText(f"")
+            return e
+
+    def f(self, x):
+        try:
+            rownanie_matematyczne, x_sym_sorted = self.converter()
         except Exception as e:
             self.errory.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
             self.l6.setText(f"")
@@ -467,7 +490,6 @@ class Oblicz(QDialog):
             end_time = timeit.default_timer()
             time = end_time - start_time
 
-
             if math.isnan(wynik):
                 self.errory.setText("Error: Podana została zła funkcja lub jej przedziały.3")
                 self.l6.setText("")
@@ -506,9 +528,9 @@ class Oblicz(QDialog):
             error_l = abs(accurate_result - ls)
             error_r = abs(accurate_result - rs)
 
-            self.l9.setText(f"Błąd dla midpoint: {error_m}")
-            self.l9l.setText(f"Błąd dla left side: {error_l}")
-            self.l9r.setText(f"Błąd dla right side: {error_r}")
+            self.l9.setText(f"Błąd dla midpoint:  +-{error_m}")
+            self.l9l.setText(f"Błąd dla left side:  +-{error_l}")
+            self.l9r.setText(f"Błąd dla right side:  +-{error_r}")
         except Exception as e:
             self.l9.setText(f"Error: Problem z obliczeniem błędu.")
             self.l9l.setText(f"")
@@ -585,35 +607,7 @@ class Oblicz(QDialog):
             self.l9r.setText(f"")
             return
 
-        rownanie_string = self.rownanie.text()
-        try:
-            rownanie_matematyczne = sympify(rownanie_string)
-            x_sym = rownanie_matematyczne.free_symbols
-            if not x_sym:
-                self.errory.setText("Error: Brak zmiennej w równaniu.")
-                self.l6.setText(f"")
-                self.l6l.setText(f"")
-                self.l6r.setText(f" ")
-                self.l8.setText(f"")
-                self.l8l.setText(f"")
-                self.l8r.setText(f"")
-                self.l9.setText(f"")
-                self.l9l.setText(f"")
-                self.l9r.setText(f"")
-                return
-            x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
-        except SympifyError:
-            self.errory.setText("Error: Nie można przekształcić wprowadzonego równania.")
-            self.l6.setText(f"")
-            self.l6l.setText(f"")
-            self.l6r.setText(f" ")
-            self.l8.setText(f"")
-            self.l8l.setText(f"")
-            self.l8r.setText(f"")
-            self.l9.setText(f"")
-            self.l9l.setText(f"")
-            self.l9r.setText(f"")
-            return
+        rownanie_matematyczne, x_sym_sorted = self.converter()
         zera = self.dzielenie_przez_zero(rownanie_matematyczne, x_sym_sorted)
 
         if zera:
@@ -638,12 +632,10 @@ class Oblicz(QDialog):
                 self.l6.setText("Error: Problem z obliczeniem wartości.")
                 return
 
-
             result_leftside = self.metoda_prostokatow_leftside(self.n, a, b)
             if result_leftside is None:
                 self.l6l.setText("Error: Problem z obliczeniem wartości.")
                 return
-
 
             result_rightside = self.metoda_prostokatow_rightside(self.n, a, b)
             if result_rightside is None:
@@ -705,7 +697,10 @@ class Oblicz(QDialog):
 
         x_f = np.linspace(start, stop, 300)
         y_f = self.f(x_f)
-        ax.plot(x_f, y_f, 'b-', linewidth=1)
+        ax.plot(x_f, y_f, 'b-', linewidth=1, label=self.rownanie.text())
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.legend(loc='upper left')
         self.canvas1.draw()
 
     def update_wykres_leftside(self, a, b):
@@ -727,7 +722,10 @@ class Oblicz(QDialog):
         start, stop = a - 2, b + 2
         x_f = np.linspace(start, stop, 300)
         y_f = self.f(x_f)
-        ax.plot(x_f, y_f, 'b-', linewidth=1)
+        ax.plot(x_f, y_f, 'b-', linewidth=1, label=self.rownanie.text())
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.legend(loc='upper left')
         self.canvas2.draw()
 
     def update_wykres_rightside(self, a, b):
@@ -748,5 +746,8 @@ class Oblicz(QDialog):
         start, stop = a - 2, b + 2
         x_f = np.linspace(start, stop, 300)
         y_f = self.f(x_f)
-        ax.plot(x_f, y_f, 'b-', linewidth=1)
+        ax.plot(x_f, y_f, 'b-', linewidth=1, label=self.rownanie.text())
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.legend(loc='upper left')
         self.canvas3.draw()

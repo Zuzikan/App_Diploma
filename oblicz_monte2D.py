@@ -25,7 +25,7 @@ import oblicz_trapez
 import regula_3_8
 
 
-class ObliczMonte(QDialog):
+class ObliczMonte2(QDialog):
     def __init__(self):
         super().__init__()
         self.maximum = None
@@ -60,7 +60,6 @@ class ObliczMonte(QDialog):
         self.n = QLineEdit(self)
         self.l6 = QLabel(self)
         self.l6l = QLabel(self)
-        self.l6r = QLabel(self)
         self.l7 = QLabel(self)
         self.l8 = QLabel(self)
         self.l8l = QLabel(self)
@@ -79,6 +78,7 @@ class ObliczMonte(QDialog):
 
         instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         oblicz.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+        self.l7.setStyleSheet('color: red')
 
         validator = QDoubleValidator()
         validator.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
@@ -123,12 +123,9 @@ class ObliczMonte(QDialog):
         layout.addWidget(oblicz, 7, 0, 1, 2)
         oblicz.clicked.connect(self.check_errors)
 
-        layout.addWidget(self.wartosc, 7, 0, 1, 2)
-
         layout.addWidget(self.l6, 9, 0, 1, 2)
         layout.addWidget(self.l6l, 10, 0, 1, 2)
-        layout.addWidget(self.l6r, 11, 0, 1, 2)
-        layout.addWidget(self.l7, 12, 0, 1, 2)
+        layout.addWidget(self.l7, 11, 0, 1, 2)
 
         self.tabTimeErrors = QTabWidget(self)
 
@@ -145,23 +142,22 @@ class ObliczMonte(QDialog):
         self.tabTimeErrors.addTab(self.tabt, "Czas")
         self.tabTimeErrors.addTab(self.tabe, "Błędy")
 
-        layout.addWidget(self.tabTimeErrors, 14, 0, 4, 2)
+        layout.addWidget(self.tabTimeErrors, 13, 0, 4, 2)
 
-        #canvas tab
+        # canvas tab
         self.tabWidget = QTabWidget(self)
         self.tab1 = QWidget()
         self.tab1.layout = QVBoxLayout(self.tab1)
-        self.tab1.layout.addWidget(self.canvas)
-        self.tab1.layout.addWidget(self.toolbar2)
+        self.tab1.layout.addWidget(self.canvas2)
+        self.tab1.layout.addWidget(self.toolbar)
 
         self.tab2 = QWidget()
         self.tab2.layout = QVBoxLayout(self.tab2)
-        self.tab2.layout.addWidget(self.canvas2)
-        self.tab2.layout.addWidget(self.toolbar)
+        self.tab2.layout.addWidget(self.canvas)
+        self.tab2.layout.addWidget(self.toolbar2)
 
-
-        self.tabWidget.addTab(self.tab1, "Średniej wartości")
-        self.tabWidget.addTab(self.tab2, "Hit or miss")
+        self.tabWidget.addTab(self.tab1, "Hit or miss")
+        self.tabWidget.addTab(self.tab2, "Średniej wartości")
         layout.addWidget(self.tabWidget, 0, 3, 18, 1)
 
         zamknij = QPushButton('Zamknij program')
@@ -184,7 +180,10 @@ class ObliczMonte(QDialog):
 
         self.setLayout(layout)
         self.setFontForLayout(layout, self.font)
-        self.setWindowTitle('Obliczenia metoda Monte Carlo 1D i 2D')
+        self.setFontForLayout(sliderLayout, self.font)
+        self.setFontForLayout(abHorizontal, self.font)
+        self.setFontForLayout(layout_for_buttons, self.font)
+        self.setWindowTitle('Obliczenia metoda Monte Carlo 2D')
 
     def wroc(self):
         self.w = regula_3_8.Regula38()
@@ -247,17 +246,24 @@ class ObliczMonte(QDialog):
     def check_errors(self):
         try:
             self.fxy(1, 1)
+            self.l7.setText("")
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.1")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         try:
             self.get_a_b()
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.2")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
 
     def symbols(self, rownanie):
@@ -273,13 +279,21 @@ class ObliczMonte(QDialog):
             x_sym_sorted = self.symbols(rownanie_string)
             if len(x_sym_sorted) != 2:
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
+                self.l6l.setText(f"")
                 self.l8.setText(f"")
+                self.l8l.setText(f"")
+                self.l9.setText(f"")
+                self.l8l.setText(f"")
                 return None
             return rownanie_matematyczne, x_sym_sorted
 
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji. 1")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l9.setText(f"")
+            self.l8l.setText(f"")
             return e
 
     def fxy(self, x, y):
@@ -290,13 +304,19 @@ class ObliczMonte(QDialog):
             x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
             if len(x_sym_sorted) != 2:
                 self.l6.setText("Error: Funkcja powinna zawierać dwie zmienne.")
+                self.l6l.setText(f"")
                 self.l8.setText(f"")
+                self.l8l.setText(f"")
                 self.l9.setText(f"")
+                self.l8l.setText(f"")
                 return None
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
 
             return None
         try:
@@ -304,13 +324,19 @@ class ObliczMonte(QDialog):
             return funkcja(x, y)
         except ValueError:
             self.l6.setText("Error: Wartość nieprawidłowa.")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.4")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
 
             return
 
@@ -354,44 +380,56 @@ class ObliczMonte(QDialog):
 
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
+                self.l6l.setText(f"")
                 self.l8.setText(f"")
+                self.l8l.setText(f"")
                 self.l9.setText(f"")
+                self.l8l.setText(f"")
                 return None
             else:
-                self.l6.setText(f"Wynik dla wartości średniej: {wynik}")
-                self.l8.setText(f"Czas potrzebny do w.ś: {time}")
+                self.l6l.setText(f"Wynik dla wartości średniej: {wynik}")
+                self.l8l.setText(f"Czas potrzebny do w.ś: {time}")
                 return wynik
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.2")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return e
 
     def monte_carlo_4(self, a, b, n):
         try:
             num_on, num_above = self.ilosc_punktow()
             start_time = timeit.default_timer()
-            h = self.maximum-self.minimum
-            pole = h * (b - a)**2
+            h = self.maximum - self.minimum
+            pole = h * (b - a) ** 2
 
-            wynik = (num_on/n)*pole
+            wynik = (num_on / n) * pole
 
             end_time = timeit.default_timer()
             time = end_time - start_time
 
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
+                self.l6l.setText(f"")
                 self.l8.setText(f"")
+                self.l8l.setText(f"")
                 self.l9.setText(f"")
+                self.l8l.setText(f"")
                 return None
             else:
-                self.l6l.setText(f"Wynik dla hit or miss: {wynik}")
-                self.l8l.setText(f"Czas potrzebny do obliczenia h.o.m.: {time}")
+                self.l6.setText(f"Wynik dla hit or miss: {wynik}")
+                self.l8.setText(f"Czas potrzebny do obliczenia h.o.m.: {time}")
                 return wynik
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.2")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return e
 
     def error(self, a, b, value, value2):
@@ -401,8 +439,8 @@ class ObliczMonte(QDialog):
             error = abs(accurate_result - value)
             error2 = abs(accurate_result - value2)
 
-            self.l9.setText(f"Błąd dla Metody Monte Carlo 2D w.ś.: {error}")
-            self.l9l.setText(f"Błąd dla Metody Monte Carlo 2D h.o.m: {error2}")
+            self.l9.setText(f"Błąd dla Metody Monte Carlo 2D h.o.m.:  +-{error2}")
+            self.l9l.setText(f"Błąd dla Metody Monte Carlo 2D w.ś.:  +-{error}")
         except Exception as e:
             self.l9.setText(f"Error: Problem z obliczeniem błędu.")
             self.l9l.setText(f"")
@@ -411,23 +449,35 @@ class ObliczMonte(QDialog):
     def get_a_b(self):
         if self.rownanie.text().strip() == "":
             self.l6.setText("Error: Wpisz równanie")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         if self.a.text().strip() == "":
             self.l6.setText("Error: a nie może być puste")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         if self.b.text().strip() == "":
             self.l6.setText("Error: b nie może być puste")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         if self.n.text().strip() == "":
             self.l6.setText("Error: Wpisz wartość n")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         try:
             a = float(self.a.text())
@@ -435,21 +485,30 @@ class ObliczMonte(QDialog):
             n = int(self.n.text())
         except ValueError:
             self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a, b lub n")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         try:
             self.maximum, self.minimum = self.min_max(a, b)
             self.ar_x, self.ar_y, self.ar_z = self.punkty(n, a, b)
         except Exception as e:
-            self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
+            self.l6.setText("Error: Nieprawidłowe dane wejściowe.")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         if a >= b:
             self.l6.setText("Error: a powinno być mniejsze niż b.")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
 
         rownanie_matematyczne, x_sym_sorted = self.converter()
@@ -459,6 +518,11 @@ class ObliczMonte(QDialog):
             for i in zera:
                 if i == a or i == b or a <= i <= b:
                     self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b. 1")
+                    self.l6l.setText(f"")
+                    self.l8.setText(f"")
+                    self.l8l.setText(f"")
+                    self.l9.setText(f"")
+                    self.l8l.setText(f"")
                     return
 
         try:
@@ -479,8 +543,11 @@ class ObliczMonte(QDialog):
             self.error(a, b, result_monte3, result_monte4)
         except Exception as e:
             self.l6.setText(f"Error: Błąd z errorem")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
 
             return e
         try:
@@ -493,8 +560,10 @@ class ObliczMonte(QDialog):
         f_values = np.array([self.fxy(x, y) for x, y in zip(self.ar_x, self.ar_y)])
         threshold = 0.1
         points_on_curve = np.abs(f_values - self.ar_z) < threshold
-        num_on = np.sum(points_on_curve)
-        num_above = np.sum(~points_on_curve)
+        points_under_curve = self.ar_z < f_values
+        points_above_curve = self.ar_z > f_values
+        num_on = np.sum(points_on_curve) + np.sum(points_under_curve)
+        num_above = np.sum(points_above_curve)
         return num_on, num_above
 
     def update_wykres3(self, a, b, ar_x, ar_y):
@@ -512,7 +581,8 @@ class ObliczMonte(QDialog):
 
         ax.scatter(ar_x, ar_y, f_values, color='red', marker=".", label="Punkty Monte Carlo")
 
-        surf = ax.plot_surface(x, y, z, cmap='viridis', alpha=0.5, linewidth=0, antialiased=False, label=self.rownanie.text())
+        surf = ax.plot_surface(x, y, z, cmap='viridis', alpha=0.5, linewidth=0, antialiased=False,
+                               label=self.rownanie.text())
 
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
@@ -535,17 +605,20 @@ class ObliczMonte(QDialog):
         f_values = np.array([self.fxy(x, y) for x, y in zip(ar_x, ar_y)])
         threshold = 0.1
         points_on_curve = np.abs(f_values - ar_z) < threshold
+        points_under_curve = ar_z < f_values
+        points_above_curve = self.ar_z > f_values
 
         x = np.linspace(a, b, 100)
         y = np.linspace(a, b, 100)
         x, y = np.meshgrid(x, y)
         z = self.fxy(x, y)
 
-        #ax.scatter(ar_x, ar_y, f_values, color='red', marker=".", label="Punkty Monte Carlo")
         ax.scatter(ar_x[points_on_curve], ar_y[points_on_curve], ar_z[points_on_curve], color='green', marker=".",
-                   label="Punkty na wykresie")
-        ax.scatter(ar_x[~points_on_curve], ar_y[~points_on_curve], ar_z[~points_on_curve], color='red', marker=".",
-                   label="Punkty poza wykresem")
+                   label="Punkty w obszarze")
+        ax.scatter(ar_x[points_under_curve], ar_y[points_under_curve], ar_z[points_under_curve], color='green',
+                   marker=".")
+        ax.scatter(ar_x[points_above_curve], ar_y[points_above_curve], ar_z[points_above_curve], color='red', marker=".",
+                   label="Punkty poza obszarem")
         surf = ax.plot_surface(x, y, z, cmap='viridis', alpha=0.5, linewidth=0, antialiased=False,
                                label=self.rownanie.text())
 
@@ -563,7 +636,7 @@ class ObliczMonte(QDialog):
 
 def main():
     app = QApplication(sys.argv)
-    ex = ObliczMonte()
+    ex = ObliczMonte2()
     ex.show()
     sys.exit(app.exec_())
 

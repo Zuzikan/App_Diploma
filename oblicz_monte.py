@@ -76,6 +76,7 @@ class ObliczMonte(QDialog):
 
         instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         oblicz.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+        self.l7.setStyleSheet('color: red')
 
         validator = QDoubleValidator()
         validator.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
@@ -140,11 +141,12 @@ class ObliczMonte(QDialog):
         self.tabe.layout = QVBoxLayout(self.tabe)
         self.tabe.layout.addWidget(self.l9)
         self.tabe.layout.addWidget(self.l9l)
+        self.tabe.layout.addWidget((QLabel("")))
 
         self.tabTimeErrors.addTab(self.tabt, "Czas")
         self.tabTimeErrors.addTab(self.tabe, "Błędy")
 
-        layout.addWidget(self.tabTimeErrors, 14, 0, 4, 2)
+        layout.addWidget(self.tabTimeErrors, 13, 0, 4, 2)
 
         # tab for canvas
         self.tabWidget = QTabWidget(self)
@@ -245,17 +247,24 @@ class ObliczMonte(QDialog):
     def check_errors(self):
         try:
             self.f(1)
+            self.l7.setText("")
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.1")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         try:
             self.get_a_b()
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.2")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
 
     def symbols(self, rownanie):
@@ -271,13 +280,21 @@ class ObliczMonte(QDialog):
             x_sym_sorted = self.symbols(rownanie_string)
             if len(x_sym_sorted) != 1:
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
+                self.l6l.setText(f"")
                 self.l8.setText(f"")
+                self.l8l.setText(f"")
+                self.l9.setText(f"")
+                self.l8l.setText(f"")
                 return None
             return rownanie_matematyczne, x_sym_sorted
 
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji. 1")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l9.setText(f"")
+            self.l8l.setText(f"")
             return e
 
     def f(self, x):
@@ -285,21 +302,30 @@ class ObliczMonte(QDialog):
             rownanie_matematyczne, x_sym_sorted = self.converter()
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return None
         try:
             funkcja = lambdify(x_sym_sorted, rownanie_matematyczne, 'numpy')
             return funkcja(x)
         except ValueError:
             self.l6.setText("Error: Wartość nieprawidłowa.")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.4")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
 
             return
 
@@ -344,8 +370,11 @@ class ObliczMonte(QDialog):
 
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
+                self.l6l.setText(f"")
                 self.l8.setText(f"")
+                self.l8l.setText(f"")
                 self.l9.setText(f"")
+                self.l8l.setText(f"")
                 return None
             else:
                 self.l6.setText(f"Wynik: {wynik}")
@@ -354,8 +383,11 @@ class ObliczMonte(QDialog):
 
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return e
 
     def monte_carlo_2(self, n, a, b, ar_x):
@@ -371,8 +403,11 @@ class ObliczMonte(QDialog):
 
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
+                self.l6l.setText(f"")
                 self.l8.setText(f"")
+                self.l8l.setText(f"")
                 self.l9.setText(f"")
+                self.l8l.setText(f"")
                 return None
             else:
                 self.l6l.setText(f"Wynik2: {wynik}")
@@ -381,8 +416,11 @@ class ObliczMonte(QDialog):
 
         except Exception as e:
             self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return e
 
     def error(self, a, b, value, value2):
@@ -391,32 +429,45 @@ class ObliczMonte(QDialog):
 
             error = abs(accurate_result - value)
             error2 = abs(accurate_result - value2)
-            self.l9.setText(f"Błąd dla Metody Monte Carlo 1D: {error}")
-            self.l9l.setText(f"Błąd dla Metody Monte Carlo 1D2: {error2}")
+            self.l9.setText(f"Błąd dla Metody Monte Carlo 1D:  +-{error}")
+            self.l9l.setText(f"Błąd dla Metody Monte Carlo 1D:  +-{error2}")
         except Exception as e:
             self.l9.setText(f"Error: Problem z obliczeniem błędu.")
+            self.l9l.setText(f"")
             return e
 
     def get_a_b(self):
         if self.rownanie.text().strip() == "":
             self.l6.setText("Error: Wpisz równanie")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         if self.a.text().strip() == "":
             self.l6.setText("Error: a nie może być puste")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         if self.b.text().strip() == "":
             self.l6.setText("Error: b nie może być puste")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         if self.n.text().strip() == "":
             self.l6.setText("Error: Wpisz wartość n")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         try:
             a = float(self.a.text())
@@ -424,21 +475,30 @@ class ObliczMonte(QDialog):
             n = int(self.n.text())
         except ValueError:
             self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a, b lub n.")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         try:
             self.maximum, self.minimum = self.min_max(a, b)
             self.ar_x, self.ar_y = self.punkty(n, a, b)
         except Exception as e:
-            self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
+            self.l6.setText("Error: Nieprawidłowe dane wejściowe.")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         if a >= b:
             self.l6.setText("Error: a powinno być mniejsze niż b.")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
 
         rownanie_matematyczne, x_sym_sorted = self.converter()
@@ -448,6 +508,11 @@ class ObliczMonte(QDialog):
             for i in zera:
                 if i == a or i == b or a <= i <= b:
                     self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b. 1")
+                    self.l6l.setText(f"")
+                    self.l8.setText(f"")
+                    self.l8l.setText(f"")
+                    self.l9.setText(f"")
+                    self.l8l.setText(f"")
                     return
 
         try:
@@ -468,8 +533,11 @@ class ObliczMonte(QDialog):
             self.error(a, b, result_monte, result_monte2)
         except Exception as e:
             self.l6.setText(f"Error: Błąd z errorem")
+            self.l6l.setText(f"")
             self.l8.setText(f"")
+            self.l8l.setText(f"")
             self.l9.setText(f"")
+            self.l8l.setText(f"")
 
             return e
 

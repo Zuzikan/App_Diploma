@@ -78,6 +78,7 @@ class ObliczTrapezy(QDialog):
                     border-radius:4px;  
                 }
                 """)
+        self.l7.setStyleSheet('color: red')
         validator = QDoubleValidator()
         validator.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.a.setPlaceholderText("Wpisz wartość a")
@@ -220,6 +221,7 @@ class ObliczTrapezy(QDialog):
     def check_errors(self):
         try:
             self.f(1)
+            self.l7.setText("")
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.1")
             self.l8.setText(f"")
@@ -233,20 +235,35 @@ class ObliczTrapezy(QDialog):
             self.l9.setText(f"")
             return
 
-    def f(self, x):
-        rownanie_string = self.rownanie.text()
+    def symbols(self, rownanie):
+        rownanie_matematyczne = sympify(rownanie)
+        x_sym = rownanie_matematyczne.free_symbols
+        x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+        return x_sym_sorted
+
+    def converter(self):
         try:
+            rownanie_string = self.rownanie.text()
             rownanie_matematyczne = sympify(rownanie_string)
-            x_sym = rownanie_matematyczne.free_symbols
-            x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+            x_sym_sorted = self.symbols(rownanie_string)
             if len(x_sym_sorted) != 1:
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
                 self.l8.setText(f"")
                 self.l9.setText(f"")
-
                 return None
+            return rownanie_matematyczne, x_sym_sorted
+
         except Exception as e:
-            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji. 1")
+            self.l8.setText(f"")
+            self.l9.setText(f"")
+            return e
+
+    def f(self, x):
+        try:
+            rownanie_matematyczne, x_sym_sorted = self.converter()
+        except Exception as e:
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
             self.l8.setText(f"")
             self.l9.setText(f"")
 
@@ -344,23 +361,15 @@ class ObliczTrapezy(QDialog):
             self.l9.setText(f"")
             return
 
-        rownanie_string = self.rownanie.text()
-        try:
-            rownanie_matematyczne = sympify(rownanie_string)
-            x_sym = rownanie_matematyczne.free_symbols
-            if not x_sym:
-                self.l6.setText("Error: Brak zmiennej w równaniu.")
-                return
-            x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
-        except SympifyError:
-            self.l6.setText("Error: Nie można przekształcić wprowadzonego równania.")
-            return
+        rownanie_matematyczne, x_sym_sorted = self.converter()
         zera = self.dzielenie_przez_zero(rownanie_matematyczne, x_sym_sorted)
 
         if zera:
             for i in zera:
                 if i == a or i == b or a <= i <= b:
                     self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b. 1")
+                    self.l8.setText(f"")
+                    self.l9.setText(f"")
                     return
 
         try:
@@ -388,33 +397,27 @@ class ObliczTrapezy(QDialog):
     def update_wykres(self, a, b):
         if a is None or b is None or a >= b:
             return
-        #Czyszczenie poprzedniego wykresu:
-        self.figure.clear()
 
-        #Dodawanie osi do figury:
+        self.figure.clear()
         ax = self.figure.add_subplot(111)
 
-        #Generowanie punktów x i y:
         x_points = np.linspace(a, b, self.n + 1)
         y_points = self.f(x_points)
 
-        #Rysowanie punktów:
         ax.scatter(x_points, y_points, color='red', marker=".")
 
-        #Dodawanie siatki, wygładzenie linii funkcji
-        #oraz Generowanie punktów x i y dla przedziału [a;b]:
         ax.grid(True, alpha=0.2)
         x_fine = np.linspace(a, b, 300)
         y_fine = self.f(x_fine)
-        ax.plot(x_fine, y_fine, 'b-', linewidth=1)
+        ax.plot(x_fine, y_fine, 'b-', linewidth=1, label=self.rownanie.text())
 
-        #Wypełnienie obszaru pod wykresem
         for i in range(self.n):
             xs = [x_points[i], x_points[i], x_points[i + 1], x_points[i + 1]]
             ys = [0, y_points[i], y_points[i + 1], 0]
-            ax.fill(xs, ys, 'r', edgecolor='r', alpha=0.3)
-
-        #Dodanie wykresu do canvas, wyświetlenie:
+            ax.fill(xs, ys, 'r', edgecolor='r', alpha=0.5)
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.legend(loc='upper left')
         self.canvas.draw()
 
 

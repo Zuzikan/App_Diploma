@@ -90,6 +90,7 @@ class ObliczBoole(QDialog):
         self.rownanie.setPlaceholderText("Wpisz wartość całki")
         l3.setAlignment(Qt.AlignCenter)
         self.wartosc.setAlignment(Qt.AlignCenter)
+        self.l7.setStyleSheet('color: red')
 
         self.combo.addItem("Wybierz", "none")
         self.combo.addItem("Metoda prostokątów", "window1")
@@ -225,6 +226,7 @@ class ObliczBoole(QDialog):
     def check_errors(self):
         try:
             self.f(1)
+            self.l7.setText("")
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.1")
             self.l6p.setText(f"")
@@ -244,21 +246,39 @@ class ObliczBoole(QDialog):
             self.l9p.setText(f"")
             return
 
-    def f(self, x):
-        rownanie_string = self.rownanie.text()
+    def symbols(self, rownanie):
+        rownanie_matematyczne = sympify(rownanie)
+        x_sym = rownanie_matematyczne.free_symbols
+        x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+        return x_sym_sorted
+
+    def converter(self):
         try:
+            rownanie_string = self.rownanie.text()
             rownanie_matematyczne = sympify(rownanie_string)
-            x_sym = rownanie_matematyczne.free_symbols
-            x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+            x_sym_sorted = self.symbols(rownanie_string)
             if len(x_sym_sorted) != 1:
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
-                self.l6p.setText(f"")
+                self.l6l.setText(f"")
                 self.l8.setText(f"")
-                self.l8p.setText(f"")
+                self.l8l.setText(f"")
                 self.l9.setText(f"")
-                self.l9p.setText(f"")
-
+                self.l8l.setText(f"")
                 return None
+            return rownanie_matematyczne, x_sym_sorted
+
+        except Exception as e:
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji. 1")
+            self.l6l.setText(f"")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l9.setText(f"")
+            self.l8l.setText(f"")
+            return e
+
+    def f(self, x):
+        try:
+            rownanie_matematyczne, x_sym_sorted = self.converter()
         except Exception as e:
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
             self.l6p.setText(f"")
@@ -289,7 +309,6 @@ class ObliczBoole(QDialog):
         if punkty:
             self.l7.setText(f"Error: W zakresie [a,b] nie mogą znajdować sie te punkty: {punkty}")
             return punkty
-
 
     def metoda_zlozona_boole(self, n, a, b):
         try:
@@ -377,8 +396,8 @@ class ObliczBoole(QDialog):
 
             error_z = abs(accurate_result - zl)
             error_p = abs(accurate_result - pr)
-            self.l9.setText(f"Błąd dla metody Boole'a złożonej: {error_z}")
-            self.l9p.setText(f"Błąd dla metody Boole'a prostej: {error_p}")
+            self.l9.setText(f"Błąd dla metody Boole'a złożonej:  +-{error_z}")
+            self.l9p.setText(f"Błąd dla metody Boole'a prostej:  +-{error_p}")
         except Exception as e:
             self.l9.setText(f"Error: Problem z obliczeniem błędu.")
             return e
@@ -428,23 +447,18 @@ class ObliczBoole(QDialog):
             self.l9p.setText(f"")
             return
 
-        rownanie_string = self.rownanie.text()
-        try:
-            rownanie_matematyczne = sympify(rownanie_string)
-            x_sym = rownanie_matematyczne.free_symbols
-            if not x_sym:
-                self.l6.setText("Error: Brak zmiennej w równaniu.")
-                return
-            x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
-        except SympifyError:
-            self.l6.setText("Error: Nie można przekształcić wprowadzonego równania.")
-            return
+        rownanie_matematyczne, x_sym_sorted = self.converter()
         zera = self.dzielenie_przez_zero(rownanie_matematyczne, x_sym_sorted)
 
         if zera:
             for i in zera:
                 if i == a or i == b or a <= i <= b:
                     self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b. 1")
+                    self.l6p.setText(f"")
+                    self.l8.setText(f"")
+                    self.l8p.setText(f"")
+                    self.l9.setText(f"")
+                    self.l9p.setText(f"")
                     return
 
         try:
@@ -497,7 +511,7 @@ class ObliczBoole(QDialog):
 
         x_fine = np.linspace(a, b, 300)
         y_fine = self.f(x_fine)
-        ax.plot(x_fine, y_fine, 'b-', linewidth=1)
+        ax.plot(x_fine, y_fine, 'b-', linewidth=1, label=self.rownanie.text())
         h = (b - a) / 4
         x0 = a
         x1 = a + h
@@ -513,7 +527,9 @@ class ObliczBoole(QDialog):
             ys = y_points[i:i + 5]
             ax.fill_between(xs, 0, ys, color='red', alpha=0.3, step='pre', linewidth=0.5, edgecolor='r')
             ax.scatter(xs, ys, color='red', marker=".")
-
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.legend(loc='upper left')
         ax.grid(True, alpha=0.2)
         self.canvas.draw()
 

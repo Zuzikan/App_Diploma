@@ -1,3 +1,5 @@
+import oblicz_monte
+import oblicz_monte2D
 import obliczenia_czeb
 import wykres_metoda_tr
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
@@ -82,23 +84,28 @@ class MetodaMonte(QDialog):
 
         zamknij = QPushButton('Zamknij program')
         zamknij_okno = QPushButton("Zamknij okno")
-        obliczenia = QPushButton('Przejdź do obliczeń')
+        obliczenia = QPushButton('Przejdź do obliczeń dla 1D')
+        obliczenia2 = QPushButton('Przejdź do obliczeń dla 2D')
 
         obliczenia.clicked.connect(self.open_oblicz)
+        obliczenia2.clicked.connect(self.open_oblicz2)
         zamknij_okno.clicked.connect(self.close)
         zamknij.clicked.connect(qtc.QCoreApplication.instance().quit)
 
         zamknij.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         zamknij_okno.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         obliczenia.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        obliczenia2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         zamknij.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
         zamknij_okno.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
         obliczenia.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+        obliczenia2.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
 
         layout_for_buttons.addWidget(zamknij)
         layout_for_buttons.addWidget(zamknij_okno)
         layout_for_buttons.addWidget(obliczenia)
+        layout_for_buttons.addWidget(obliczenia2)
         layout.addLayout(layout_for_buttons)
 
         self.setLayout(layout)
@@ -119,7 +126,18 @@ class MetodaMonte(QDialog):
         if hasattr(self, 'w1') and self.w1.isVisible():
             self.w1.close()
 
-        self.w2 = obliczenia_czeb.ObliczCzeb()
+        self.w2 = oblicz_monte.ObliczMonte()
+        self.w2.show()
+        self.close()
+
+    def open_oblicz2(self):
+        if hasattr(self, 'w') and self.w.isVisible():
+            self.w.close()
+
+        if hasattr(self, 'w1') and self.w1.isVisible():
+            self.w1.close()
+
+        self.w2 = oblicz_monte2D.ObliczMonte2()
         self.w2.show()
         self.close()
 
