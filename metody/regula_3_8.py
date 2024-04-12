@@ -43,7 +43,7 @@ class Regula38(QDialog):
             label = QLabel(text)
             add_label(label, layout)
 
-        wykres = QPushButton('Pokaż wykres ')
+        wykres = QPushButton("Pokaż wykres dla reguły 3/8")
         wykres.clicked.connect(self.open_przedzial_regula)
         layout.addWidget(wykres)
         wykres.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")

@@ -44,7 +44,7 @@ class MetodaSimp(QDialog):
 
         add_label(l5, layout)
 
-        wykres = QPushButton('Pokaż wykres')
+        wykres = QPushButton('Pokaż wykres dla metody Simpsona')
         wykres.clicked.connect(self.open_przedzial_simpson)
         layout.addWidget(wykres)
         wykres.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")

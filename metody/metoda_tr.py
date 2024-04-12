@@ -58,7 +58,7 @@ class MetodaTr(QDialog):
         add_pic("zdjecia/ksi.png", layout_horizontal)
         layout.addLayout(layout_horizontal)
 
-        wykres_kwadrat = QPushButton('Pokaż wykres z jednym trapezem')
+        wykres_kwadrat = QPushButton('Pokaż wykres dla metody trapezów z jednym trapezem')
         wykres_kwadrat.clicked.connect(self.open_przedzial_trapez)
         layout.addWidget(wykres_kwadrat)
         wykres_kwadrat.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
@@ -84,11 +84,11 @@ class MetodaTr(QDialog):
         add_pic("zdjecia/ksi.png", layout_horizontal_new)
         layout.addLayout(layout_horizontal_new)
 
-        wykres_kwadraty = QPushButton('Pokaż wykres z wieloma trapezami')
+        wykres_kwadraty = QPushButton('Pokaż wykres dla metody trapezów z wieloma trapezami')
         wykres_kwadraty.clicked.connect(self.open_przedzial_trapezy)
         layout.addWidget(wykres_kwadraty)
         wykres_kwadraty.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
-
+        add_label(QLabel(""), layout)
         zamknij = QPushButton('Zamknij program')
         zamknij_okno = QPushButton("Zamknij okno")
         obliczenia = QPushButton('Przejdź do obliczeń')

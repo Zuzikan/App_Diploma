@@ -1,5 +1,5 @@
+import wykres_g_c
 from obliczenia import obliczenia_czeb
-import wykres_metoda_tr
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
 import PyQt5.QtCore as qtc
 from PyQt5.QtGui import QPixmap, QFont
@@ -42,7 +42,6 @@ class MetodaCzeb(QDialog):
         l7c = QLabel("a wartości A<sub>i</sub> są odpowiadającymi im współczynnikami.")
         l8 = QLabel("Wartości węzłów i współczynników dla kwadratur Gaussa-Czebyszewa wyraża się wzorami:")
 
-
         for text in labels_1:
             label = QLabel(text)
             add_label(label, layout)
@@ -64,6 +63,12 @@ class MetodaCzeb(QDialog):
         add_label(l7c, layout)
         add_label(l8, layout)
         add_pic("zdjecia/Czebyszew/wzory.png", layout)
+        add_label(QLabel(""), layout)
+
+        wykres_czeb = QPushButton("Pokaż wykres dla kwadratury Gaussa-Czebyszewa")
+        wykres_czeb.clicked.connect(self.open_wykres_czeb)
+        layout.addWidget(wykres_czeb)
+        wykres_czeb.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         add_label(QLabel(""), layout)
 
         zamknij = QPushButton('Zamknij program')
@@ -90,13 +95,9 @@ class MetodaCzeb(QDialog):
         self.setLayout(layout)
         self.setWindowTitle('Kwadratura Gaussa-Czebyszewa')
 
-    def open_przedzial_trapez(self):
-        self.w = wykres_metoda_tr.WykresTrapez()
+    def open_wykres_czeb(self):
+        self.w = wykres_g_c.WykresCzeb()
         self.w.show()
-
-    def open_przedzial_trapezy(self):
-        self.w1 = wykres_metoda_tr.WykresTrapezy()
-        self.w1.show()
 
     def open_oblicz(self):
         if hasattr(self, 'w') and self.w.isVisible():

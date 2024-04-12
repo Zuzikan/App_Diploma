@@ -5,6 +5,7 @@ from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog, QApplication)
 
 import nieoznaczone_metody
+import wykres_nieozn
 from obliczenia import oblicz_nieoznaczone
 
 
@@ -29,27 +30,35 @@ class Nieoznaczone(QDialog):
         labels_1 = [
             "<h3>Całki nieoznaczone</h3>",
             "Całki nieoznaczone odgrywają dużą role w obliczeniach pola powierzchni figur lub pola pod funkcją. ",
-            "Całkowanie nieoznaczone polega na znalezieniu tak zwanej funkcji pierwotnej, czyli funkcji której pochodna ",
-            "jest równa danej funkcji podcałkowej. Nie obowiązuje ograniczenie pola poddawanego całkowaniu.",
-            "Całka nieoznaczona funkcji f(x) to:",
-
+            "Całkowanie nieoznaczone polega na znalezieniu tak zwanej funkcji pierwotnej, czyli funkcji której "
+            "pochodna ",
+            "jest równa danej funkcji podcałkowej. Nie obowiązuje ograniczenie pola poddawanego całkowaniu."
 
         ]
         labels_2 = [
 
-
             "Całki nieoznaczone nie są unikatowe. Istnieje nieskończona ilość całek każdej funkcji, które można ",
-            "uzyskać wybierając dowolne C ze zbioru liczb rzeczywistych. Dlatego C jest zwykle określane jako stała arbitralna.",
+            "uzyskać wybierając dowolne C ze zbioru liczb rzeczywistych. Dlatego C jest zwykle określane jako stała "
+            "arbitralna.",
 
         ]
 
-        l1 = QLabel("Dzięki znajomości wzorów pochodnych wielu ważnych funkcji, możemy wywnioskować formuły ich całkowania np.:")
+        l1 = QLabel(
+            "Dzięki znajomości wzorów pochodnych wielu ważnych funkcji, możemy wywnioskować formuły ich całkowania np.:")
         l2 = QLabel("Niestety nie zawsze jest proste do zauważenia przez co musimy stosować inne metody obliczania")
         l3 = QLabel("całek nieoznaczonych, w tym:")
+        l4 = QLabel("Całka nieoznaczona funkcji f(x) to:")
 
         for text in labels_1:
             label = QLabel(text)
             add_label(label, layout)
+
+        wykres_nieo = QPushButton("Pokaż wykres dla całek nieoznaczonych")
+        wykres_nieo.clicked.connect(self.open_wykres_nieo)
+        layout.addWidget(wykres_nieo)
+        wykres_nieo.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+
+        add_label(l4, layout)
 
         add_pic("zdjecia/Nieoznaczone/nieoznaczone_1.png", layout)
 
@@ -65,7 +74,7 @@ class Nieoznaczone(QDialog):
         add_label(l2, layout)
         add_label(l3, layout)
 
-        #metody
+        # metody
         podstawianie = QPushButton("Całkowanie przez podstawienie")
         czesci = QPushButton("Całkowanie przez części")
         rozklad = QPushButton("Rozkład na ułamki proste")
@@ -85,7 +94,7 @@ class Nieoznaczone(QDialog):
         layout.addLayout(layout_horizontal)
         layout.addWidget(QLabel(""))
 
-        #podstawowe
+        # podstawowe
         zamknij = QPushButton('Zamknij program')
         zamknij_okno = QPushButton("Zamknij okno")
         obliczenia = QPushButton('Przejdź do obliczeń')
@@ -110,6 +119,10 @@ class Nieoznaczone(QDialog):
         self.setLayout(layout)
         self.setWindowTitle("Całki nieoznaczone")
 
+    def open_wykres_nieo(self):
+        self.w = wykres_nieozn.WykresNieo()
+        self.w.show()
+
     def podstawienie(self):
         self.w = nieoznaczone_metody.Podstawienie()
         self.w.show()
@@ -132,6 +145,7 @@ class Nieoznaczone(QDialog):
         self.w2 = oblicz_nieoznaczone.ObliczNieoznaczona()
         self.w2.show()
         self.close()
+
 
 def add_label(name, layout):
     layout.addWidget(name)

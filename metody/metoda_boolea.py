@@ -1,6 +1,8 @@
 import PyQt5.QtCore as qtc
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
+
+import wykres_bool
 import wykres_metoda_tr
 
 
@@ -36,10 +38,12 @@ class MetodaBoole(QDialog):
 
         l1 = QLabel("<h3>Metoda Boole'a</h3>")
         l2 = QLabel(
-            "Polega na przybliżeniu całki f(x) w przedziale [x<sub>0</sub>,x<sub>4</sub>], czyli n=4, a liczba punktów to 5.")
+            "Polega na przybliżeniu całki f(x) w przedziale [x<sub>0</sub>,x<sub>4</sub>], czyli n=4, a liczba "
+            "punktów to 5.")
         l3 = QLabel("gdzie: ")
         l4 = QLabel("Jest to wzór prostej metody Boole’a (Simple Boole’s Rule). ")
-        l5 = QLabel("")
+
+        l6 = QLabel("")
 
         add_label(l1, layout)
         add_label(l2, layout)
@@ -47,11 +51,23 @@ class MetodaBoole(QDialog):
         add_label(l3, layout)
         add_pic("zdjecia/Boole/boole_2.png", layout)
         add_label(l4, layout)
+
+        wykres_boole_pr = QPushButton("Pokaż wykres dla prostej metody Boole'a")
+        wykres_boole_pr.clicked.connect(self.open_wykres_boole_pr)
+        layout.addWidget(wykres_boole_pr)
+        wykres_boole_pr.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+
         for text in labels_1:
             label = QLabel(text)
             add_label(label, layout)
 
         add_pic("zdjecia/Boole/boole_3.png", layout)
+
+        wykres_boole_zl = QPushButton("Pokaż wykres dla złożonej metody Boole'a")
+        wykres_boole_zl.clicked.connect(self.open_wykres_boole_zl)
+        layout.addWidget(wykres_boole_zl)
+        wykres_boole_zl.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+        add_label(l6, layout)
 
         zamknij = QPushButton('Zamknij program')
         zamknij_okno = QPushButton("Zamknij okno")
@@ -77,12 +93,12 @@ class MetodaBoole(QDialog):
         self.setLayout(layout)
         self.setWindowTitle("Metoda Boole'a")
 
-    def open_przedzial_trapez(self):
-        self.w = wykres_metoda_tr.WykresTrapez()
+    def open_wykres_boole_pr(self):
+        self.w = wykres_bool.WykresBooleProsty()
         self.w.show()
 
-    def open_przedzial_trapezy(self):
-        self.w1 = wykres_metoda_tr.WykresTrapezy()
+    def open_wykres_boole_zl(self):
+        self.w1 = wykres_bool.WykresBooleZlozony()
         self.w1.show()
 
     def open_oblicz(self):

@@ -217,7 +217,7 @@ class WykresMC1HOM(QWidget):
 
 def main():
     app = QApplication(sys.argv)
-    ex = WykresMC2WS()
+    ex = WykresMC1WS()
     ex.show()
     sys.exit(app.exec_())
 

@@ -1,3 +1,4 @@
+import wykres_g_h
 from obliczenia import oblicz_herm
 import wykres_metoda_tr
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
@@ -38,8 +39,7 @@ class MetodaHerm(QDialog):
         l6 = QLabel("W tych kwadraturach węzły x<sub>i</sub> są pierwiastkami wielomianu ortogonalnego Hermite’a "
                     "stopnia (n+1),")
         l6c = QLabel("a wartości A<sub>i</sub> odpowiadającymi im współczynnikami. W poniższej tabeli przedstawiono ")
-        l6cc=QLabel("wartości współczynników dla wielomianów stopnia 1-4.")
-
+        l6cc = QLabel("wartości współczynników dla wielomianów stopnia 1-4.")
 
         for text in labels_1:
             label = QLabel(text)
@@ -53,18 +53,25 @@ class MetodaHerm(QDialog):
         add_pic("zdjecia/Hermit/wagowa.png", layout)
         add_label(l4, layout)
 
-
         add_label(l5, layout)
 
-
         add_pic("zdjecia/Hermit/calka.png", layout)
+
+        wykres_herm = QPushButton("Pokaż wykres dla kwadratury Gaussa-Hermite'a")
+        wykres_herm.clicked.connect(self.open_wykres_herm)
+        layout.addWidget(wykres_herm)
+        wykres_herm.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+
 
         add_label(l6, layout)
         add_label(l6c, layout)
         add_label(l6cc, layout)
+
         add_label(QLabel(""), layout)
         add_pic("zdjecia/Hermit/tabela.png", layout)
         add_label(QLabel(""), layout)
+
+
 
         zamknij = QPushButton('Zamknij program')
         zamknij_okno = QPushButton("Zamknij okno")
@@ -90,13 +97,9 @@ class MetodaHerm(QDialog):
         self.setLayout(layout)
         self.setWindowTitle('Kwadratura Gaussa-Czebyszewa')
 
-    def open_przedzial_trapez(self):
-        self.w = wykres_metoda_tr.WykresTrapez()
+    def open_wykres_herm(self):
+        self.w = wykres_g_h.WykresHerm()
         self.w.show()
-
-    def open_przedzial_trapezy(self):
-        self.w1 = wykres_metoda_tr.WykresTrapezy()
-        self.w1.show()
 
     def open_oblicz(self):
         if hasattr(self, 'w') and self.w.isVisible():

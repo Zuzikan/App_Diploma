@@ -68,7 +68,7 @@ class MetodaPr(QDialog):
         add_pic("zdjecia/Prostokaty/eta_1.png", layout_horizontal)
         layout.addLayout(layout_horizontal)
 
-        wykres_kwadrat = QPushButton('Pokaż wykres z jednym kwadratem')
+        wykres_kwadrat = QPushButton('Pokaż wykres dla metody prostokątów z jednym kwadratem')
         wykres_kwadrat.clicked.connect(self.open_przedzial_kwadrat)
         layout.addWidget(wykres_kwadrat)
         wykres_kwadrat.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
@@ -96,10 +96,11 @@ class MetodaPr(QDialog):
         add_pic("zdjecia/Prostokaty/eta_1.png", layout_horizontal_new)
         layout.addLayout(layout_horizontal_new)
 
-        wykres_kwadraty = QPushButton('Pokaż wykres z wieloma kwadratami')
+        wykres_kwadraty = QPushButton('Pokaż wykres dla metody prostokątów z wieloma kwadratami')
         wykres_kwadraty.clicked.connect(self.open_przedzial_kwadraty)
         layout.addWidget(wykres_kwadraty)
         wykres_kwadraty.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+        add_label(QLabel(""), layout)
 
         zamknij = QPushButton('Zamknij program')
         zamknij_okno = QPushButton("Zamknij okno")
