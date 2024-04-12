@@ -20,7 +20,7 @@ import instrukcja
 from metody import metoda_monte
 from obliczenia import (oblicz_boole, oblicz_herm, obliczenia_czeb, oblicz_monte, oblicz_regula_3_8,
                         oblicz_metoda_prostokatow, oblicz_nieoznaczone, oblicz_simpson, oblicz_trapez)
-
+import PyQt5.QtGui as qtg
 
 
 class ObliczMonte2(QDialog):
@@ -36,6 +36,8 @@ class ObliczMonte2(QDialog):
     def initUI(self):
 
         # self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         self.font = QFont()
         self.font.setPointSize(9)
 

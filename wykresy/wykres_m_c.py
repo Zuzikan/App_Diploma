@@ -1,5 +1,5 @@
 import sys
-
+import PyQt5.QtGui as qtg
 import numpy as np
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QApplication
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -28,6 +28,8 @@ class WykresMC2WS(QWidget):
     def initUI(self):
         layout = QVBoxLayout()
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
         layout.addWidget(self.canvas)
@@ -76,6 +78,8 @@ class WykresMC2HOM(QWidget):
     def initUI(self):
         layout = QVBoxLayout()
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
         layout.addWidget(self.canvas)
@@ -134,6 +138,8 @@ class WykresMC1WS(QWidget):
     def initUI(self):
         layout = QVBoxLayout()
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
         layout.addWidget(self.canvas)
@@ -153,7 +159,7 @@ class WykresMC1WS(QWidget):
 
         x_fine = np.linspace(a, b, 3000)
         y_fine = [self.f(x) for x in x_fine]
-        ax.plot(x_fine, y_fine, 'b-', linewidth=1, label="x**2")
+        ax.plot(x_fine, y_fine, 'b-', linewidth=1, label="x²")
         ax.set_xlabel('x')
         ax.set_ylabel('f(x)')
         ax.set_title("Przedział: [0,5], n = 50")
@@ -174,6 +180,8 @@ class WykresMC1HOM(QWidget):
     def initUI(self):
         layout = QVBoxLayout()
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
         layout.addWidget(self.canvas)
@@ -201,7 +209,7 @@ class WykresMC1HOM(QWidget):
 
         x_fine = np.linspace(a, b, 300)
         y_fine = [self.f(x) for x in x_fine]
-        ax.plot(x_fine, y_fine, 'b-', linewidth=1, label="x**2")
+        ax.plot(x_fine, y_fine, 'b-', linewidth=1, label="x²")
 
         ax.grid(True, which='both', linestyle='--', linewidth=0.2)
         ax.set_xlabel('x')

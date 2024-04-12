@@ -1,5 +1,5 @@
 import sys
-
+import PyQt5.QtGui as qtg
 import numpy as np
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QApplication
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -14,6 +14,8 @@ class WykresBooleProsty(QWidget):
     def initUI(self):
         layout = QVBoxLayout()
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
         layout.addWidget(self.canvas)
@@ -36,7 +38,7 @@ class WykresBooleProsty(QWidget):
 
         x_fine = np.linspace(a, b, 300)
         y_fine = self.f(x_fine)
-        ax.plot(x_fine, y_fine, 'b-', linewidth=1)
+        ax.plot(x_fine, y_fine, 'b-', linewidth=1, label="x²+2x+20")
         h = (b - a) / 4
         x0 = a
         x1 = a + h
@@ -44,18 +46,21 @@ class WykresBooleProsty(QWidget):
         x3 = a + 3 * h
         x4 = b
         punkty = x0, x1, x2, x3, x4
-        for punkt in punkty:
+        punkty_label = ['a=x0', 'x1', 'x2', 'x3', 'b=x4']
+        for punkt, label in zip(punkty, punkty_label):
             ax.scatter(punkt, self.f(punkt), color='purple', s=50)
+            ax.text(punkt, self.f(punkt), label, verticalalignment='bottom', horizontalalignment='right', fontsize=12)
 
         for i in range(0, n, 4):
             xs = x_points[i:i + 5]
             ys = y_points[i:i + 5]
             ax.fill_between(xs, 0, ys, color='red', alpha=0.3, step='pre', linewidth=0.5, edgecolor='r')
             ax.scatter(xs, ys, color='red', marker=".")
-        ax.set_xlabel('X')
-        ax.set_ylabel('Y')
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
         ax.set_title("Przedział: [-10,10], n = 4")
         ax.grid(True, alpha=0.2)
+        ax.legend(loc='upper left')
         self.canvas.draw()
 
     @staticmethod
@@ -71,6 +76,8 @@ class WykresBooleZlozony(QWidget):
     def initUI(self):
         layout = QVBoxLayout()
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
         layout.addWidget(self.canvas)
@@ -91,7 +98,7 @@ class WykresBooleZlozony(QWidget):
 
         x_fine = np.linspace(a, b, 300)
         y_fine = self.f(x_fine)
-        ax.plot(x_fine, y_fine, 'b-', linewidth=1)
+        ax.plot(x_fine, y_fine, 'b-', linewidth=1, label="x²+2x+20")
         h = (b - a) / 4
         x0 = a
         x1 = a + h
@@ -99,8 +106,10 @@ class WykresBooleZlozony(QWidget):
         x3 = a + 3 * h
         x4 = b
         punkty = x0, x1, x2, x3, x4
-        for punkt in punkty:
+        punkty_label = ['a=x0', 'x1', 'x2', 'x3', 'b=x4']
+        for punkt, label in zip(punkty, punkty_label):
             ax.scatter(punkt, self.f(punkt), color='purple', s=50)
+            ax.text(punkt, self.f(punkt), label, verticalalignment='bottom', horizontalalignment='right', fontsize=12)
 
         for i in range(0, n, 4):
             xs = x_points[i:i + 5]
@@ -111,6 +120,7 @@ class WykresBooleZlozony(QWidget):
         ax.set_ylabel('f(x)')
         ax.set_title("Przedział: [-10,10], n = 12")
         ax.grid(True, alpha=0.2)
+        ax.legend(loc='upper left')
         self.canvas.draw()
 
     @staticmethod

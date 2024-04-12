@@ -2,7 +2,7 @@ import sys
 import numpy as np
 import timeit
 import math
-
+import PyQt5.QtGui as qtg
 from scipy.optimize import minimize
 from scipy.special import roots_chebyt
 from scipy.integrate import quad
@@ -34,6 +34,8 @@ class ObliczMonte(QDialog):
     def initUI(self):
 
         # self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         self.font = QFont()
         self.font.setPointSize(9)
 

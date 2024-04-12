@@ -2,6 +2,7 @@ import sys
 
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog, QApplication)
 import PyQt5.QtCore as qtc
+import PyQt5.QtGui as qtg
 from PyQt5.QtGui import QPixmap, QFont
 
 
@@ -20,6 +21,8 @@ class Instrukcja(QDialog):
 
     def initUI(self):
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         layout = QVBoxLayout(self)
         self.font = QFont()
         self.font.setPointSize(11)

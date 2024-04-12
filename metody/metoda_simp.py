@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
 import PyQt5.QtCore as qtc
+import PyQt5.QtGui as qtg
 from PyQt5.QtGui import QPixmap, QFont
 
 from obliczenia import oblicz_simpson
@@ -14,6 +15,8 @@ class MetodaSimp(QDialog):
 
     def initUI(self):
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         # layouty
         layout_for_buttons = QHBoxLayout()
         layout_horizontal_new = QHBoxLayout()

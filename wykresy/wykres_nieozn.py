@@ -4,8 +4,8 @@ import numpy as np
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QApplication
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from scipy.special import roots_chebyt
-from sympy import lambdify
+import PyQt5.QtGui as qtg
+
 
 
 def fc(x):
@@ -20,6 +20,8 @@ class WykresNieo(QWidget):
     def initUI(self):
         layout = QVBoxLayout()
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
         layout.addWidget(self.canvas)
@@ -37,8 +39,8 @@ class WykresNieo(QWidget):
         y = self.f(x)
         y_fine_integral = fc(x)
 
-        ax.plot(x, y, 'b-', linewidth=1, label="x ** 2")
-        ax.plot(x, y_fine_integral, color="orange", linestyle='--', linewidth=1, label = "(x**3)/3+C")
+        ax.plot(x, y, 'b-', linewidth=1, label="x²")
+        ax.plot(x, y_fine_integral, color="orange", linestyle='--', linewidth=1, label = "x³/3+C")
         ax.set_xlabel('x')
         ax.set_ylabel('y')
         ax.grid(True, alpha=0.2)

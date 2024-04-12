@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from scipy.interpolate import CubicSpline
-
+import PyQt5.QtGui as qtg
 
 class WykresRegula38(QWidget):
     def __init__(self):
@@ -13,6 +13,8 @@ class WykresRegula38(QWidget):
     def initUI(self):
         layout = QVBoxLayout()
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
         layout.addWidget(self.canvas)
@@ -45,10 +47,11 @@ class WykresRegula38(QWidget):
             ax.text(x, self.f(x), label, fontsize=10, ha='center', va='bottom')
         x_fine = np.linspace(0, 10, 300)
         y_fine = [self.f(x) for x in x_fine]
-        ax.plot(x_fine, y_fine, 'b-', linewidth=1)
+        ax.plot(x_fine, y_fine, 'b-', linewidth=1, label="sin(x)+1.5")
         ax.set_title("Przedział: [0,10], n = 6")
         ax.set_xlabel('x')
         ax.set_ylabel('f(x)')
+        ax.legend(loc='lower left')
         self.show()
         self.canvas.draw()
 

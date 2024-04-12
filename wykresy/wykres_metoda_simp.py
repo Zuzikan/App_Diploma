@@ -1,4 +1,6 @@
 import numpy as np
+import PyQt5.QtGui as qtg
+
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -12,6 +14,8 @@ class WykresSimp(QWidget):
     def initUI(self):
         layout = QVBoxLayout()
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
         layout.addWidget(self.canvas)
@@ -28,7 +32,7 @@ class WykresSimp(QWidget):
         y_f = self.f(x)
         y_f2 = self.f_2(x)
         ax.clear()
-        ax.plot(x, y_f)
+        ax.plot(x, y_f, label="0.8sin(x) + 0.5x")
         ax.plot(x, y_f2)
         ax.set_xlabel('x')
         ax.set_ylabel('f(x)')
@@ -39,14 +43,13 @@ class WykresSimp(QWidget):
         ax.fill_between(x, 0, y_f2, where=(x >= intersections_x[0]) & (x <= intersections_x[2]), color='orange',
                         alpha=0.3)
         ax.text(1, self.f_2(intersections_x[0]), "a=x0", fontsize=12, ha='right', va='bottom')
-        #ax.text(2.5, 0, "x1", fontsize=12, ha='left', va='bottom')
         ax.text(2.5, self.f_2(intersections_x[1]), "x1", fontsize=12, ha='right', va='bottom')
         ax.text(4, self.f_2(intersections_x[2]), "b=x2", fontsize=12, ha='left', va='bottom')
-        #ax.scatter([1, 2.5, 4], [0, 0, 0], color='red')
 
         ax.set_xlabel('x')
         ax.set_ylabel('f(x)')
-        ax.set_title("Przedział: [1;4], n = 2")
+        ax.set_title("Przedział: [1,4], n = 2")
+        ax.legend(loc='upper left')
         self.show()
         self.canvas.draw()
 

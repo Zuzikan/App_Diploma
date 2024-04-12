@@ -13,7 +13,7 @@ from PyQt5.QtGui import QDoubleValidator, QFont
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from sympy.core.sympify import SympifyError
-
+import PyQt5.QtGui as qtg
 import instrukcja
 from metody import metoda_simp
 from obliczenia import (obliczenia_czeb, oblicz_herm, oblicz_monte, oblicz_monte2D, oblicz_boole,
@@ -29,6 +29,8 @@ class ObliczSimpson(QDialog):
     def initUI(self):
 
         # self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         self.font = QFont()
         self.font.setPointSize(9)
 

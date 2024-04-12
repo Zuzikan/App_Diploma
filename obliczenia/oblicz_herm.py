@@ -2,7 +2,7 @@ import sys
 import numpy as np
 import timeit
 import math
-
+import PyQt5.QtGui as qtg
 from numpy.polynomial.hermite import hermgauss
 from scipy.special import roots_chebyt
 from scipy.integrate import quad
@@ -29,6 +29,7 @@ class ObliczHerm(QDialog):
         self.initUI()
 
     def initUI(self):
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
 
         # self.setStyleSheet("background-color: white;")
         self.font = QFont()

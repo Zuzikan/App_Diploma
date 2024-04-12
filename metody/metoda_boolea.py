@@ -1,7 +1,7 @@
 import PyQt5.QtCore as qtc
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
-
+import PyQt5.QtGui as qtg
 import wykres_bool
 import wykres_metoda_tr
 
@@ -17,6 +17,7 @@ class MetodaBoole(QDialog):
 
     def initUI(self):
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
         # layouty
         layout_for_buttons = QHBoxLayout()
         layout_horizontal = QHBoxLayout()

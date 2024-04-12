@@ -12,7 +12,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
 from sympy.core.sympify import SympifyError
-
+import PyQt5.QtGui as qtg
 import instrukcja
 from metody import metoda_pr
 from obliczenia import (oblicz_boole, obliczenia_czeb, oblicz_herm, oblicz_simpson, oblicz_regula_3_8,
@@ -28,6 +28,8 @@ class Oblicz(QDialog):
     def initUI(self):
 
         # self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         self.font = QFont()
         self.font.setPointSize(9)
 

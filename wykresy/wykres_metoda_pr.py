@@ -1,4 +1,6 @@
 import numpy as np
+import PyQt5.QtGui as qtg
+
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTabWidget
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -23,6 +25,8 @@ class WykresKwadrat(QWidget):
     def initUI(self):
         layout = QVBoxLayout()
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
         layout.addWidget(self.canvas)
@@ -37,13 +41,14 @@ class WykresKwadrat(QWidget):
         ax = self.figure.add_subplot(111)
         x_values = np.linspace(-2, 2, 100)
         y_values = self.f(x_values)
-        ax.plot(x_values, y_values, color='b')
+        ax.plot(x_values, y_values, color='b', label="2x+1")
         ax.set_xlabel('x')
         ax.set_ylabel('f(x)')
         ax.scatter([-1, 1], [self.f(-1), self.f(1)], linewidth=1, edgecolor='r', facecolor='r')
         ax.grid(True, alpha=0.2)
         create_square(ax, x_values, y_values)
-        ax.set_title("Przedział: [-1;1], n = 1")
+        ax.set_title("Przedział: [-1,1], n = 1")
+        ax.legend(loc='upper left')
         self.show()
         self.canvas.draw()
 
@@ -59,6 +64,8 @@ class WykresKwadraty(QWidget):
 
     def initUI(self):
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         self.resize(600, 500)
         layout = QVBoxLayout()
 
@@ -113,12 +120,13 @@ class WykresKwadraty(QWidget):
 
         ax.set_xlabel('x')
         ax.set_ylabel('f(x)')
-        ax.set_title("Przedział: [1;5], n = 4")
+        ax.set_title("Przedział: [1,5], n = 4")
 
         start, stop = 1 - 2, 5 + 2
         x_f = np.linspace(start, stop, 300)
         y_f = self.f(x_f)
-        ax.plot(x_f, y_f, 'b-', linewidth=1)
+        ax.plot(x_f, y_f, 'b-', linewidth=1, label="2x²")
+        ax.legend(loc='upper left')
         self.show()
         self.canvas1.draw()
 
@@ -145,13 +153,14 @@ class WykresKwadraty(QWidget):
 
         ax.set_xlabel('x')
         ax.set_ylabel('f(x)')
-        ax.set_title("Przedział: [1;5], n = 4")
+        ax.set_title("Przedział: [1,5], n = 4")
         start = 1 - 2
         stop = 5 + 2
 
         x_f = np.linspace(start, stop, 300)
         y_f = self.f(x_f)
-        ax.plot(x_f, y_f, 'b-', linewidth=1)
+        ax.plot(x_f, y_f, 'b-', linewidth=1, label="2x²")
+        ax.legend(loc='upper left')
         self.canvas2.draw()
 
     def create_plot_4(self):
@@ -176,14 +185,15 @@ class WykresKwadraty(QWidget):
         ax.text(5, self.f(5), 'b=x4', fontsize=10, ha='right', va='bottom')
         ax.set_xlabel('x')
         ax.set_ylabel('f(x)')
-        ax.set_title("Przedział: [1;5], n = 4")
+        ax.set_title("Przedział: [1,5], n = 4")
 
         start = 1 - 2
         stop = 5 + 2
 
         x_f = np.linspace(start, stop, 300)
         y_f = self.f(x_f)
-        ax.plot(x_f, y_f, 'b-', linewidth=1)
+        ax.plot(x_f, y_f, 'b-', linewidth=1, label="2x²")
+        ax.legend(loc='upper left')
         self.canvas3.draw()
 
     @staticmethod

@@ -1,5 +1,5 @@
 import sys
-
+import PyQt5.QtGui as qtg
 import PyQt5.QtCore as qtc
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QDialog, QApplication)
@@ -13,6 +13,8 @@ class Podstawienie(QDialog):
 
     def initUI(self):
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         layout = QVBoxLayout()
 
         l1 = QLabel("<h3>Całkowanie przez podstawienie</h3>")
@@ -37,6 +39,8 @@ class Czesci(QDialog):
 
     def initUI(self):
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         layout = QVBoxLayout()
 
         l1 = QLabel("<h3>Całkowanie przez części</h3>")
@@ -64,6 +68,8 @@ class Rozklad(QDialog):
 
     def initUI(self):
         self.setStyleSheet("background-color: white;")
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
+
         layout = QVBoxLayout()
 
         l1 = QLabel("<h3>Rozkład na ułamki proste</h3>")

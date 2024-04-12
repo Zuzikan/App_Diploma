@@ -2,7 +2,7 @@ import sys
 import numpy as np
 import timeit
 import math
-
+import PyQt5.QtGui as qtg
 from scipy.integrate import quad
 from sympy import sympify, lambdify, solve
 from PyQt5.QtCore import Qt, QCoreApplication, QLocale
@@ -26,6 +26,7 @@ class ObliczBoole(QDialog):
         self.initUI()
 
     def initUI(self):
+        self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
 
         # self.setStyleSheet("background-color: white;")
         self.font = QFont()
