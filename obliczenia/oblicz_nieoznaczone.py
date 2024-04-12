@@ -15,9 +15,35 @@ from obliczenia import (oblicz_boole, oblicz_herm, obliczenia_czeb, oblicz_monte
                         oblicz_metoda_prostokatow, oblicz_monte2D, oblicz_simpson, oblicz_trapez)
 import PyQt5.QtGui as qtg
 
+
+def setFontForLayout(layout, font):
+    for i in range(layout.count()):
+        widget = layout.itemAt(i).widget()
+        if widget is not None:
+            widget.setFont(font)
+
+
+def symbols(rownanie):
+    rownanie_matematyczne = sympify(rownanie)
+    x_sym = rownanie_matematyczne.free_symbols
+    x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+    return x_sym_sorted
+
+
 class ObliczNieoznaczona(QDialog):
     def __init__(self):
         super().__init__()
+        self.window = None
+        self.w = None
+        self.wi = None
+        self.l8 = None
+        self.figure = None
+        self.canvas = None
+        self.instrukcja = None
+        self.l6 = None
+        self.rownanie = None
+        self.font = None
+        self.combo = None
         self.initUI()
 
     def initUI(self):
@@ -29,24 +55,20 @@ class ObliczNieoznaczona(QDialog):
         self.font.setPointSize(10)
 
         layout = QGridLayout()
-        sliderLayout = QHBoxLayout()
-
         layout_for_buttons = QHBoxLayout()
 
         self.combo = QComboBox(self)
-
         l1 = QLabel("Porównaj z: ", self)
-        self.error_ocurred = False
         l2 = QLabel("Wpisz równanie: ", self)
         self.rownanie = QLineEdit(self)
-        instrukcja = QPushButton('Instrukcja', self)
+        self.instrukcja = QPushButton('Instrukcja', self)
         self.l6 = QLabel(self)
         self.l8 = QLabel(self)
         oblicz = QPushButton('Oblicz', self)
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
 
-        instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+        self.instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         oblicz.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         l2.setAlignment(Qt.AlignCenter)
         self.rownanie.setPlaceholderText("Wpisz wartość całki")
@@ -68,8 +90,8 @@ class ObliczNieoznaczona(QDialog):
 
         layout.addWidget(l2, 5, 0, 1, 2)
         layout.addWidget(self.rownanie, 6, 0, 1, 2)
-        layout.addWidget(instrukcja, 7, 0)
-        instrukcja.clicked.connect(self.open_inst)
+        layout.addWidget(self.instrukcja, 7, 0)
+        self.instrukcja.clicked.connect(self.open_inst)
 
         layout.addWidget(oblicz, 7, 1)
         oblicz.clicked.connect(self.check_errors)
@@ -91,15 +113,15 @@ class ObliczNieoznaczona(QDialog):
         zamknij.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
         zamknij_okno.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
 
-        layout_for_buttons.addWidget(powrot)
         layout_for_buttons.addWidget(zamknij)
         layout_for_buttons.addWidget(zamknij_okno)
+        layout_for_buttons.addWidget(powrot)
 
         layout.addLayout(layout_for_buttons, 14, 0, 1, 2)
 
         self.setLayout(layout)
-        self.setFontForLayout(layout_for_buttons, self.font)
-        self.setFontForLayout(layout, self.font)
+        setFontForLayout(layout_for_buttons, self.font)
+        setFontForLayout(layout, self.font)
         self.setWindowTitle('Obliczenia całki nieoznaczone')
 
     def wroc(self):
@@ -157,12 +179,6 @@ class ObliczNieoznaczona(QDialog):
         self.wi = instrukcja.Instrukcja()
         self.wi.show()
 
-    def setFontForLayout(self, layout, font):
-        for i in range(layout.count()):
-            widget = layout.itemAt(i).widget()
-            if widget is not None:
-                widget.setFont(font)
-
     def check_errors(self):
         try:
             self.f(1)
@@ -197,17 +213,11 @@ class ObliczNieoznaczona(QDialog):
             self.l8.setText(f"")
             return
 
-    def symbols(self, rownanie):
-        rownanie_matematyczne = sympify(rownanie)
-        x_sym = rownanie_matematyczne.free_symbols
-        x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
-        return x_sym_sorted
-
     def converter(self):
         try:
             rownanie_string = self.rownanie.text()
             rownanie_matematyczne = sympify(rownanie_string)
-            x_sym_sorted = self.symbols(rownanie_string)
+            x_sym_sorted = symbols(rownanie_string)
             if len(x_sym_sorted) != 1:
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
                 self.l8.setText(f"")
@@ -247,10 +257,12 @@ class ObliczNieoznaczona(QDialog):
 
             result_nieoznaczona = self.nieoznaczona()
             if result_nieoznaczona is None:
-                self.l6.setText("Error: Problem z obliczeniem wartości. 1")
+                self.l6.setText("Error: Problem z obliczeniem wartości. ")
+                self.l8.setText(f"")
                 return
         except Exception as e:
             self.l6.setText(f"Error: Wystąpił problem podczas obliczeń.")
+            self.l8.setText(f"")
             return
 
         self.update_wykres(self.nieoznaczona())
@@ -259,7 +271,7 @@ class ObliczNieoznaczona(QDialog):
         self.figure.clear()
         ax = self.figure.add_subplot(111)
         rownanie_string = self.rownanie.text()
-        x_sym_sorted = self.symbols(rownanie_string)
+        x_sym_sorted = symbols(rownanie_string)
         funkcja = lambdify(x_sym_sorted, calka, 'numpy')
 
         x = np.linspace(-10, 10, 300)

@@ -1,5 +1,5 @@
 from obliczenia import oblicz_metoda_prostokatow
-import wykres_metoda_pr
+from wykresy import wykres_metoda_pr
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
 import PyQt5.QtCore as qtc
 import PyQt5.QtGui as qtg

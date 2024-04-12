@@ -11,18 +11,50 @@ from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QComboBox, QLine
 from PyQt5.QtGui import QDoubleValidator, QFont
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from sympy.core.sympify import SympifyError
-
 import instrukcja
 from metody import metoda_boolea
 from obliczenia import (obliczenia_czeb, oblicz_herm, oblicz_monte, oblicz_monte2D, oblicz_regula_3_8,
                         oblicz_metoda_prostokatow, oblicz_nieoznaczone, oblicz_simpson, oblicz_trapez)
 
 
+def setFontForLayout(layout, font):
+    for i in range(layout.count()):
+        widget = layout.itemAt(i).widget()
+        if widget is not None:
+            widget.setFont(font)
+
+
+def symbols(rownanie):
+    rownanie_matematyczne = sympify(rownanie)
+    x_sym = rownanie_matematyczne.free_symbols
+    x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+    return x_sym_sorted
+
 
 class ObliczBoole(QDialog):
     def __init__(self):
         super().__init__()
+        self.window = None
+        self.instrukcja = None
+        self.wi = None
+        self.w = None
+        self.canvas = None
+        self.figure = None
+        self.wartosc = None
+        self.b = None
+        self.a = None
+        self.rownanie = None
+        self.combo = None
+        self.font = None
+        self.n = None
+        self.l6 = None
+        self.l6p = None
+        self.l7 = None
+        self.l8 = None
+        self.l8p = None
+        self.l9 = None
+        self.l9p = None
+        self.slider = None
         self.initUI()
 
     def initUI(self):
@@ -39,11 +71,10 @@ class ObliczBoole(QDialog):
 
         self.combo = QComboBox(self)
         l1 = QLabel("Porównaj z: ", self)
-        self.error_ocurred = False
         l2 = QLabel("Wpisz równanie: ", self)
         l3 = QLabel("Podaj przedział [a,b]:", self)
         self.rownanie = QLineEdit(self)
-        instrukcja = QPushButton('Instrukcja', self)
+        self.instrukcja = QPushButton('Instrukcja', self)
         la = QLabel("a: ", self)
         lb = QLabel("b:", self)
         self.a = QLineEdit(self)
@@ -63,12 +94,12 @@ class ObliczBoole(QDialog):
         start = QLabel('4')
         end = QLabel('80')
         oblicz = QPushButton('Oblicz', self)
-        self.wartosc = QLabel("Liczba node'ów: 4", self)
+        self.wartosc = QLabel("Ilość n: 4", self)
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
 
         self.slider.valueChanged.connect(self.slider_nodes)
-        instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+        self.instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         oblicz.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         self.slider.setStyleSheet("""
                 QSlider::handle:horizontal {
@@ -108,8 +139,8 @@ class ObliczBoole(QDialog):
 
         layout.addWidget(l2, 2, 0)
         layout.addWidget(self.rownanie, 2, 1)
-        layout.addWidget(instrukcja, 3, 0, 1, 2)
-        instrukcja.clicked.connect(self.open_inst)
+        layout.addWidget(self.instrukcja, 3, 0, 1, 2)
+        self.instrukcja.clicked.connect(self.open_inst)
         layout.addWidget(l3, 4, 0, 1, 2)
 
         abHorizontal.addWidget(la)
@@ -157,15 +188,15 @@ class ObliczBoole(QDialog):
         zamknij.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
         zamknij_okno.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
 
-        layout_for_buttons.addWidget(powrot)
         layout_for_buttons.addWidget(zamknij)
         layout_for_buttons.addWidget(zamknij_okno)
+        layout_for_buttons.addWidget(powrot)
 
         layout.addLayout(layout_for_buttons, 20, 0, 1, 2)
 
         self.setLayout(layout)
-        self.setFontForLayout(layout_for_buttons, self.font)
-        self.setFontForLayout(layout, self.font)
+        setFontForLayout(layout_for_buttons, self.font)
+        setFontForLayout(layout, self.font)
         self.setWindowTitle("Obliczenia metoda Boole'a")
 
     def wroc(self):
@@ -236,12 +267,6 @@ class ObliczBoole(QDialog):
         except Exception as e:
             return
 
-    def setFontForLayout(self, layout, font):
-        for i in range(layout.count()):
-            widget = layout.itemAt(i).widget()
-            if widget is not None:
-                widget.setFont(font)
-
     def check_errors(self):
         try:
             self.f(1)
@@ -265,17 +290,11 @@ class ObliczBoole(QDialog):
             self.l9p.setText(f"")
             return
 
-    def symbols(self, rownanie):
-        rownanie_matematyczne = sympify(rownanie)
-        x_sym = rownanie_matematyczne.free_symbols
-        x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
-        return x_sym_sorted
-
     def converter(self):
         try:
             rownanie_string = self.rownanie.text()
             rownanie_matematyczne = sympify(rownanie_string)
-            x_sym_sorted = self.symbols(rownanie_string)
+            x_sym_sorted = symbols(rownanie_string)
             if len(x_sym_sorted) != 1:
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
                 self.l6l.setText(f"")
@@ -333,7 +352,7 @@ class ObliczBoole(QDialog):
         try:
             if n % 4 != 0:
                 raise ValueError("Liczba podprzedziałów (n) musi być podzielna przez.")
-
+            start_time = timeit.default_timer()
             h = (b - a) / n
             wynik = 0
             for i in range(0, n, 4):
@@ -345,6 +364,8 @@ class ObliczBoole(QDialog):
 
                 wynik += (2 * h / 45) * (
                         7 * self.f(x0) + 32 * self.f(x1) + 12 * self.f(x2) + 32 * self.f(x3) + 7 * self.f(x4))
+            end_time = timeit.default_timer()
+            time = end_time - start_time
 
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
@@ -356,6 +377,7 @@ class ObliczBoole(QDialog):
                 return None
             else:
                 self.l6.setText(f"Wynik dla złożonej metody: {wynik}")
+                self.l8.setText(f"Czas potrzebny do obliczenia metody złożonej: {time}")
                 return wynik
 
         except Exception as e:
@@ -369,6 +391,7 @@ class ObliczBoole(QDialog):
 
     def metoda_prosta_boole(self, a, b):
         try:
+            start_time = timeit.default_timer()
             h = (b - a) / 4
             wynik = 0
             x0 = a
@@ -379,7 +402,8 @@ class ObliczBoole(QDialog):
 
             wynik += (2 * h / 45) * (
                     7 * self.f(x0) + 32 * self.f(x1) + 12 * self.f(x2) + 32 * self.f(x3) + 7 * self.f(x4))
-
+            end_time = timeit.default_timer()
+            timep = end_time - start_time
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
                 self.l6p.setText(f"")
@@ -390,6 +414,7 @@ class ObliczBoole(QDialog):
                 return None
             else:
                 self.l6p.setText(f"Wynik dla prostej metody: {wynik}")
+                self.l8p.setText(f"Czas potrzebny do obliczenia metody prostej: {timep}")
                 return wynik
 
         except Exception as e:
@@ -406,7 +431,7 @@ class ObliczBoole(QDialog):
             self.n = value
         else:
             self.n = value + (4 - value % 4)
-        self.wartosc.setText(f"Liczba node'ów: {self.n}")
+        self.wartosc.setText(f"Ilość n: {self.n}")
         self.get_a_b()
 
     def error(self, a, b, zl, pr):
@@ -481,26 +506,27 @@ class ObliczBoole(QDialog):
                     return
 
         try:
-            start_time = timeit.default_timer()
+
             result_zlozona = self.metoda_zlozona_boole(self.n, a, b)
-            end_time = timeit.default_timer()
             if result_zlozona is None:
                 self.l6.setText("Error: Problem z obliczeniem wartości.")
+                self.l8.setText(f"")
+                self.l9.setText(f"")
                 return
-            time = end_time - start_time
-            self.l8.setText(f"Czas potrzebny do obliczenia złożona: {time}")
 
-            start_timep = timeit.default_timer()
             result_prosta = self.metoda_prosta_boole(a, b)
-            end_timep = timeit.default_timer()
             if result_prosta is None:
-                self.l6.setText("Error: Problem z obliczeniem wartości.")
+                self.l6p.setText("Error: Problem z obliczeniem wartości.")
+                self.l8p.setText(f"")
+                self.l9p.setText(f"")
                 return
-            timep = end_timep - start_timep
-            self.l8p.setText(f"Czas potrzebny do obliczenia prosta: {timep}")
-
         except Exception as e:
             self.l6.setText(f"Error: Wystąpił problem podczas obliczeń.")
+            self.l6p.setText(f"")
+            self.l8.setText(f"")
+            self.l8p.setText(f"")
+            self.l9.setText(f"")
+            self.l9p.setText(f"")
             return
         try:
             self.error(a, b, result_zlozona, result_prosta)

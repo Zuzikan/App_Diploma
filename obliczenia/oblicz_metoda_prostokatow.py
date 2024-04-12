@@ -1,7 +1,6 @@
 import numpy as np
 import timeit
 import math
-
 from scipy.integrate import quad
 from sympy import sympify, lambdify, solve
 from PyQt5.QtCore import Qt, QCoreApplication, QLocale
@@ -11,7 +10,6 @@ from PyQt5.QtGui import QDoubleValidator, QFont
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
-from sympy.core.sympify import SympifyError
 import PyQt5.QtGui as qtg
 import instrukcja
 from metody import metoda_pr
@@ -19,15 +17,63 @@ from obliczenia import (oblicz_boole, obliczenia_czeb, oblicz_herm, oblicz_simps
                         oblicz_nieoznaczone, oblicz_monte, oblicz_monte2D, oblicz_trapez)
 
 
+def setFontForLayout(layout, font):
+    for i in range(layout.count()):
+        widget = layout.itemAt(i).widget()
+        if widget is not None:
+            widget.setFont(font)
+
+
+def symbols(rownanie):
+    rownanie_matematyczne = sympify(rownanie)
+    x_sym = rownanie_matematyczne.free_symbols
+    x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+    return x_sym_sorted
+
 
 class Oblicz(QDialog):
     def __init__(self):
         super().__init__()
+        self.instrukcja = None
+        self.window = None
+        self.wi = None
+        self.w = None
+        self.tab3 = None
+        self.tab2 = None
+        self.tab1 = None
+        self.tabWidget = None
+        self.tabe = None
+        self.tabt = None
+        self.tabTimeErrors = None
+        self.slider = None
+        self.errory = None
+        self.l9 = None
+        self.l8r = None
+        self.l8l = None
+        self.l8 = None
+        self.l6r = None
+        self.l7 = None
+        self.l6l = None
+        self.l6 = None
+        self.l9l = None
+        self.l9r = None
+        self.n = None
+        self.b = None
+        self.a = None
+        self.wartosc = None
+        self.figure1 = None
+        self.canvas1 = None
+        self.figure2 = None
+        self.canvas2 = None
+        self.figure3 = None
+        self.canvas3 = None
+        self.rownanie = None
+        self.combo = None
+        self.font = None
         self.initUI()
 
     def initUI(self):
 
-        # self.setStyleSheet("background-color: white;")
         self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
 
         self.font = QFont()
@@ -40,11 +86,10 @@ class Oblicz(QDialog):
 
         self.combo = QComboBox(self)
         l1 = QLabel("Porównaj z: ", self)
-        self.error_ocurred = False
         l2 = QLabel("Wpisz równanie: ", self)
         l3 = QLabel("Podaj przedział [a,b]:", self)
         self.rownanie = QLineEdit(self)
-        instrukcja = QPushButton('Instrukcja', self)
+        self.instrukcja = QPushButton('Instrukcja', self)
         la = QLabel("a: ", self)
         lb = QLabel("b:", self)
         self.a = QLineEdit(self)
@@ -68,7 +113,7 @@ class Oblicz(QDialog):
         start = QLabel('1')
         end = QLabel('50')
         oblicz = QPushButton('Oblicz', self)
-        self.wartosc = QLabel("Liczba node'ów: 1", self)
+        self.wartosc = QLabel("Ilość n: 1", self)
         self.figure1 = Figure()
         self.canvas1 = FigureCanvas(self.figure1)
         self.figure2 = Figure()
@@ -77,7 +122,7 @@ class Oblicz(QDialog):
         self.canvas3 = FigureCanvas(self.figure3)
 
         self.slider.valueChanged.connect(self.slider_nodes)
-        instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+        self.instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         oblicz.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         self.slider.setStyleSheet("""
                 QSlider::handle:horizontal {
@@ -117,8 +162,8 @@ class Oblicz(QDialog):
 
         layout.addWidget(l2, 2, 0)
         layout.addWidget(self.rownanie, 2, 1)
-        layout.addWidget(instrukcja, 3, 0, 1, 2)
-        instrukcja.clicked.connect(self.open_inst)
+        layout.addWidget(self.instrukcja, 3, 0, 1, 2)
+        self.instrukcja.clicked.connect(self.open_inst)
 
         layout.addWidget(l3, 4, 0, 1, 2)
 
@@ -190,7 +235,6 @@ class Oblicz(QDialog):
         self.tabWidget.addTab(self.tab2, "Left side")
         self.tabWidget.addTab(self.tab3, "Right side")
 
-        # layout.addWidget(self.canvas, 0, 3, 15, 1)
         layout.addWidget(self.tabWidget, 0, 3, 18, 1)
 
         zamknij = QPushButton('Zamknij program')
@@ -205,14 +249,14 @@ class Oblicz(QDialog):
         zamknij.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
         zamknij_okno.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
 
-        layout_for_buttons.addWidget(powrot)
         layout_for_buttons.addWidget(zamknij)
         layout_for_buttons.addWidget(zamknij_okno)
+        layout_for_buttons.addWidget(powrot)
 
         layout.addLayout(layout_for_buttons, 25, 0, 1, 2)
 
         self.setLayout(layout)
-        self.setFontForLayout(layout, self.font)
+        setFontForLayout(layout, self.font)
         self.setWindowTitle('Obliczenia metoda prostokątów')
 
     def wroc(self):
@@ -283,12 +327,6 @@ class Oblicz(QDialog):
         except Exception as e:
             return
 
-    def setFontForLayout(self, layout, font):
-        for i in range(layout.count()):
-            widget = layout.itemAt(i).widget()
-            if widget is not None:
-                widget.setFont(font)
-
     def check_errors(self):
         try:
             self.errory.setText("")
@@ -321,17 +359,11 @@ class Oblicz(QDialog):
             self.l9r.setText(f"")
             return
 
-    def symbols(self, rownanie):
-        rownanie_matematyczne = sympify(rownanie)
-        x_sym = rownanie_matematyczne.free_symbols
-        x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
-        return x_sym_sorted
-
     def converter(self):
         try:
             rownanie_string = self.rownanie.text()
             rownanie_matematyczne = sympify(rownanie_string)
-            x_sym_sorted = self.symbols(rownanie_string)
+            x_sym_sorted = symbols(rownanie_string)
             if len(x_sym_sorted) != 1:
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
                 self.l6.setText(f"")
@@ -438,7 +470,7 @@ class Oblicz(QDialog):
                 return None
             else:
                 self.l6.setText(f"Wynik dla midpoint: {wynik}")
-                self.l8.setText(f"Czas potrzebny do obliczenia lmidpoint: {time}")
+                self.l8.setText(f"Czas potrzebny do obliczenia midpoint: {time}")
                 return wynik
 
         except Exception as e:
@@ -559,7 +591,7 @@ class Oblicz(QDialog):
 
     def slider_nodes(self, value):
         self.n = value
-        self.wartosc.setText(f"Liczba node'ów: {value}")
+        self.wartosc.setText(f"Ilość n: {value}")
         self.get_a_b()
 
     def get_a_b(self):
@@ -650,19 +682,23 @@ class Oblicz(QDialog):
             result_midpoint = self.metoda_prostokatow_midpoint(self.n, a, b)
             if result_midpoint is None:
                 self.l6.setText("Error: Problem z obliczeniem wartości.")
+                self.l8.setText(f"")
+                self.l9.setText(f"")
                 return
 
             result_leftside = self.metoda_prostokatow_leftside(self.n, a, b)
             if result_leftside is None:
                 self.l6l.setText("Error: Problem z obliczeniem wartości.")
+                self.l8l.setText(f"")
+                self.l9l.setText(f"")
                 return
 
             result_rightside = self.metoda_prostokatow_rightside(self.n, a, b)
             if result_rightside is None:
                 self.l6r.setText("Error: Problem z obliczeniem wartości.")
+                self.l8r.setText(f"")
+                self.l9r.setText(f"")
                 return
-
-
         except Exception as e:
             self.errory.setText(f"Error: Wystąpił problem podczas obliczeń.")
             self.l6.setText(f"")

@@ -12,7 +12,6 @@ from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QComboBox, QLine
 from PyQt5.QtGui import QDoubleValidator, QFont
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from sympy.core.sympify import SympifyError
 import PyQt5.QtGui as qtg
 import instrukcja
 from metody import regula_3_8
@@ -20,9 +19,34 @@ from obliczenia import (obliczenia_czeb, oblicz_herm, oblicz_monte, oblicz_monte
                         oblicz_metoda_prostokatow, oblicz_nieoznaczone, oblicz_simpson, oblicz_trapez)
 
 
+def symbols(rownanie):
+    rownanie_matematyczne = sympify(rownanie)
+    x_sym = rownanie_matematyczne.free_symbols
+    x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+    return x_sym_sorted
+
+
 class ObliczRegula(QDialog):
     def __init__(self):
         super().__init__()
+        self.window = None
+        self.instrukcja = None
+        self.wi = None
+        self.w = None
+        self.canvas = None
+        self.figure = None
+        self.wartosc = None
+        self.b = None
+        self.a = None
+        self.rownanie = None
+        self.combo = None
+        self.font = None
+        self.n = None
+        self.l6 = None
+        self.l7 = None
+        self.l8 = None
+        self.l9 = None
+        self.slider = None
         self.initUI()
 
     def initUI(self):
@@ -40,11 +64,10 @@ class ObliczRegula(QDialog):
 
         self.combo = QComboBox(self)
         l1 = QLabel("Porównaj z: ", self)
-        self.error_ocurred = False
         l2 = QLabel("Wpisz równanie: ", self)
         l3 = QLabel("Podaj przedział [a,b]:", self)
         self.rownanie = QLineEdit(self)
-        instrukcja = QPushButton('Instrukcja', self)
+        self.instrukcja = QPushButton('Instrukcja', self)
         la = QLabel("a: ", self)
         lb = QLabel("b:", self)
         self.a = QLineEdit(self)
@@ -61,12 +84,12 @@ class ObliczRegula(QDialog):
         start = QLabel('3')
         end = QLabel('60')
         oblicz = QPushButton('Oblicz', self)
-        self.wartosc = QLabel("Liczba node'ów: 3", self)
+        self.wartosc = QLabel("Ilość n: 3", self)
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
 
         self.slider.valueChanged.connect(self.slider_nodes)
-        instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+        self.instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         oblicz.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         self.slider.setStyleSheet("""
                 QSlider::handle:horizontal {
@@ -106,8 +129,8 @@ class ObliczRegula(QDialog):
 
         layout.addWidget(l2, 2, 0)
         layout.addWidget(self.rownanie, 2, 1)
-        layout.addWidget(instrukcja, 3, 0, 1, 2)
-        instrukcja.clicked.connect(self.open_inst)
+        layout.addWidget(self.instrukcja, 3, 0, 1, 2)
+        self.instrukcja.clicked.connect(self.open_inst)
         layout.addWidget(l3, 4, 0, 1, 2)
 
         abHorizontal.addWidget(la)
@@ -152,9 +175,9 @@ class ObliczRegula(QDialog):
         zamknij.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
         zamknij_okno.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
 
-        layout_for_buttons.addWidget(powrot)
         layout_for_buttons.addWidget(zamknij)
         layout_for_buttons.addWidget(zamknij_okno)
+        layout_for_buttons.addWidget(powrot)
 
         layout.addLayout(layout_for_buttons, 18, 0, 1, 2)
 
@@ -253,17 +276,11 @@ class ObliczRegula(QDialog):
             self.l9.setText(f"")
             return
 
-    def symbols(self, rownanie):
-        rownanie_matematyczne = sympify(rownanie)
-        x_sym = rownanie_matematyczne.free_symbols
-        x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
-        return x_sym_sorted
-
     def converter(self):
         try:
             rownanie_string = self.rownanie.text()
             rownanie_matematyczne = sympify(rownanie_string)
-            x_sym_sorted = self.symbols(rownanie_string)
+            x_sym_sorted = symbols(rownanie_string)
             if len(x_sym_sorted) != 1:
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
                 self.l8.setText(f"")
@@ -314,6 +331,7 @@ class ObliczRegula(QDialog):
             if n % 3 == 1:
                 self.l8.setText(f"")
                 raise ValueError(self.l6.setText("Reguła 3/8 przyjmuje tylko liczbę przedziałów podzielną przez 3."))
+            start_time = timeit.default_timer()
 
             h = (b - a) / n
             wynik = self.f(a) + self.f(b) + 3 * sum(self.f(a + i * h) for i in range(1, n, 3)) + 3 * sum(
@@ -321,6 +339,8 @@ class ObliczRegula(QDialog):
 
             wynik *= 3 * h / 8
 
+            end_time = timeit.default_timer()
+            time = end_time - start_time
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
                 self.l8.setText(f"")
@@ -328,6 +348,7 @@ class ObliczRegula(QDialog):
                 return None
             else:
                 self.l6.setText(f"Wynik: {wynik}")
+                self.l8.setText(f"Czas potrzebny do obliczenia: {time}")
                 return wynik
 
         except Exception as e:
@@ -341,7 +362,7 @@ class ObliczRegula(QDialog):
             self.n = value
         else:
             self.n = value + (3 - value % 3)
-        self.wartosc.setText(f"Liczba node'ów: {self.n}")
+        self.wartosc.setText(f"Ilość n: {self.n}")
         self.get_a_b()
 
     def error(self, a, b, value):
@@ -397,16 +418,18 @@ class ObliczRegula(QDialog):
                     return
 
         try:
-            start_time = timeit.default_timer()
+
             result_regula = self.regula_3_8(self.n, a, b)
-            end_time = timeit.default_timer()
+
             if result_regula is None:
                 self.l6.setText("Error: Problem z obliczeniem wartości.")
+                self.l8.setText(f"")
+                self.l9.setText(f"")
                 return
-            time = end_time - start_time
-            self.l8.setText(f"Czas potrzebny do obliczenia: {time}")
         except Exception as e:
             self.l6.setText(f"Error: Wystąpił problem podczas obliczeń.")
+            self.l8.setText(f"")
+            self.l9.setText(f"")
             return
         try:
             self.error(a, b, result_regula)

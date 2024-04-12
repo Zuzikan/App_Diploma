@@ -3,32 +3,72 @@ import numpy as np
 import timeit
 import math
 import PyQt5.QtGui as qtg
-from scipy.optimize import minimize
-from scipy.special import roots_chebyt
 from scipy.integrate import quad
-from scipy.interpolate import CubicSpline
 from sympy import sympify, lambdify, solve
 from PyQt5.QtCore import Qt, QCoreApplication, QLocale
-from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QComboBox, QLineEdit, QSlider, QHBoxLayout,
+from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QComboBox, QLineEdit, QHBoxLayout,
                              QPushButton, QDialog, QTabWidget, QVBoxLayout, QWidget)
 from PyQt5.QtGui import QDoubleValidator, QFont
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from sympy.core.sympify import SympifyError
-
 import instrukcja
 from metody import metoda_monte
 from obliczenia import (oblicz_boole, oblicz_herm, obliczenia_czeb, oblicz_monte2D, oblicz_regula_3_8,
                         oblicz_metoda_prostokatow, oblicz_nieoznaczone, oblicz_simpson, oblicz_trapez)
 
 
+def setFontForLayout(layout, font):
+    for i in range(layout.count()):
+        widget = layout.itemAt(i).widget()
+        if widget is not None:
+            widget.setFont(font)
+
+
+def symbols(rownanie):
+    rownanie_matematyczne = sympify(rownanie)
+    x_sym = rownanie_matematyczne.free_symbols
+    x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
+    return x_sym_sorted
+
+
 class ObliczMonte(QDialog):
     def __init__(self):
         super().__init__()
+        self.window = None
+        self.w = None
+        self.tab2 = None
+        self.tabWidget = None
+        self.tab1 = None
+        self.tabe = None
+        self.tabt = None
+        self.tabTimeErrors = None
+        self.figure2 = None
+        self.canvas2 = None
+        self.canvas = None
+        self.figure = None
+        self.wartosc = None
+        self.instrukcja = None
+        self.wi = None
+        self.rownanie = None
+        self.combo = None
+        self.font = None
         self.ar_x = None
         self.ar_y = None
         self.maximum = None
         self.minimum = None
+        self.a = None
+        self.b = None
+        self.n = None
+        self.l6 = None
+        self.l6l = None
+        self.l6r = None
+        self.l7 = None
+        self.l8 = None
+        self.l8l = None
+        self.l8r = None
+        self.l9 = None
+        self.l9l = None
+        self.l9r = None
         self.initUI()
 
     def initUI(self):
@@ -46,11 +86,10 @@ class ObliczMonte(QDialog):
 
         self.combo = QComboBox(self)
         l1 = QLabel("Porównaj z: ", self)
-        self.error_ocurred = False
         l2 = QLabel("Wpisz równanie: ", self)
         l3 = QLabel("Podaj przedział [a,b]:", self)
         self.rownanie = QLineEdit(self)
-        instrukcja = QPushButton('Instrukcja', self)
+        self.instrukcja = QPushButton('Instrukcja', self)
         la = QLabel("a: ", self)
         lb = QLabel("b:", self)
         self.a = QLineEdit(self)
@@ -67,13 +106,13 @@ class ObliczMonte(QDialog):
         self.l9l = QLabel(self)
         self.l9r = QLabel(self)
         oblicz = QPushButton('Oblicz', self)
-        self.wartosc = QLabel("Liczba punktów:", self)
+        self.wartosc = QLabel("Ilość n:", self)
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
         self.figure2 = Figure()
         self.canvas2 = FigureCanvas(self.figure2)
 
-        instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
+        self.instrukcja.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         oblicz.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         self.l7.setStyleSheet('color: red')
 
@@ -105,8 +144,8 @@ class ObliczMonte(QDialog):
 
         layout.addWidget(l2, 2, 0)
         layout.addWidget(self.rownanie, 2, 1)
-        layout.addWidget(instrukcja, 3, 0, 1, 2)
-        instrukcja.clicked.connect(self.open_inst)
+        layout.addWidget(self.instrukcja, 3, 0, 1, 2)
+        self.instrukcja.clicked.connect(self.open_inst)
         layout.addWidget(l3, 4, 0, 1, 2)
 
         abHorizontal.addWidget(la)
@@ -179,14 +218,14 @@ class ObliczMonte(QDialog):
         zamknij.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
         zamknij_okno.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
 
-        layout_for_buttons.addWidget(powrot)
         layout_for_buttons.addWidget(zamknij)
         layout_for_buttons.addWidget(zamknij_okno)
+        layout_for_buttons.addWidget(powrot)
 
         layout.addLayout(layout_for_buttons, 18, 0, 1, 2)
 
         self.setLayout(layout)
-        self.setFontForLayout(layout, self.font)
+        setFontForLayout(layout, self.font)
         self.setWindowTitle('Obliczenia metoda Monte Carlo 1D')
 
     def wroc(self):
@@ -257,12 +296,6 @@ class ObliczMonte(QDialog):
         except Exception as e:
             return
 
-    def setFontForLayout(self, layout, font):
-        for i in range(layout.count()):
-            widget = layout.itemAt(i).widget()
-            if widget is not None:
-                widget.setFont(font)
-
     def check_errors(self):
         try:
             self.f(1)
@@ -286,17 +319,11 @@ class ObliczMonte(QDialog):
             self.l8l.setText(f"")
             return
 
-    def symbols(self, rownanie):
-        rownanie_matematyczne = sympify(rownanie)
-        x_sym = rownanie_matematyczne.free_symbols
-        x_sym_sorted = sorted(x_sym, key=lambda s: s.name)
-        return x_sym_sorted
-
     def converter(self):
         try:
             rownanie_string = self.rownanie.text()
             rownanie_matematyczne = sympify(rownanie_string)
-            x_sym_sorted = self.symbols(rownanie_string)
+            x_sym_sorted = symbols(rownanie_string)
             if len(x_sym_sorted) != 1:
                 self.l6.setText("Error: Funkcja powinna zawierać tylko jedną zmienną.")
                 self.l6l.setText(f"")
@@ -396,8 +423,8 @@ class ObliczMonte(QDialog):
                 self.l8l.setText(f"")
                 return None
             else:
-                self.l6.setText(f"Wynik: {wynik}")
-                self.l8.setText(f"Czas potrzebny do obliczenia: {time}")
+                self.l6.setText(f"Wynik dla hit or miss: {wynik}")
+                self.l8.setText(f"Czas potrzebny do obliczenia h.o.m: {time}")
                 return wynik
 
         except Exception as e:
@@ -429,8 +456,8 @@ class ObliczMonte(QDialog):
                 self.l8l.setText(f"")
                 return None
             else:
-                self.l6l.setText(f"Wynik2: {wynik}")
-                self.l8l.setText(f"Czas potrzebny do obliczenia2: {time}")
+                self.l6l.setText(f"Wynik dla średniej wartości: {wynik}")
+                self.l8l.setText(f"Czas potrzebny do obliczenia ś.w: {time}")
                 return wynik
 
         except Exception as e:
@@ -448,8 +475,8 @@ class ObliczMonte(QDialog):
 
             error = abs(accurate_result - value)
             error2 = abs(accurate_result - value2)
-            self.l9.setText(f"Błąd dla Metody Monte Carlo 1D:  +-{error}")
-            self.l9l.setText(f"Błąd dla Metody Monte Carlo 1D:  +-{error2}")
+            self.l9.setText(f"Błąd dla Metody Monte Carlo 1D h.o.m:  +-{error}")
+            self.l9l.setText(f"Błąd dla Metody Monte Carlo 1D ś.w:  +-{error2}")
         except Exception as e:
             self.l9.setText(f"Error: Problem z obliczeniem błędu.")
             self.l9l.setText(f"")
@@ -539,14 +566,22 @@ class ObliczMonte(QDialog):
             result_monte = self.monte_carlo(n, a, b)
             if result_monte is None:
                 self.l6.setText("Error: Problem z obliczeniem wartości.")
+                self.l8.setText(f"")
+                self.l9.setText(f"")
                 return
             result_monte2 = self.monte_carlo_2(n, a, b, self.ar_x)
             if result_monte2 is None:
-                self.l6.setText("Error: Problem z obliczeniem wartości.")
+                self.l6l.setText("Error: Problem z obliczeniem wartości.")
+                self.l8l.setText(f"")
+                self.l8l.setText(f"")
                 return
-
         except Exception as e:
             self.l6.setText(f"Error: Wystąpił problem podczas obliczeń.")
+            self.l6l.setText(f"")
+            self.l8.setText(f"")
+            self.l8l.setText(f"")
+            self.l9.setText(f"")
+            self.l8l.setText(f"")
             return
         try:
             self.error(a, b, result_monte, result_monte2)

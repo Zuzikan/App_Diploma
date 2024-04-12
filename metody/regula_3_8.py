@@ -2,14 +2,14 @@ from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSiz
 import PyQt5.QtCore as qtc
 import PyQt5.QtGui as qtg
 from PyQt5.QtGui import QPixmap, QFont
-
 from obliczenia import oblicz_regula_3_8
-import wykres_regula_3_8
+from wykresy import wykres_regula_3_8
 
 
 class Regula38(QDialog):
     def __init__(self):
         super().__init__()
+
 
         self.initUI()
 

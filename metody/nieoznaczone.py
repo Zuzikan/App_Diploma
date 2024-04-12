@@ -3,9 +3,8 @@ import PyQt5.QtGui as qtg
 import PyQt5.QtCore as qtc
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog, QApplication)
-
 import nieoznaczone_metody
-import wykres_nieozn
+from wykresy import wykres_nieozn
 from obliczenia import oblicz_nieoznaczone
 
 
@@ -138,12 +137,13 @@ class Nieoznaczone(QDialog):
     def open_oblicz(self):
         if hasattr(self, 'w') and self.w.isVisible():
             self.w.close()
-
         if hasattr(self, 'w1') and self.w1.isVisible():
             self.w1.close()
+        if hasattr(self, 'w2') and self.w.isVisible():
+            self.w2.close()
 
-        self.w2 = oblicz_nieoznaczone.ObliczNieoznaczona()
-        self.w2.show()
+        self.w3 = oblicz_nieoznaczone.ObliczNieoznaczona()
+        self.w3.show()
         self.close()
 
 

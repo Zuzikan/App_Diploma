@@ -13,6 +13,26 @@ class MainWindow(qtw.QDialog):
     def __init__(self):
         super().__init__()
 
+        self.p1 = None
+        self.p2 = None
+        self.p3 = None
+        self.p4 = None
+        self.p5 = None
+        self.p6 = None
+        self.p7 = None
+        self.p8 = None
+        self.p10 = None
+        self.nieoznaczone = None
+        self.zamknij = None
+        self.metoda_m_c = None
+        self.kwadratura_g_h = None
+        self.kwadratura_g_c = None
+        self.regula_3_8 = None
+        self.metoda_boole = None
+        self.metoda_simp = None
+        self.metoda_tr = None
+        self.metoda_pr = None
+        self.intro = None
         self.initUI()
 
     def initUI(self):
@@ -99,16 +119,16 @@ class MainWindow(qtw.QDialog):
         self.p5.show()
 
     def open_kwadratura_g_c(self):
-        self.w = metoda_czeb.MetodaCzeb()
-        self.w.show()
+        self.p6 = metoda_czeb.MetodaCzeb()
+        self.p6.show()
 
     def open_kwadratura_g_h(self):
-        self.w = metoda_herm.MetodaHerm()
-        self.w.show()
+        self.p7 = metoda_herm.MetodaHerm()
+        self.p7.show()
 
     def open_metoda_m_c(self):
-        self.w = metoda_monte.MetodaMonte()
-        self.w.show()
+        self.p8 = metoda_monte.MetodaMonte()
+        self.p8.show()
 
     def open_nieoznaczone(self):
         self.p10 = nieoznaczone.Nieoznaczone()

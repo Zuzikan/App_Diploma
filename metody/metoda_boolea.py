@@ -1,17 +1,16 @@
+
 import PyQt5.QtCore as qtc
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
 import PyQt5.QtGui as qtg
-import wykres_bool
-import wykres_metoda_tr
-
-
+from wykresy import wykres_bool
 from obliczenia import oblicz_boole
 
 
 class MetodaBoole(QDialog):
     def __init__(self):
         super().__init__()
+
 
         self.initUI()
 
@@ -20,8 +19,6 @@ class MetodaBoole(QDialog):
         self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
         # layouty
         layout_for_buttons = QHBoxLayout()
-        layout_horizontal = QHBoxLayout()
-        layout_horizontal_new = QHBoxLayout()
         layout = QVBoxLayout()
 
         # czcionka
@@ -30,7 +27,8 @@ class MetodaBoole(QDialog):
 
         labels_1 = [
 
-            "Złożona metoda Boole’a (Composite Boole’s Rule) jest ulepszeniem prostej metody. Przedział [x<sub>0</sub>,x<sub>4</sub>] ",
+            "Złożona metoda Boole’a (Composite Boole’s Rule) jest ulepszeniem prostej metody. Przedział ["
+            "x<sub>0</sub>,x<sub>4</sub>] ",
             "możemy podzielić na małe podprzedziały o szerokości 4h i dla każdego z nich zastosować regułę Boole’a. ",
             "Suma pól wszystkich podprzedziałów jest całką przedziału [x<sub>0</sub>,x<sub>4</sub>]. ",
             "Mimo tego, że jest to metoda bardziej pracochłonna, oferuje większą precyzję i elastyczność."

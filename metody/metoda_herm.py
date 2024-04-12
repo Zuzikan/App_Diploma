@@ -1,4 +1,4 @@
-import wykres_g_h
+from wykresy import wykres_g_h
 from obliczenia import oblicz_herm
 import PyQt5.QtGui as qtg
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
@@ -106,12 +106,8 @@ class MetodaHerm(QDialog):
     def open_oblicz(self):
         if hasattr(self, 'w') and self.w.isVisible():
             self.w.close()
-
-        if hasattr(self, 'w1') and self.w1.isVisible():
-            self.w1.close()
-
-        self.w2 = oblicz_herm.ObliczHerm()
-        self.w2.show()
+        self.w1= oblicz_herm.ObliczHerm()
+        self.w1.show()
         self.close()
 
 

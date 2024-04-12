@@ -1,7 +1,6 @@
-import wykres_m_c
+from wykresy import wykres_m_c
 from obliczenia import oblicz_monte
 from obliczenia import oblicz_monte2D
-import wykres_metoda_tr
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
 import PyQt5.QtCore as qtc
 import PyQt5.QtGui as qtg
@@ -11,7 +10,6 @@ from PyQt5.QtGui import QPixmap, QFont
 class MetodaMonte(QDialog):
     def __init__(self):
         super().__init__()
-
         self.initUI()
 
     def initUI(self):
@@ -41,7 +39,6 @@ class MetodaMonte(QDialog):
 
         ]
 
-
         l1 = QLabel("gdzie n<sub>s</sub> to ilość kamieni, które wpadły do wody, a n to ilość kamieni rzuconych.")
         l2 = QLabel("Kolejny sposób opiera się na średniej wartości rachunku całkowego. Całkę oznaczoną:")
 
@@ -54,9 +51,12 @@ class MetodaMonte(QDialog):
 
         l9 = QLabel("gdzie n jest liczbą próbek. ")
         l10 = QLabel("Funkcja H (Heaviside) H(x,y)=1 jeśli (x,y) znajduje się w obrębie naszej powierzchni.")
-        l11 = QLabel("Metoda Monte Carlo 2D jest stosowana do obliczenia całek podwójnych lub rozwiązywania problemów w "
+        l11 = QLabel(
+            "Metoda Monte Carlo 2D jest stosowana do obliczenia całek podwójnych lub rozwiązywania problemów w "
             "dwuwymiarowych przestrzeniach.")
-        l12 = QLabel("Tak samo jak 1D opiera się ona na losowych próbkach, jednak tym razem w dwóch wymiarach. Przyjmijmy całkę oznaczoną dwuwymiarową jako:")
+        l12 = QLabel(
+            "Tak samo jak 1D opiera się ona na losowych próbkach, jednak tym razem w dwóch wymiarach. Przyjmijmy "
+            "całkę oznaczoną dwuwymiarową jako:")
 
         for text in labels_1:
             label = QLabel(text)
@@ -72,7 +72,6 @@ class MetodaMonte(QDialog):
         add_label(l2, layout)
         add_pic("zdjecia/Monte/F.png", layout)
         add_label(l4, layout)
-
 
         add_label(l5, layout)
 
@@ -155,23 +154,28 @@ class MetodaMonte(QDialog):
     def open_oblicz(self):
         if hasattr(self, 'w') and self.w.isVisible():
             self.w.close()
-
         if hasattr(self, 'w1') and self.w1.isVisible():
             self.w1.close()
-
-        self.w2 = oblicz_monte.ObliczMonte()
-        self.w2.show()
+        if hasattr(self, 'w2') and self.w.isVisible():
+            self.w2.close()
+        if hasattr(self, 'w3') and self.w1.isVisible():
+            self.w3.close()
+        self.w4 = oblicz_monte.ObliczMonte()
+        self.w4.show()
         self.close()
 
     def open_oblicz2(self):
         if hasattr(self, 'w') and self.w.isVisible():
             self.w.close()
-
         if hasattr(self, 'w1') and self.w1.isVisible():
             self.w1.close()
+        if hasattr(self, 'w2') and self.w.isVisible():
+            self.w2.close()
+        if hasattr(self, 'w3') and self.w1.isVisible():
+            self.w3.close()
 
-        self.w2 = oblicz_monte2D.ObliczMonte2()
-        self.w2.show()
+        self.w4 = oblicz_monte2D.ObliczMonte2()
+        self.w4.show()
         self.close()
 
 

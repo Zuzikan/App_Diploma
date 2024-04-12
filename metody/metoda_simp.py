@@ -2,15 +2,13 @@ from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSiz
 import PyQt5.QtCore as qtc
 import PyQt5.QtGui as qtg
 from PyQt5.QtGui import QPixmap, QFont
-
 from obliczenia import oblicz_simpson
-import wykres_metoda_simp
+from wykresy import wykres_metoda_simp
 
 
 class MetodaSimp(QDialog):
     def __init__(self):
         super().__init__()
-
         self.initUI()
 
     def initUI(self):

@@ -1,6 +1,6 @@
 from obliczenia import oblicz_trapez
-import wykres_metoda_tr
-from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout,QSizePolicy, QDialog)
+from wykresy import wykres_metoda_tr
+from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
 import PyQt5.QtCore as qtc
 import PyQt5.QtGui as qtg
 from PyQt5.QtGui import QPixmap, QFont
@@ -134,6 +134,7 @@ class MetodaTr(QDialog):
         self.w2 = oblicz_trapez.ObliczTrapezy()
         self.w2.show()
         self.close()
+
 
 def add_label(name, layout):
     layout.addWidget(name)

@@ -1,15 +1,15 @@
-import wykres_g_c
+
 import PyQt5.QtGui as qtg
 from obliczenia import obliczenia_czeb
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog)
 import PyQt5.QtCore as qtc
 from PyQt5.QtGui import QPixmap, QFont
+from wykresy import wykres_g_c
 
 
 class MetodaCzeb(QDialog):
     def __init__(self):
         super().__init__()
-
         self.initUI()
 
     def initUI(self):
@@ -105,11 +105,8 @@ class MetodaCzeb(QDialog):
         if hasattr(self, 'w') and self.w.isVisible():
             self.w.close()
 
-        if hasattr(self, 'w1') and self.w1.isVisible():
-            self.w1.close()
-
-        self.w2 = obliczenia_czeb.ObliczCzeb()
-        self.w2.show()
+        self.w1 = obliczenia_czeb.ObliczCzeb()
+        self.w1.show()
         self.close()
 
 
