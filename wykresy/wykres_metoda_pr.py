@@ -89,9 +89,9 @@ class WykresKwadraty(QWidget):
         self.tab3.layout = QVBoxLayout(self.tab3)
         self.tab3.layout.addWidget(self.canvas3)
 
-        self.tabWidget.addTab(self.tab1, "Left side")
-        self.tabWidget.addTab(self.tab2, "Midpoint")
-        self.tabWidget.addTab(self.tab3, "Right side")
+        self.tabWidget.addTab(self.tab1, "Lewostronna")
+        self.tabWidget.addTab(self.tab2, "Środkowa")
+        self.tabWidget.addTab(self.tab3, "Prawostronna")
 
         layout.addWidget(self.tabWidget)
         self.create_plot_2()

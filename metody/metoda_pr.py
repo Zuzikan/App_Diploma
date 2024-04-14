@@ -6,23 +6,27 @@ import PyQt5.QtGui as qtg
 from PyQt5.QtGui import QPixmap, QFont
 
 
+#
 class MetodaPr(QDialog):
     def __init__(self):
         super().__init__()
 
         self.initUI()
 
+    # Funkcja zawierająca wszystkie elementy wizualne (tekst, przyciski, zdjęcia)
     def initUI(self):
+        # Ustawienie koloru tła
         self.setStyleSheet("background-color: white;")
+        # Ustawienie ikony aplikacji
         self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
 
-        # layouty
+        # Layouty
         layout_for_buttons = QHBoxLayout()
         layout_horizontal = QHBoxLayout()
         layout_horizontal_new = QHBoxLayout()
         layout = QVBoxLayout()
 
-        # czcionka
+        # Czcionka
         font = QFont()
         font.setPointSize(10)
 
@@ -46,9 +50,9 @@ class MetodaPr(QDialog):
             "długość podprzedziału (szerokość), a drugim wartość zależna od wartości funkcji (wysokość) f(x).",
             "Przyjmujemy oznaczenie h jako długość przedziału:"
 
-
         ]
 
+        #inicjalizowanie zmiennych QLabel zawierających tekst
         l1 = QLabel("Jeśli funkcja podcałkowa nie jest wielomianem stopnia co najmniej pierwszego, błąd wynosi:")
         l2 = QLabel("gdzie: ")
         l3 = QLabel("Przedział podcałkowy możemy podzielić na podprzedziały i do każdego z nich zastosować tę metodę.")
@@ -57,12 +61,15 @@ class MetodaPr(QDialog):
         l6 = QLabel("Natomiast błąd tej metody wyraża się wzorem:")
         l7 = QLabel("gdzie: ")
 
+        #Wstawienie tekstu z tabeli labels_1
         for text in labels_1:
             label = QLabel(text)
             add_label(label, layout)
 
+        #Wstawienie zdjęcia
         add_pic("zdjecia/Prostokaty/metoda_pr_jeden_kwadrat.png", layout)
 
+        #Wstawienie tekstu za pomocą funkcji add_label
         add_label(l1, layout)
 
         add_pic("zdjecia/Prostokaty/metoda_pr_jeden_blad.png", layout)
@@ -99,12 +106,14 @@ class MetodaPr(QDialog):
         add_pic("zdjecia/Prostokaty/eta_1.png", layout_horizontal_new)
         layout.addLayout(layout_horizontal_new)
 
+        #Dodanie przycisku ukazującego przykładową wizualizację metody
         wykres_kwadraty = QPushButton('Pokaż wykres dla metody prostokątów z wieloma kwadratami')
         wykres_kwadraty.clicked.connect(self.open_przedzial_kwadraty)
         layout.addWidget(wykres_kwadraty)
         wykres_kwadraty.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
         add_label(QLabel(""), layout)
 
+        #Inicjalizowanie przycisków podstawowych
         zamknij = QPushButton('Zamknij program')
         zamknij_okno = QPushButton("Zamknij okno")
         obliczenia = QPushButton('Przejdź do obliczeń')
@@ -121,22 +130,27 @@ class MetodaPr(QDialog):
         zamknij_okno.setStyleSheet("border-radius : 5px; background-color : #FCDDDD")
         obliczenia.setStyleSheet("border-radius : 5px; background-color : #CCDDFF")
 
+        #Dodanie layout_for_buttons do layout
         layout_for_buttons.addWidget(zamknij)
         layout_for_buttons.addWidget(zamknij_okno)
         layout_for_buttons.addWidget(obliczenia)
         layout.addLayout(layout_for_buttons)
 
+        #Ustawienie layoutu i nazwy okna
         self.setLayout(layout)
         self.setWindowTitle('Metoda prostokątów')
 
+    # Funkcja otwierająca przykłądową wizualizacje dla przedziału z jednym kwadratem
     def open_przedzial_kwadrat(self):
         self.w = wykres_metoda_pr.WykresKwadrat()
         self.w.show()
 
+    # Funkcja otwierająca przykłądową wizualizacje dla przedziału z wieloma kwadratami
     def open_przedzial_kwadraty(self):
         self.w1 = wykres_metoda_pr.WykresKwadraty()
         self.w1.show()
 
+    # Funkcja otwierająca okno 'oblicz'
     def open_oblicz(self):
         if hasattr(self, 'w') and self.w.isVisible():
             self.w.close()
@@ -149,11 +163,13 @@ class MetodaPr(QDialog):
         self.close()
 
 
+# Funkcja dodająca 'label' do ekranu zgodnie z podanym layout'em
 def add_label(name, layout):
     layout.addWidget(name)
     name.setAlignment(qtc.Qt.AlignCenter)
 
 
+# Funkcja dodająca zdjecie do ekranu zgodnie z podanym layout'em
 def add_pic(path, layout_name):
     label_pic = QLabel()
     label_pic.setPixmap(QPixmap(path))

@@ -80,30 +80,46 @@ class WykresMC2HOM(QWidget):
         self.setStyleSheet("background-color: white;")
         self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
 
+        #Tworzy obiekt Figure za pomocą biblioteki Matplotlib
         self.figure = Figure()
+
+        #Tworzy 'miejsce' na wyświetlanie wykresu
         self.canvas = FigureCanvas(self.figure)
         layout.addWidget(self.canvas)
 
+        #Wywołuje metodę create_plot
         self.create_plot(0, 5)
 
         self.setLayout(layout)
         self.setWindowTitle("Metoda Monte Carlo 2D hit or miss")
 
     def create_plot(self, a, b):
+
+        #Czyści poprzednią zawartość figury
         self.figure.clear()
         ax = self.figure.add_subplot(111, projection='3d')
+
+        #Wywołuje funkcję punkty2, aby uzyskać współrzędne punktów
         ar_x, ar_y, ar_z = punkty2()
+
+        #Oblicza wartość funkcji dla pary ar_x, ar_y
         f_values = np.array([self.fxy(x, y) for x, y in zip(ar_x, ar_y)])
-        threshold = 0.1
-        points_on_curve = np.abs(f_values - ar_z) < threshold
+
+        #Sprawdza punkty znajdujące się na, pod lub nad wykresem
+        points_on_curve = np.abs(f_values - ar_z)
         points_under_curve = ar_z < f_values
         points_above_curve = ar_z > f_values
 
+        #Generuje tablice wartości x, y
         x = np.linspace(a, b, 100)
         y = np.linspace(a, b, 100)
+
+        #Tworzy siatkę x, y
         x, y = np.meshgrid(x, y)
+        # Oblicza wartość z dla pary x, y
         z = self.fxy(x, y)
 
+        #Wyświetlanie punktów
         ax.scatter(ar_x[points_on_curve], ar_y[points_on_curve], ar_z[points_on_curve], color='green', marker=".",
                    label="Punkty w obszarze")
         ax.scatter(ar_x[points_under_curve], ar_y[points_under_curve], ar_z[points_under_curve], color='green',
@@ -111,9 +127,12 @@ class WykresMC2HOM(QWidget):
         ax.scatter(ar_x[points_above_curve], ar_y[points_above_curve], ar_z[points_above_curve], color='red',
                    marker=".",
                    label="Punkty poza obszarem")
+
+        #Tworzy wykres zdefiniowany przez x, y, z
         surf = ax.plot_surface(x, y, z, cmap='viridis', alpha=0.5, linewidth=0, antialiased=False,
                                label="x+y")
 
+        #Dodaje legende do wykresu
         ax.set_xlabel('x')
         ax.set_ylabel('y')
         ax.set_zlabel('f(x, y)')
@@ -122,7 +141,10 @@ class WykresMC2HOM(QWidget):
         surf._edgecolors2d = surf._edgecolor3d
         ax.legend(loc='upper left')
 
+        #Dodaje siatkę na wykresie
         ax.grid(True, alpha=0.2)
+
+        #Aktualizuje wykres
         self.canvas.draw()
 
     @staticmethod

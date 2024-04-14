@@ -318,7 +318,6 @@ class ObliczTrapezy(QDialog):
             self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.4")
             self.l8.setText(f"")
             self.l9.setText(f"")
-
             return
 
     def dzielenie_przez_zero(self, funkcja, x):

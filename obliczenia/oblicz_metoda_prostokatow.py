@@ -17,6 +17,7 @@ from obliczenia import (oblicz_boole, obliczenia_czeb, oblicz_herm, oblicz_simps
                         oblicz_nieoznaczone, oblicz_monte, oblicz_monte2D, oblicz_trapez)
 
 
+# Funkcja zmieniająca czcionkę
 def setFontForLayout(layout, font):
     for i in range(layout.count()):
         widget = layout.itemAt(i).widget()
@@ -24,6 +25,7 @@ def setFontForLayout(layout, font):
             widget.setFont(font)
 
 
+# Funkcja, która określa zmienną do funkcji f(zmienna)
 def symbols(rownanie):
     rownanie_matematyczne = sympify(rownanie)
     x_sym = rownanie_matematyczne.free_symbols
@@ -34,6 +36,8 @@ def symbols(rownanie):
 class Oblicz(QDialog):
     def __init__(self):
         super().__init__()
+
+        # Innicjalizowanie zmiennych
         self.instrukcja = None
         self.window = None
         self.wi = None
@@ -72,6 +76,7 @@ class Oblicz(QDialog):
         self.font = None
         self.initUI()
 
+    # Metoda zawierająca inicjalizację interfejsu użytkownika
     def initUI(self):
 
         self.setWindowIcon(qtg.QIcon('zdjecia/icon.png'))
@@ -231,9 +236,9 @@ class Oblicz(QDialog):
         self.tab3.layout = QVBoxLayout(self.tab3)
         self.tab3.layout.addWidget(self.canvas3)
 
-        self.tabWidget.addTab(self.tab1, "Midpoint")
-        self.tabWidget.addTab(self.tab2, "Left side")
-        self.tabWidget.addTab(self.tab3, "Right side")
+        self.tabWidget.addTab(self.tab1, "Środkowa")
+        self.tabWidget.addTab(self.tab2, "Lewostronna")
+        self.tabWidget.addTab(self.tab3, "Prawostronna")
 
         layout.addWidget(self.tabWidget, 0, 3, 18, 1)
 
@@ -259,15 +264,18 @@ class Oblicz(QDialog):
         setFontForLayout(layout, self.font)
         self.setWindowTitle('Obliczenia metoda prostokątów')
 
+    # Metoda połączona z przyciskiem 'Powrót', aby wrócić do ekranu teoretycznego metody
     def wroc(self):
         self.w = metoda_pr.MetodaPr()
         self.w.show()
         self.close()
 
+    # Metoda połączona z przyciskiem 'Instrukcja', aby otworzyć instrukcję
     def open_inst(self):
         self.wi = instrukcja.Instrukcja()
         self.wi.show()
 
+    # Metoda połączona z combobox'em, aby otworyć dodatkowe okno obliczeniowe w celu porównania metod
     def porownaj(self, index):
         if self.combo.itemData(index) == "window1":
             self.window = oblicz_trapez.ObliczTrapezy()
@@ -306,6 +314,7 @@ class Oblicz(QDialog):
             self.pass_data_n(self.window)
             self.window.show()
 
+    # Metoda przekazująca dane do porównywanej metody (równanie, a, b, n)
     def pass_data(self, window):
         try:
             a = self.a.text()
@@ -319,6 +328,7 @@ class Oblicz(QDialog):
         except Exception as e:
             return
 
+    # Metoda przekazująca dane do porównywanej metody (równanie)
     def pass_data_n(self, window):
         try:
             rownanie = self.rownanie.text()
@@ -327,6 +337,7 @@ class Oblicz(QDialog):
         except Exception as e:
             return
 
+    # Metoda sprawdzająca, czy zostały wpisane poprawne dane
     def check_errors(self):
         try:
             self.errory.setText("")
@@ -359,6 +370,7 @@ class Oblicz(QDialog):
             self.l9r.setText(f"")
             return
 
+    # Metoda zwracająca wpisane przez użytkownika równanie i wykorzystane w nim zmienne
     def converter(self):
         try:
             rownanie_string = self.rownanie.text()
@@ -391,6 +403,7 @@ class Oblicz(QDialog):
             self.l9r.setText(f"")
             return e
 
+    # Metoda zwracająca funkcje 'f(zmienna)'
     def f(self, x):
         try:
             rownanie_matematyczne, x_sym_sorted = self.converter()
@@ -436,6 +449,7 @@ class Oblicz(QDialog):
 
             return
 
+    # Metoda sprawdzająca, czy istnieją x nienależące do funkcji
     def dzielenie_przez_zero(self, funkcja, x):
         denominator = funkcja.as_numer_denom()[1]
         punkty = solve(denominator, x)
@@ -443,6 +457,7 @@ class Oblicz(QDialog):
             self.l7.setText(f"Error: W zakresie [a,b] nie mogą znajdować się te punkty: {punkty}")
             return punkty
 
+    # Metoda obliczająca wartość da metody prostokątów midpoint
     def metoda_prostokatow_midpoint(self, n, a, b):
         try:
             start_time = timeit.default_timer()
@@ -469,8 +484,8 @@ class Oblicz(QDialog):
                 self.l9r.setText(f"")
                 return None
             else:
-                self.l6.setText(f"Wynik dla midpoint: {wynik}")
-                self.l8.setText(f"Czas potrzebny do obliczenia midpoint: {time}")
+                self.l6.setText(f"Wynik dla środkowej: {wynik}")
+                self.l8.setText(f"Czas potrzebny do obliczenia metody środkowej: {time}")
                 return wynik
 
         except Exception as e:
@@ -486,6 +501,7 @@ class Oblicz(QDialog):
             self.l9r.setText(f"")
             return e
 
+    # Metoda obliczająca wartość da metody prostokątów leftside
     def metoda_prostokatow_leftside(self, n, a, b):
         try:
             start_time = timeit.default_timer()
@@ -512,8 +528,8 @@ class Oblicz(QDialog):
                 self.l9r.setText(f"")
                 return None
             else:
-                self.l6l.setText(f"Wynik da left side: {wynik}")
-                self.l8l.setText(f"Czas potrzebny do obliczenia left side: {time}")
+                self.l6l.setText(f"Wynik dla lewostronnej: {wynik}")
+                self.l8l.setText(f"Czas potrzebny do obliczenia metody lewostronnej: {time}")
                 return wynik
 
         except Exception as e:
@@ -529,6 +545,7 @@ class Oblicz(QDialog):
             self.l9r.setText(f"")
             return e
 
+    # Metoda obliczająca wartość da metody prostokątów rightside
     def metoda_prostokatow_rightside(self, n, a, b):
         try:
             start_time = timeit.default_timer()
@@ -555,8 +572,8 @@ class Oblicz(QDialog):
                 self.l9r.setText(f"")
                 return
             else:
-                self.l6r.setText(f"Wynik rightside: {wynik}")
-                self.l8r.setText(f"Czas potrzebny do obliczenia right side: {time}")
+                self.l6r.setText(f"Wynik dla prawostronnej: {wynik}")
+                self.l8r.setText(f"Czas potrzebny do obliczenia metody prawostronnej: {time}")
                 return wynik
         except Exception as e:
             self.errory.setText(f"Error: Problem z obliczeniem wartości funkcji.")
@@ -571,6 +588,7 @@ class Oblicz(QDialog):
             self.l9r.setText(f"")
             return e
 
+    # Metoda obliczająca błędy metody
     def error(self, a, b, ls, rs, mp):
         try:
 
@@ -580,20 +598,23 @@ class Oblicz(QDialog):
             error_l = abs(accurate_result - ls)
             error_r = abs(accurate_result - rs)
 
-            self.l9.setText(f"Błąd dla midpoint:  +-{error_m}")
-            self.l9l.setText(f"Błąd dla left side:  +-{error_l}")
-            self.l9r.setText(f"Błąd dla right side:  +-{error_r}")
+            self.l9.setText(f"Błąd dla środkowej:  +-{error_m}")
+            self.l9l.setText(f"Błąd dla lewostronnej:  +-{error_l}")
+            self.l9r.setText(f"Błąd dla prawostronnej:  +-{error_r}")
         except Exception as e:
             self.l9.setText(f"Error: Problem z obliczeniem błędu.")
             self.l9l.setText(f"")
             self.l9r.setText(f"")
             return e
 
+    # Metoda, która przekazuje ilość n wybranych na suwaku
     def slider_nodes(self, value):
         self.n = value
         self.wartosc.setText(f"Ilość n: {value}")
         self.get_a_b()
 
+    # Metoda przekazująca a,b użytkownika
+    # Wywołuje funkcje obliczaące całkę za pomocą metody oraz błędy
     def get_a_b(self):
         if self.rownanie.text().strip() == "":
             self.errory.setText("Error: Wpisz równanie")
@@ -729,6 +750,7 @@ class Oblicz(QDialog):
         self.update_wykres_leftside(a, b)
         self.update_wykres_rightside(a, b)
 
+    # Metody tworzące wizualizację
     def update_wykres_midpoint(self, a, b):
         if a is None or b is None or a >= b:
             return

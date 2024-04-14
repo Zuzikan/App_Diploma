@@ -79,7 +79,7 @@ class MainWindow(qtw.QDialog):
         self.kwadratura_g_h.clicked.connect(self.open_kwadratura_g_h)
         self.kwadratura_g_h.setSizePolicy(qtw.QSizePolicy.Expanding, qtw.QSizePolicy.Expanding)
 
-        self.metoda_m_c = qtw.QPushButton("Metoda Monte-Carlo 1D i 2D")
+        self.metoda_m_c = qtw.QPushButton("Metoda Monte Carlo 1D i 2D")
         self.layout().addWidget(self.metoda_m_c)
         self.metoda_m_c.clicked.connect(self.open_metoda_m_c)
         self.metoda_m_c.setSizePolicy(qtw.QSizePolicy.Expanding, qtw.QSizePolicy.Expanding)

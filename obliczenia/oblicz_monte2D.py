@@ -35,6 +35,8 @@ def symbols(rownanie):
 class ObliczMonte2(QDialog):
     def __init__(self):
         super().__init__()
+        self.toolbar = None
+        self.toolbar2 = None
         self.tabTimeErrors = None
         self.maximum = None
         self.minimum = None
