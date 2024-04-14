@@ -265,14 +265,14 @@ class ObliczCzeb(QDialog):
             self.f(1)
             self.l7.setText("")
         except Exception as e:
-            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.1")
+            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.")
             self.l8.setText(f"")
             self.l9.setText(f"")
             return
         try:
             self.get_a_b()
         except Exception as e:
-            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.2")
+            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.")
             self.l8.setText(f"")
             self.l9.setText(f"")
             return
@@ -290,7 +290,7 @@ class ObliczCzeb(QDialog):
             return rownanie_matematyczne, x_sym_sorted
 
         except Exception as e:
-            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji. 1")
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
             self.l8.setText(f"")
             self.l9.setText(f"")
             return e
@@ -299,7 +299,7 @@ class ObliczCzeb(QDialog):
         try:
             rownanie_matematyczne, x_sym_sorted = self.converter()
         except Exception as e:
-            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
             self.l8.setText(f"")
             self.l9.setText(f"")
 
@@ -313,7 +313,7 @@ class ObliczCzeb(QDialog):
             self.l9.setText(f"")
             return
         except Exception as e:
-            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.4")
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
             self.l8.setText(f"")
             self.l9.setText(f"")
 
@@ -423,7 +423,7 @@ class ObliczCzeb(QDialog):
         if zera:
             for i in zera:
                 if i == a or i == b or a <= i <= b:
-                    self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b. 1")
+                    self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
                     self.l8.setText(f"")
                     self.l9.setText(f"")
                     return

@@ -301,7 +301,7 @@ class ObliczMonte(QDialog):
             self.f(1)
             self.l7.setText("")
         except Exception as e:
-            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.1")
+            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.")
             self.l6l.setText(f"")
             self.l8.setText(f"")
             self.l8l.setText(f"")
@@ -311,7 +311,7 @@ class ObliczMonte(QDialog):
         try:
             self.get_a_b()
         except Exception as e:
-            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.2")
+            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.")
             self.l6l.setText(f"")
             self.l8.setText(f"")
             self.l8l.setText(f"")
@@ -335,7 +335,7 @@ class ObliczMonte(QDialog):
             return rownanie_matematyczne, x_sym_sorted
 
         except Exception as e:
-            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji. 1")
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
             self.l6l.setText(f"")
             self.l8.setText(f"")
             self.l8l.setText(f"")
@@ -347,7 +347,7 @@ class ObliczMonte(QDialog):
         try:
             rownanie_matematyczne, x_sym_sorted = self.converter()
         except Exception as e:
-            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
             self.l6l.setText(f"")
             self.l8.setText(f"")
             self.l8l.setText(f"")
@@ -366,7 +366,7 @@ class ObliczMonte(QDialog):
             self.l8l.setText(f"")
             return
         except Exception as e:
-            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.4")
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
             self.l6l.setText(f"")
             self.l8.setText(f"")
             self.l8l.setText(f"")
@@ -405,14 +405,10 @@ class ObliczMonte(QDialog):
     def monte_carlo(self, n, a, b):
         try:
             num_on_under, num_above = self.ilosc_punktow()
-            start_time = timeit.default_timer()
 
             h = self.f(self.maximum) - self.f(self.minimum)
             A = h * (b - a)
             wynik = A * (num_on_under / n)
-
-            end_time = timeit.default_timer()
-            time = end_time - start_time
 
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
@@ -424,7 +420,6 @@ class ObliczMonte(QDialog):
                 return None
             else:
                 self.l6.setText(f"Wynik dla hit or miss: {wynik}")
-                self.l8.setText(f"Czas potrzebny do obliczenia h.o.m: {time}")
                 return wynik
 
         except Exception as e:
@@ -438,14 +433,10 @@ class ObliczMonte(QDialog):
 
     def monte_carlo_2(self, n, a, b, ar_x):
         try:
-            start_time = timeit.default_timer()
             calka = 0.0
             for i in ar_x:
                 calka += self.f(i)
             wynik = (b - a) / float(n) * calka
-
-            end_time = timeit.default_timer()
-            time = end_time - start_time
 
             if math.isnan(wynik):
                 self.l6.setText("Error: Podana została zła funkcja lub jej przedziały.")
@@ -457,7 +448,6 @@ class ObliczMonte(QDialog):
                 return None
             else:
                 self.l6l.setText(f"Wynik dla średniej wartości: {wynik}")
-                self.l8l.setText(f"Czas potrzebny do obliczenia ś.w: {time}")
                 return wynik
 
         except Exception as e:
@@ -528,10 +518,13 @@ class ObliczMonte(QDialog):
             self.l8l.setText(f"")
             return
         try:
+            start_time_rand = timeit.default_timer()
             self.maximum, self.minimum = self.min_max(a, b)
             self.ar_x, self.ar_y = self.punkty(n, a, b)
+            end_time_rand = timeit.default_timer()
+            time_rand = end_time_rand - start_time_rand
         except Exception as e:
-            self.l6.setText("Error: Nieprawidłowe dane wejściowe.")
+            self.l6.setText("Error: Problem z wygenerowaniem punktów.")
             self.l6l.setText(f"")
             self.l8.setText(f"")
             self.l8l.setText(f"")
@@ -553,7 +546,7 @@ class ObliczMonte(QDialog):
         if zera:
             for i in zera:
                 if i == a or i == b or a <= i <= b:
-                    self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b. 1")
+                    self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
                     self.l6l.setText(f"")
                     self.l8.setText(f"")
                     self.l8l.setText(f"")
@@ -562,14 +555,24 @@ class ObliczMonte(QDialog):
                     return
 
         try:
-
+            start_time = timeit.default_timer()
             result_monte = self.monte_carlo(n, a, b)
+            end_time = timeit.default_timer()
+            time = end_time - start_time + time_rand
+            self.l8.setText(f"Czas potrzebny do obliczenia h.o.m: {time}")
+
             if result_monte is None:
                 self.l6.setText("Error: Problem z obliczeniem wartości.")
                 self.l8.setText(f"")
                 self.l9.setText(f"")
                 return
+
+            start_time2 = timeit.default_timer()
             result_monte2 = self.monte_carlo_2(n, a, b, self.ar_x)
+            end_time2 = timeit.default_timer()
+            time2 = end_time2 - start_time2 + time_rand
+            self.l8l.setText(f"Czas potrzebny do obliczenia ś.w: {time2}")
+
             if result_monte2 is None:
                 self.l6l.setText("Error: Problem z obliczeniem wartości.")
                 self.l8l.setText(f"")

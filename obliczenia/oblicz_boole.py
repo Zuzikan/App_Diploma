@@ -272,7 +272,7 @@ class ObliczBoole(QDialog):
             self.f(1)
             self.l7.setText("")
         except Exception as e:
-            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.1")
+            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.")
             self.l6p.setText(f"")
             self.l8.setText(f"")
             self.l8p.setText(f"")
@@ -282,7 +282,7 @@ class ObliczBoole(QDialog):
         try:
             self.get_a_b()
         except Exception as e:
-            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.2")
+            self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.")
             self.l6p.setText(f"")
             self.l8.setText(f"")
             self.l8p.setText(f"")
@@ -306,7 +306,7 @@ class ObliczBoole(QDialog):
             return rownanie_matematyczne, x_sym_sorted
 
         except Exception as e:
-            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji. 1")
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
             self.l6l.setText(f"")
             self.l8.setText(f"")
             self.l8l.setText(f"")
@@ -318,7 +318,7 @@ class ObliczBoole(QDialog):
         try:
             rownanie_matematyczne, x_sym_sorted = self.converter()
         except Exception as e:
-            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
             self.l6p.setText(f"")
             self.l8.setText(f"")
             self.l8p.setText(f"")
@@ -335,7 +335,7 @@ class ObliczBoole(QDialog):
             self.l9.setText(f"")
             return
         except Exception as e:
-            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.4")
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
             self.l8.setText(f"")
             self.l9.setText(f"")
 
@@ -381,7 +381,7 @@ class ObliczBoole(QDialog):
                 return wynik
 
         except Exception as e:
-            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.9")
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
             self.l6p.setText(f"")
             self.l8.setText(f"")
             self.l8p.setText(f"")
@@ -418,7 +418,7 @@ class ObliczBoole(QDialog):
                 return wynik
 
         except Exception as e:
-            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji. 0")
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
             self.l6p.setText(f"")
             self.l8.setText(f"")
             self.l8p.setText(f"")
@@ -497,7 +497,7 @@ class ObliczBoole(QDialog):
         if zera:
             for i in zera:
                 if i == a or i == b or a <= i <= b:
-                    self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b. 1")
+                    self.l6.setText("Error: Nieprawidłowe dane wejściowe dla a lub b.")
                     self.l6p.setText(f"")
                     self.l8.setText(f"")
                     self.l8p.setText(f"")

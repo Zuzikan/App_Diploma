@@ -358,7 +358,7 @@ class Oblicz(QDialog):
         try:
             self.get_a_b()
         except Exception as e:
-            self.errory.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.2")
+            self.errory.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.")
             self.l6.setText(f"")
             self.l6l.setText(f"")
             self.l6r.setText(f" ")
@@ -391,7 +391,7 @@ class Oblicz(QDialog):
             return rownanie_matematyczne, x_sym_sorted
 
         except Exception as e:
-            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji. 1")
+            self.l6.setText(f"Error: Problem z obliczeniem wartości funkcji.")
             self.l6.setText(f"")
             self.l6l.setText(f"")
             self.l6r.setText(f" ")
@@ -408,10 +408,10 @@ class Oblicz(QDialog):
         try:
             rownanie_matematyczne, x_sym_sorted = self.converter()
         except Exception as e:
-            self.errory.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.3")
+            self.errory.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
             self.l6.setText(f"")
             self.l6l.setText(f"")
-            self.l6r.setText(f" ")
+            self.l6r.setText(f"")
             self.l8.setText(f"")
             self.l8l.setText(f"")
             self.l8r.setText(f"")
@@ -436,7 +436,7 @@ class Oblicz(QDialog):
             self.l9r.setText(f"")
             return
         except Exception as e:
-            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.4")
+            self.l6.setText("Error: Podana została zła funkcja. Sprawdź wpisane dane.")
             self.errory.setText("")
             self.l6l.setText(f"")
             self.l6r.setText(f" ")
@@ -516,7 +516,7 @@ class Oblicz(QDialog):
             time = end_time - start_time
 
             if math.isnan(wynik):
-                self.errory.setText("Error: Podana została zła funkcja lub jej przedziały.2")
+                self.errory.setText("Error: Podana została zła funkcja lub jej przedziały.")
                 self.l6.setText("")
                 self.l6l.setText(f"")
                 self.l6r.setText(f" ")
@@ -560,7 +560,7 @@ class Oblicz(QDialog):
             time = end_time - start_time
 
             if math.isnan(wynik):
-                self.errory.setText("Error: Podana została zła funkcja lub jej przedziały.3")
+                self.errory.setText("Error: Podana została zła funkcja lub jej przedziały.")
                 self.l6.setText("")
                 self.l6l.setText(f"")
                 self.l6r.setText(f" ")
