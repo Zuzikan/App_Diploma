@@ -60,5 +60,3 @@ class WykresSimp(QWidget):
     @staticmethod
     def f_2(x):
         return -0.19773791977030136*x**2 + 1.0624833374872868*x + 0.3084313701293318
-
-

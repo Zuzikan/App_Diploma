@@ -14,6 +14,7 @@ from matplotlib.figure import Figure
 import PyQt5.QtGui as qtg
 import instrukcja
 from metody import metoda_czeb
+sys.path.append('obliczenia')
 from obliczenia import (oblicz_boole, oblicz_herm, oblicz_monte, oblicz_monte2D, oblicz_regula_3_8,
                         oblicz_metoda_prostokatow, oblicz_nieoznaczone, oblicz_simpson, oblicz_trapez)
 
@@ -86,10 +87,10 @@ class ObliczCzeb(QDialog):
         self.l9 = QLabel(self)
         self.slider = QSlider(Qt.Horizontal, self)
         self.slider.setMinimum(1)
-        self.slider.setMaximum(50)
+        self.slider.setMaximum(100)
         self.slider.setValue(1)
         start = QLabel('1')
-        end = QLabel('50')
+        end = QLabel('100')
         oblicz = QPushButton('Oblicz', self)
         self.wartosc = QLabel("Ilość n: 1", self)
         self.figure = Figure()

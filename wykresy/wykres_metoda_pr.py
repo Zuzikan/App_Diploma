@@ -178,7 +178,6 @@ class WykresKwadraty(QWidget):
                              alpha=0.5)
             ax.add_patch(rect)
 
-
         ax.text(2, self.f(2), 'a=x1', fontsize=10, ha='right', va='bottom')
         ax.text(3, self.f(3), 'x2', fontsize=10, ha='right', va='bottom')
         ax.text(4, self.f(4), 'x3', fontsize=10, ha='right', va='bottom')

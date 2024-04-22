@@ -5,6 +5,7 @@ from matplotlib.figure import Figure
 from scipy.interpolate import CubicSpline
 import PyQt5.QtGui as qtg
 
+
 class WykresRegula38(QWidget):
     def __init__(self):
         super().__init__()
@@ -62,5 +63,3 @@ class WykresRegula38(QWidget):
     @staticmethod
     def f_2(x):
         return np.sin(x + np.pi / 4) + 1.5
-
-

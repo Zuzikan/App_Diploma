@@ -37,7 +37,7 @@ class WykresMC2WS(QWidget):
         self.create_plot(0, 5)
 
         self.setLayout(layout)
-        self.setWindowTitle("Metoda Monte Carlo 2D wartości średniej")
+        self.setWindowTitle("Metoda Monte Carlo 2D średniej wartości")
 
     def create_plot(self, a, b):
         self.figure.clear()
@@ -106,7 +106,8 @@ class WykresMC2HOM(QWidget):
         f_values = np.array([self.fxy(x, y) for x, y in zip(ar_x, ar_y)])
 
         #Sprawdza punkty znajdujące się na, pod lub nad wykresem
-        points_on_curve = np.abs(f_values - ar_z)
+        threshold = 0.1
+        points_on_curve = np.abs(f_values - ar_z) < threshold
         points_under_curve = ar_z < f_values
         points_above_curve = ar_z > f_values
 
@@ -247,7 +248,7 @@ class WykresMC1HOM(QWidget):
 
 def main():
     app = QApplication(sys.argv)
-    ex = WykresMC1WS()
+    ex = WykresMC2HOM()
     ex.show()
     sys.exit(app.exec_())
 

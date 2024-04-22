@@ -1,12 +1,16 @@
 import sys
+import os
 import PyQt5.QtWidgets as qtw
 import PyQt5.QtCore as qtc
 import PyQt5.QtGui as qtg
-sys.path.append('wykresy')
+
 sys.path.append('metody')
-sys.path.append('obliczenia')
 from metody import (metoda_czeb, metoda_herm, metoda_monte, metoda_pr, metoda_tr, metoda_simp, nieoznaczone,
                     regula_3_8, metoda_boolea)
+
+sys.path.append('wykresy')
+sys.path.append('obliczenia')
+sys.path.append('zdjecia')
 
 
 class MainWindow(qtw.QDialog):

@@ -3,7 +3,7 @@ import PyQt5.QtGui as qtg
 import PyQt5.QtCore as qtc
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtWidgets import (QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy, QDialog, QApplication)
-import nieoznaczone_metody
+from metody import nieoznaczone_metody
 from wykresy import wykres_nieozn
 from obliczenia import oblicz_nieoznaczone
 
@@ -123,27 +123,29 @@ class Nieoznaczone(QDialog):
         self.w.show()
 
     def podstawienie(self):
-        self.w = nieoznaczone_metody.Podstawienie()
-        self.w.show()
-
-    def czesci(self):
-        self.w1 = nieoznaczone_metody.Czesci()
+        self.w1 = nieoznaczone_metody.Podstawienie()
         self.w1.show()
 
-    def rozklad(self):
-        self.w2 = nieoznaczone_metody.Rozklad()
+    def czesci(self):
+        self.w2 = nieoznaczone_metody.Czesci()
         self.w2.show()
+
+    def rozklad(self):
+        self.w3 = nieoznaczone_metody.Rozklad()
+        self.w3.show()
 
     def open_oblicz(self):
         if hasattr(self, 'w') and self.w.isVisible():
             self.w.close()
         if hasattr(self, 'w1') and self.w1.isVisible():
             self.w1.close()
-        if hasattr(self, 'w2') and self.w.isVisible():
+        if hasattr(self, 'w2') and self.w2.isVisible():
             self.w2.close()
+        if hasattr(self, 'w3') and self.w3.isVisible():
+            self.w3.close()
 
-        self.w3 = oblicz_nieoznaczone.ObliczNieoznaczona()
-        self.w3.show()
+        self.w4 = oblicz_nieoznaczone.ObliczNieoznaczona()
+        self.w4.show()
         self.close()
 
 

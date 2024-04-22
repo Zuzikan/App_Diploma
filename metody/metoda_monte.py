@@ -156,9 +156,9 @@ class MetodaMonte(QDialog):
             self.w.close()
         if hasattr(self, 'w1') and self.w1.isVisible():
             self.w1.close()
-        if hasattr(self, 'w2') and self.w.isVisible():
+        if hasattr(self, 'w2') and self.w2.isVisible():
             self.w2.close()
-        if hasattr(self, 'w3') and self.w1.isVisible():
+        if hasattr(self, 'w3') and self.w3.isVisible():
             self.w3.close()
         self.w4 = oblicz_monte.ObliczMonte()
         self.w4.show()

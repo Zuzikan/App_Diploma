@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QApplication
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from numpy.polynomial.hermite import hermgauss
-from scipy.special import roots_chebyt
 
 
 class WykresHerm(QWidget):

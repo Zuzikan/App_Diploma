@@ -113,10 +113,10 @@ class Oblicz(QDialog):
         self.errory = QLabel(self)
         self.slider = QSlider(Qt.Horizontal, self)
         self.slider.setMinimum(1)
-        self.slider.setMaximum(50)
+        self.slider.setMaximum(100)
         self.slider.setValue(1)
         start = QLabel('1')
-        end = QLabel('50')
+        end = QLabel('100')
         oblicz = QPushButton('Oblicz', self)
         self.wartosc = QLabel("Ilość n: 1", self)
         self.figure1 = Figure()
@@ -264,16 +264,16 @@ class Oblicz(QDialog):
         setFontForLayout(layout, self.font)
         self.setWindowTitle('Obliczenia metoda prostokątów')
 
+    # Metoda połączona z przyciskiem 'Instrukcja', aby otworzyć instrukcję
+    def open_inst(self):
+        self.wi = instrukcja.Instrukcja()
+        self.wi.show()
+
     # Metoda połączona z przyciskiem 'Powrót', aby wrócić do ekranu teoretycznego metody
     def wroc(self):
         self.w = metoda_pr.MetodaPr()
         self.w.show()
         self.close()
-
-    # Metoda połączona z przyciskiem 'Instrukcja', aby otworzyć instrukcję
-    def open_inst(self):
-        self.wi = instrukcja.Instrukcja()
-        self.wi.show()
 
     # Metoda połączona z combobox'em, aby otworyć dodatkowe okno obliczeniowe w celu porównania metod
     def porownaj(self, index):

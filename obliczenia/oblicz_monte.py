@@ -524,7 +524,7 @@ class ObliczMonte(QDialog):
             end_time_rand = timeit.default_timer()
             time_rand = end_time_rand - start_time_rand
         except Exception as e:
-            self.l6.setText("Error: Problem z wygenerowaniem punktów.")
+            self.l6.setText("Error: Problem z wygenerowaniem punktów. Sprawdź podaną funkcję.")
             self.l6l.setText(f"")
             self.l8.setText(f"")
             self.l8l.setText(f"")

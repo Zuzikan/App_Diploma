@@ -7,9 +7,8 @@ from matplotlib.figure import Figure
 import PyQt5.QtGui as qtg
 
 
-
 def fc(x):
-    return (x**3)/3
+    return (x ** 3) / 3
 
 
 class WykresNieo(QWidget):
@@ -40,7 +39,7 @@ class WykresNieo(QWidget):
         y_fine_integral = fc(x)
 
         ax.plot(x, y, 'b-', linewidth=1, label="x²")
-        ax.plot(x, y_fine_integral, color="orange", linestyle='--', linewidth=1, label = "x³/3+C")
+        ax.plot(x, y_fine_integral, color="orange", linestyle='--', linewidth=1, label="x³/3+C")
         ax.set_xlabel('x')
         ax.set_ylabel('y')
         ax.grid(True, alpha=0.2)

@@ -182,7 +182,6 @@ class ObliczNieoznaczona(QDialog):
     def check_errors(self):
         try:
             self.f(1)
-            self.l7.setText("")
         except Exception as e:
             self.l6.setText(f"Error: Nieprawidłowe równanie. Sprawdź wpisane dane.")
             self.l8.setText(f"")
